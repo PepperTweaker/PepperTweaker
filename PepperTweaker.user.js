@@ -89,33 +89,6 @@
         return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
     };
 
-    /*** START Load Configuration from Local Storage ***/
-    const pepperTweakerConfig = {};
-
-    try {
-        pepperTweakerConfig.pluginEnabled = JSON.parse(localStorage.getItem('PepperTweaker.config.pluginEnabled'));
-        pepperTweakerConfig.darkThemeEnabled = JSON.parse(localStorage.getItem('PepperTweaker.config.darkThemeEnabled'));
-        pepperTweakerConfig.repairLinksEnabled = JSON.parse(localStorage.getItem('PepperTweaker.config.repairLinksEnabled'));
-        pepperTweakerConfig.dealsFilters = JSON.parse(localStorage.getItem('PepperTweaker.config.dealsFilters'), JSONRegExpReviver);
-        pepperTweakerConfig.commentsFilters = JSON.parse(localStorage.getItem('PepperTweaker.config.commentsFilters'), JSONRegExpReviver);
-    } catch (error) {
-        console.error(`${error.message}: Cannot parse some configuration variables (wrong JSON). Using defaults instead...`);
-        console.error(`pluginEnabled: ${localStorage.getItem('PepperTweaker.config.pluginEnabled')}`);
-        console.error(`darkThemeEnabled: ${localStorage.getItem('PepperTweaker.config.darkThemeEnabled')}`);
-        console.error(`repairLinksEnabled: ${localStorage.getItem('PepperTweaker.config.repairLinksEnabled')}`);
-        console.error(`dealsFilters: ${localStorage.getItem('PepperTweaker.config.dealsFilters')}`);
-        console.error(`commentsFilters: ${localStorage.getItem('PepperTweaker.config.commentsFilters')}`);
-        /* Backup Current Values */
-        if (backupConfigOnFailureLoad) {
-            console.error('Saving old configuration variables to local storage...');
-            localStorage.setItem('PepperTweaker.config.dealsFilters-backup', localStorage.getItem('PepperTweaker.config.dealsFilters'));
-            localStorage.setItem('PepperTweaker.config.commentsFilters-backup', localStorage.getItem('PepperTweaker.config.commentsFilters'));
-            console.error('Varaibles saved, loading defaults...');
-        }
-        resetConfig();
-    }
-    /*** END Load configuration ***/
-
     /*** START Configuration Functions ***/
     const setConfig = (configuration = { pluginEnabled, darkThemeEnabled, repairLinksEnabled, dealsFilters, commentsFilters }, reload = false) => {
         if ((configuration.pluginEnabled !== undefined) && isBoolean(configuration.pluginEnabled)) {
@@ -143,24 +116,24 @@
         }
     };
 
-    const resetConfig = (resetConfiguration = { resetPluginEnabled : true, resetDarkThemeEnabled : true, resetRepairLinksEnabled: true, resetDealsFilters : true, resetCommentsFilters : true }) => {
+    const resetConfig = (resetConfiguration = { resetPluginEnabled : true, resetDarkThemeEnabled : true, resetRepairLinksEnabled: true, resetDealsFilters : true, resetCommentsFilters : true }, reload = true) => {
         const setConfigObject = {};
-        if (resetConfiguration.resetPluginEnabled === true) {
+        if (!resetConfiguration || resetConfiguration.resetPluginEnabled === true) {
             setConfigObject.pluginEnabled = defaultConfigPluginEnabled;
         }
-        if (resetConfiguration.resetDarkThemeEnabled === true) {
+        if (!resetConfiguration || resetConfiguration.resetDarkThemeEnabled === true) {
             setConfigObject.darkThemeEnabled = defaultConfigDarkThemeEnabled;
         }
-        if (resetConfiguration.resetRepairLinksEnabled === true) {
+        if (!resetConfiguration || resetConfiguration.resetRepairLinksEnabled === true) {
             setConfigObject.repairLinksEnabled = defaultConfigRepairLinksEnabled;
         }
-        if (resetConfiguration.resetDealsFilters === true) {
+        if (!resetConfiguration || resetConfiguration.resetDealsFilters === true) {
             setConfigObject.dealsFilters = defaultConfigDealsFilters;
         }
-        if (resetConfiguration.resetCommentsFilters === true) {
+        if (!resetConfiguration || resetConfiguration.resetCommentsFilters === true) {
             setConfigObject.commentsFilters = defaultConfigCommentsFilters;
         }
-        setConfig(setConfigObject, true);
+        setConfig(setConfigObject, reload);
     };
     // resetConfig();
 
@@ -206,6 +179,40 @@
         fileInput.click();
     };
     /*** END Configuration Functions ***/
+
+    /*** START Load Configuration from Local Storage ***/
+    const pepperTweakerConfig = {};
+    let configLoaded = false;
+
+    if (localStorage.getItem('PepperTweaker.config.pluginEnabled') !== null) {
+        try {
+            pepperTweakerConfig.pluginEnabled = JSON.parse(localStorage.getItem('PepperTweaker.config.pluginEnabled'));
+            pepperTweakerConfig.darkThemeEnabled = JSON.parse(localStorage.getItem('PepperTweaker.config.darkThemeEnabled'));
+            pepperTweakerConfig.repairLinksEnabled = JSON.parse(localStorage.getItem('PepperTweaker.config.repairLinksEnabled'));
+            pepperTweakerConfig.dealsFilters = JSON.parse(localStorage.getItem('PepperTweaker.config.dealsFilters'), JSONRegExpReviver);
+            pepperTweakerConfig.commentsFilters = JSON.parse(localStorage.getItem('PepperTweaker.config.commentsFilters'), JSONRegExpReviver);
+            configLoaded = true;
+        } catch (error) {
+            console.error(`${error.message}: Cannot parse some configuration variables (wrong JSON). Using defaults instead...`);
+            console.error(`pluginEnabled: ${localStorage.getItem('PepperTweaker.config.pluginEnabled')}`);
+            console.error(`darkThemeEnabled: ${localStorage.getItem('PepperTweaker.config.darkThemeEnabled')}`);
+            console.error(`repairLinksEnabled: ${localStorage.getItem('PepperTweaker.config.repairLinksEnabled')}`);
+            console.error(`dealsFilters: ${localStorage.getItem('PepperTweaker.config.dealsFilters')}`);
+            console.error(`commentsFilters: ${localStorage.getItem('PepperTweaker.config.commentsFilters')}`);
+            /* Backup Current Values */
+            if (backupConfigOnFailureLoad) {
+                console.error('Saving old configuration variables to local storage...');
+                localStorage.setItem('PepperTweaker.config.dealsFilters-backup', localStorage.getItem('PepperTweaker.config.dealsFilters'));
+                localStorage.setItem('PepperTweaker.config.commentsFilters-backup', localStorage.getItem('PepperTweaker.config.commentsFilters'));
+                console.error('Varaibles saved, loading defaults...');
+            }
+        }
+    }
+
+    if (!configLoaded) {
+        resetConfig(null, false);
+    }
+    /*** END Load configuration ***/
 
     if (pepperTweakerConfig.pluginEnabled) {
 
