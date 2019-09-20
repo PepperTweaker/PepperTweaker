@@ -1362,7 +1362,7 @@
         }
 
         /* Add Profile Info */
-        const profileLinks = document.querySelectorAll('article a[href*="/profile/"]');
+        const profileLinks = document.querySelectorAll('.cept-thread-main a[href*="/profile/"], .comment-header a[href*="/profile/"]');
         for (const profileLink of profileLinks) {
             if (profileLink && profileLink.href) {
                 fetch(profileLink.href)
