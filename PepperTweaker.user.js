@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.2
+// @version      0.9.3
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -1304,6 +1304,26 @@
     }
     /*** END Settings Page ***/
 
+    /*** START Search Page ***/
+    if ((location.pathname.indexOf('/search') >= 0) && (location.search.indexOf('q=') >= 0)) {
+        const searchSubheadline = document.querySelector('h1.cept-nav-subheadline');
+        if (searchSubheadline) {
+            const searchQuery = searchSubheadline.textContent.replace(/Szukaj |"/gi, '');
+            const searchGoogleLink = document.createElement('A');
+            searchGoogleLink.href = `https://www.google.pl/search?q=site%3A${location.host.replace('www.', '')}+${searchQuery}`;
+            searchGoogleLink.target = '_blank';
+            searchGoogleLink.appendChild(document.createTextNode('Szukaj w Google'));
+            searchGoogleLink.classList.add('space--mr-3', 'subNavMenu-btn',);
+            const wrapper = document.createElement('DIV');
+            wrapper.classList.add('subNavMenu', 'subNavMenu--menu', 'tGrid-cell', 'vAlign--all-m', 'subNav-item');
+            wrapper.appendChild(searchGoogleLink);
+            const subNavMenu = document.querySelector('.subNavMenu--menu');
+            subNavMenu.parentNode.insertBefore(wrapper, subNavMenu);
+        }
+        return;
+    }
+    /*** END Search Page ***/
+
     /*** START Deal Details Page ***/
     if (pepperTweakerConfig.pluginEnabled && location.pathname.match(/promocje|kupony|dyskusji|feedback/)) {
 
@@ -1410,6 +1430,7 @@
     if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/\?page=|search\?|gor%C4%85ce|nowe|grupa|om%C3%B3wione|profile/))) {
 
         const checkFilters = (filters, deal) => {
+            let resultStyle = {};
             for (const filter of filters) {
                 //if (Object.keys(filter).length === 0) { continue; }  // if the filter is empty => continue (otherwise empty filter will remove all elements!)
                 if ((filter.active === false) || !filter.keyword && !filter.merchant && !filter.user && !filter.groups && !(filter.local === true) && !filter.priceBelow && !filter.priceAbove && !filter.discountBelow && !filter.discountAbove) {
@@ -1425,15 +1446,17 @@
                     && (!filter.priceAbove || (deal.price && deal.price > filter.priceAbove))
                     && (!filter.discountBelow || (deal.discount && deal.discount < filter.discountBelow))
                     && (!filter.discountAbove || (deal.discount && deal.discount > filter.discountAbove))) {
-                    return (filter.style ? filter.style : true);  // matching filter was found => stop checking next filters
+                    // return (filter.style ? filter.style : true);  // matching filter was found => stop checking next filters
+                    Object.assign(resultStyle, filter.style);
                 }
             }
-            return false;  // no matching filters
+            // return false;  // no matching filters
+            return resultStyle;
         };
 
         const checkFiltersAndApplyStyle = (element, deal) => {
-            let styleToApply;
-            if (styleToApply = checkFilters(pepperTweakerConfig.dealsFilters, deal)) {
+            const styleToApply = checkFilters(pepperTweakerConfig.dealsFilters, deal);
+            if (Object.keys(styleToApply).length > 0) {
                 if ((styleToApply.display === 'none') && element.classList.contains('thread--type-card')) {
                     element.parentNode.style.display = 'none';
                 } else {
@@ -1446,7 +1469,7 @@
             if ((element.nodeName === 'DIV') && element.classList.contains('threadCardLayout--card')) {
                 element = element.querySelector('article[id^="thread"]');
             }
-            if ((element.nodeName === 'ARTICLE') && element.classList.contains('thread--deal')) {
+            if ((element.nodeName === 'ARTICLE') && (element.id.indexOf('thread') === 0)) {
 
                 let title = element.querySelector('.cept-tt');
                 title = title && title.textContent;
