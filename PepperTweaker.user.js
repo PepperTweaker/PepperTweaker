@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.1
+// @version      0.9.2
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -1434,16 +1434,19 @@
         const checkFiltersAndApplyStyle = (element, deal) => {
             let styleToApply;
             if (styleToApply = checkFilters(pepperTweakerConfig.dealsFilters, deal)) {
-                if (styleToApply.display === 'none') {
-                    element.style.display = 'none';
+                if ((styleToApply.display === 'none') && element.classList.contains('thread--type-card')) {
+                    element.parentNode.style.display = 'none';
                 } else {
-                    Object.assign(element.querySelector('article').style, styleToApply);
+                    Object.assign(element.style, styleToApply);
                 }
             }
         };
 
         const processElement = (element, deepSearch = false) => {
-            if ((element.nodeName == 'DIV') && (element.classList.contains('threadCardLayout--card'))) {
+            if ((element.nodeName === 'DIV') && element.classList.contains('threadCardLayout--card')) {
+                element = element.querySelector('article[id^="thread"]');
+            }
+            if ((element.nodeName === 'ARTICLE') && element.classList.contains('thread--deal')) {
 
                 let title = element.querySelector('.cept-tt');
                 title = title && title.textContent;
@@ -1492,19 +1495,20 @@
             }
         }
 
-        const gridLayoutSection = document.querySelector('section.gridLayout') || document.querySelector('div.gridLayout');  // cannot combine as one selector => div.gridLayout appears before section.gridLayout on the main page
+        const dealsSection = document.querySelector('section.gridLayout') || document.querySelector('div.gridLayout') || document.querySelector('section.listLayout .js-threadList')  || document.querySelector('div.listLayout');
+        // cannot combine as one selector => div.gridLayout appears before section.gridLayout on the main page
 
-        if (gridLayoutSection) {
+        if (dealsSection) {
 
-            const deepSearch = pepperTweakerConfig.dealsFilters.findIndex(filter => filter.groups || filter.local) >= 0;
+            const deepSearch = pepperTweakerConfig.dealsFilters.findIndex(filter => (filter.active !== false) && (filter.groups || (filter.local === true))) >= 0;
 
             /* Process already visible elements */
-            for (let childNode of gridLayoutSection.childNodes) {
+            for (let childNode of dealsSection.childNodes) {
                 processElement(childNode, deepSearch);
             }
 
             /* Set the observer to process elements on addition */
-            const gridLayoutObserver = new MutationObserver(function(allMutations, observer){
+            const gridLayoutObserver = new MutationObserver(function(allMutations, observer) {
                 allMutations.every(function(mutation){
                     for (const addedNode of mutation.addedNodes) {
                         processElement(addedNode, deepSearch);
@@ -1512,7 +1516,7 @@
                     return false;
                 });
             });
-            gridLayoutObserver.observe(gridLayoutSection, { childList: true });
+            gridLayoutObserver.observe(dealsSection, { childList: true });
         }
     }
     /*** END Deals Filtering ***/
