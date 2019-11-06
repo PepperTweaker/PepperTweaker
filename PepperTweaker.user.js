@@ -18,7 +18,7 @@
 
     /*** Dark Theme Style ***/
     // if (pepperTweakerConfig.pluginEnabled && pepperTweakerConfig.darkThemeEnabled) {
-    if (localStorage.getItem('PepperTweaker.config.pluginEnabled') && localStorage.getItem('PepperTweaker.config.darkThemeEnabled')) {
+    if ((JSON.parse(localStorage.getItem('PepperTweaker.config.pluginEnabled')) === true) && (JSON.parse(localStorage.getItem('PepperTweaker.config.darkThemeEnabled')) === true)) {
 
         // const invertColor = color => '#' + (Number(`0x1${ color.replace('#', '') }`) ^ 0xFFFFFF).toString(16).substr(1);
         const darkBorderColor = '#121212';
