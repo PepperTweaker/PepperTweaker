@@ -2183,7 +2183,7 @@
                 if ((element.nodeName === 'DIV') && element.classList.contains('threadCardLayout--card')) {
                     element = element.querySelector('article[id^="thread"]');
                 }
-                if ((element.nodeName === 'ARTICLE') && (element.id.indexOf('thread') === 0)) {
+                if (element && (element.nodeName === 'ARTICLE') && element.id && (element.id.indexOf('thread') === 0)) {
 
                     let title = element.querySelector('.cept-tt');
                     title = title && title.textContent;
