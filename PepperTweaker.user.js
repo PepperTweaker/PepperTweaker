@@ -1024,7 +1024,7 @@
                                 addLikeButtonsToBestCommentsCheckbox: {
                                     create: createLabeledCheckbox,
                                     params: {
-                                        label: 'Dodaj przyciski "Like" do najlepszych komentarzy',
+                                        label: 'Dodaj przyciski "Lubię to" do najlepszych komentarzy',
                                         id: 'add-like-buttons-to-best-comments',
                                         checked: pepperTweakerConfig.improvements.addLikeButtonsToBestComments,
                                         callback: event => setConfig({ improvements: { addLikeButtonsToBestComments: event.target.checked } }, false),
@@ -1724,7 +1724,7 @@
                         .catch(error => {
                             console.error(`${this.constructor.name}: ${error}`);
                             if (this.errorCallback instanceof Function) {
-                                this.errorCallback(this);
+                                this.errorCallback(this, error);
                             }
                         });
                 }, 10 * 1000);
@@ -2111,12 +2111,12 @@
                         insertNewComments(observer);
                     }
                 }),
-                errorCallback: observer => {
-                    if (confirm(`Wystąpił błąd podczas pobierania strony (status: ${observer.responseStatus}).\nCzy przerwać obserwowanie?`)) {
-                        observer.disconnect();
-                        autoUpdateCheckbox.querySelector('input').checked = false;
-                    }
-                },
+                // errorCallback: observer => {
+                //     if (confirm(`Wystąpił błąd podczas pobierania strony (status: ${observer.responseStatus}).\nCzy przerwać obserwowanie?`)) {
+                //         observer.disconnect();
+                //         autoUpdateCheckbox.querySelector('input').checked = false;
+                //     }
+                // },
             });
 
             const autoUpdateCheckbox = createLabeledCheckbox({ label: 'Obserwuj', callback: event => {
@@ -2362,14 +2362,14 @@
                             insertNewDeals(observer);
                         }
                     }),
-                    errorCallback: observer => {
-                        if (observer.responseStatus !== 200) {
-                            if (confirm(`Wystąpił błąd podczas pobierania strony (status: ${observer.responseStatus}).\nCzy przerwać obserwowanie?`)) {
-                                observer.disconnect();
-                                autoUpdateCheckbox.querySelector('input').checked = false;
-                            }
-                        }
-                    },
+                    // errorCallback: observer => {
+                    //     if (observer.responseStatus !== 200) {
+                    //         if (confirm(`Wystąpił błąd podczas pobierania strony (status: ${observer.responseStatus}).\nCzy przerwać obserwowanie?`)) {
+                    //             observer.disconnect();
+                    //             autoUpdateCheckbox.querySelector('input').checked = false;
+                    //         }
+                    //     }
+                    // },
                 });
 
                 const autoUpdateCheckbox = createLabeledCheckbox({ label: 'Obserwuj', callback: event => {
