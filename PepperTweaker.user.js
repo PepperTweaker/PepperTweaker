@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.6
+// @version      0.9.7
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -33,7 +33,7 @@
 
         const style = document.createElement('STYLE');
         const css = `
-            .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
+            .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
                 color: ${textColor};
             }
             .speechBubble {
@@ -157,7 +157,7 @@
             .overflow--fade:after {
                 background-color: linear-gradient(90deg,hsla(0,0%,100%,0) 0,#242424 80%) !important;
             }
-            img, .badge {
+            img, .badge, .btn--mode-primary-inverted, .btn--mode-primary-inverted--no-state, .btn--mode-primary-inverted--no-state:active, .btn--mode-primary-inverted--no-state:focus, .btn--mode-primary-inverted--no-state:hover, .btn--mode-primary-inverted:active, .btn--mode-primary-inverted:focus, button:active .btn--mode-primary-inverted, button:active .btn--mode-primary-inverted--no-state, button:focus .btn--mode-primary-inverted, button:focus .btn--mode-primary-inverted--no-state, button:hover .btn--mode-primary-inverted--no-state {
                 filter: invert(5%) brightness(90%);
             }
             .thread--expired > * {
@@ -1949,6 +1949,69 @@
             };
             addProfileInfo(document);
 
+            /* Add calendar option */
+            const dateToGoogleCalendarFormat = date => date.toISOString().replace(/-|:|\.\d\d\d/g,"");
+            const extractDealDateFromString = (str, time) => {
+                if (!str) {
+                    return new Date();
+                }
+                let dateResult;
+                const dateString = str.match(/\d+\/\d+\/\d+/);  // date in a format: 15/12/2019
+                if (dateString) {
+                    const parts = dateString[0].split('/');
+                    dateResult = new Date(parts[2], parts[1] - 1, parts[0]);
+                } else if (str.match(/jutro/i)) {
+                    dateResult = new Date();
+                    dateResult.setDate(dateResult.getDate() + 1);
+                // } else if (str.match(/dzisiaj/i)) {
+                } else {
+                    dateResult = new Date();
+                }
+                if (time) {
+                    time = time.split(':');
+                    dateResult.setHours(time[0], time[1], 0);
+                }
+                return dateResult;
+            };
+            const extractDealDates = () => {
+                // const dateSpans = document.querySelectorAll('.cept-thread-content .border--color-borderGrey.bRad--a span');
+                let start = document.querySelector('.cept-thread-content .border--color-borderGrey .icon--clock.text--color-green');
+                start = extractDealDateFromString(start && start.parentNode.parentNode.textContent, '00:01');
+                let end = document.querySelector('.cept-thread-content .border--color-borderGrey .icon--hourglass');
+                end = extractDealDateFromString(end && end.parentNode.parentNode.textContent, '23:59');
+                if (start >= end) {
+                    end.setTime(start.getTime());
+                    end.setDate(start.getDate() + 1);
+                }
+                return { start, end };
+            };
+            let dealTitle = document.querySelector('.thread-title--item');
+            dealTitle = dealTitle && encodeURIComponent(dealTitle.textContent.trim());
+            let dealDescription = document.querySelector('.cept-description-container');
+            dealDescription = dealDescription && encodeURIComponent(`${location.href}<br><br>${dealDescription.innerHTML.trim()}`);
+            let dealMerchant = document.querySelector('.cept-merchant-name');
+            dealMerchant = dealMerchant && encodeURIComponent(dealMerchant.textContent.trim());
+            const dealDates = extractDealDates();
+            console.log(dealTitle, dealDescription);
+            console.log(dealDates.start, dealDates.end);
+            const commentOptionLink = document.querySelector('.thread-userOptionLink');
+            // const calendarOptionLink = repairSvgWithUseChildren(commentOptionLink.cloneNode(true));
+            const calendarOptionLink = commentOptionLink.cloneNode(true);
+            calendarOptionLink.removeAttribute('data-handler');
+            calendarOptionLink.removeAttribute('data-track');
+            calendarOptionLink.target = '_blank';
+            calendarOptionLink.href = `https://www.google.com/calendar/render?action=TEMPLATE&text=${dealTitle}&details=${dealDescription}&location=${dealMerchant}&dates=${dateToGoogleCalendarFormat(dealDates.start)}%2F${dateToGoogleCalendarFormat(dealDates.end)}`;
+            calendarOptionLink.removeChild(calendarOptionLink.lastChild);
+            calendarOptionLink.appendChild(document.createTextNode('Kalendarz'));
+            const calendarOptionImg = document.createElement('IMG');
+            calendarOptionImg.style.width = '18px';
+            calendarOptionImg.style.height = '20px';
+            calendarOptionImg.style.filter = `invert(${pepperTweakerConfig.darkThemeEnabled ? 77 : 28}%)`;
+            calendarOptionImg.classList.add('icon', 'space--mr-2');
+            calendarOptionImg.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAABmJLR0QA/wD/AP+gvaeTAAABAklEQVRIid2WPQ6CMBSAPwx6CokH8Aj+DCYeQTdu4ClcrBdxdtLFGI16FPECJi4mOFDJi4FSlDL4koYC3+vXEtI+yI8LcDK8/5VPI9atEr4BtIAlEBnguKDl8VdAaQcqJzGrbxKZeOUDYcaM2sBZQ0HWpyjJh3mz3ejkANharKiQ98RynUajDkmtIl/0PUeOGP7x09mKTL/2o0qRKe42kF+MADD9uB8CM91f2c6o7C4NyXHwzuvajl9WNBY5ewv+a9FR5ExciUaCvwFNV6KD4OeWOaVFPcE+gY4r0U6wa0tJOr48j5xvqpF+0HcgGehrBNnFSdVtAUkppEhKo6oFabn1Ajsht5QbUQgDAAAAAElFTkSuQmCC';
+            calendarOptionLink.querySelector('svg').replaceWith(calendarOptionImg);
+            commentOptionLink.parentNode.appendChild(calendarOptionLink);
+
             /* Repair Deal Details Links */  // and comment links
             if (pepperTweakerConfig.improvements.repairDealDetailsLinks) {
                 const links = document.querySelectorAll('a[title^="http"]');
@@ -2015,43 +2078,49 @@
             }
 
             /* Add Search Interface */
-            const getSelectionHTML = () => {
-                let html = '';
-                if (typeof window.getSelection !== 'undefined') {
-                    const selection = window.getSelection();
-                    if (selection.rangeCount) {
-                        const container = document.createElement('div');
-                        for (let i = 0, selectionRangeCount = selection.rangeCount; i < selectionRangeCount; i++) {
-                            container.appendChild(selection.getRangeAt(i).cloneContents());
-                        }
-                        html = container.innerHTML;
-                    }
-                } else if (typeof document.selection !== 'undefined') {  // only for IE < 9
-                    if (document.selection.type === 'Text') {
-                        html = document.selection.createRange().htmlText;
-                    }
-                }
-                return html;
-            }
-
-            const getSelectionText = () => {
-                let text = '';
-                if (typeof window.getSelection !== 'undefined') {
-                    const selection = window.getSelection();
-                    if (selection.rangeCount) {
-                        for (let i = 0, selectionRangeCount = selection.rangeCount; i < selectionRangeCount; i++) {
-                            text += selection.getRangeAt(i).toString();
-                        }
-                    }
-                } else if (typeof document.selection !== 'undefined') {  // only for IE < 9
-                    if (document.selection.type === 'Text') {
-                        text = document.selection.createRange().text;
-                    }
-                }
-                return text;
-            }
-
             if (pepperTweakerConfig.improvements.addSearchInterface && location.pathname.match(/promocje|kupony|dyskusji\//)) {
+
+                const getSelectionHTML = () => {
+                    let html = '';
+                    if (typeof window.getSelection !== 'undefined') {
+                        const selection = window.getSelection();
+                        if (selection.rangeCount) {
+                            const container = document.createElement('div');
+                            for (let i = 0, selectionRangeCount = selection.rangeCount; i < selectionRangeCount; i++) {
+                                container.appendChild(selection.getRangeAt(i).cloneContents());
+                            }
+                            html = container.innerHTML;
+                        }
+                    } else if (typeof document.selection !== 'undefined') {  // only for IE < 9
+                        if (document.selection.type === 'Text') {
+                            html = document.selection.createRange().htmlText;
+                        }
+                    }
+                    return html;
+                };
+
+                const getSelectionText = () => {
+                    let text = '';
+                    if (typeof window.getSelection !== 'undefined') {
+                        const selection = window.getSelection();
+                        if (selection.rangeCount) {
+                            for (let i = 0, selectionRangeCount = selection.rangeCount; i < selectionRangeCount; i++) {
+                                text += selection.getRangeAt(i).toString();
+                            }
+                        }
+                    } else if (typeof document.selection !== 'undefined') {  // only for IE < 9
+                        if (document.selection.type === 'Text') {
+                            text = document.selection.createRange().text;
+                        }
+                    }
+                    return text;
+                };
+
+                const getWindowSize = () => ({
+                    width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
+                    height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
+                });
+
                 // const dealTitleSpan = document.querySelector('article .thread-title--item');
                 // const dealTitleInput = createTextInput({ value: dealTitleSpan.textContent.trim() });
                 // dealTitleSpan.replaceWith(dealTitleInput);
@@ -2066,16 +2135,16 @@
                     return null;
                     // return (input.selectionStart < input.selectionEnd) ? value.substring(input.selectionStart, input.selectionEnd) : value;
                 };
-                const threadArticle = document.querySelector('article[id^="thread"]');
-                const threadArticleBoundingClientRect = threadArticle.getBoundingClientRect();
+
                 const searchButtonsWrapper = document.createElement('DIV');
                 searchButtonsWrapper.style.display = 'flex';
                 searchButtonsWrapper.style.flexDirection = 'column';
                 searchButtonsWrapper.style.position = 'fixed';
+                searchButtonsWrapper.style.width = '42px';  // for setSearchInterfacePosition()
                 searchButtonsWrapper.style.top = '50%';
-                searchButtonsWrapper.style.left = `${threadArticleBoundingClientRect.left}px`;
+                // searchButtonsWrapper.style.left = `55px`;
                 searchButtonsWrapper.style.zIndex = 2002;
-                searchButtonsWrapper.style.transform = 'translate(-110%, -50%)';
+                searchButtonsWrapper.style.transform = 'translate(0, -50%)';
                 searchButtonsWrapper.append(
                     createSearchButton(searchEngine.google, getActualSelectionValue),
                     createSearchButton(searchEngine.ceneo, getActualSelectionValue),
@@ -2091,7 +2160,28 @@
                     createSearchButton(searchEngine.iszop, getActualSelectionValue)
                     // createSearchButton(searchEngine.ggdeals, getActualSelectionValue, { marginRight: 0 })
                 );
-                document.body.appendChild(searchButtonsWrapper);
+
+                const setSearchInterfacePosition = () => {
+                    // const searchButtonsWrapperWidth = parseInt(window.getComputedStyle(searchButtonsWrapper).width);
+                    const searchButtonsWrapperWidth = parseInt(searchButtonsWrapper.style.width);
+                    const threadArticle = document.querySelector('article[id^="thread"]');
+                    const threadArticleBoundingClientRect = threadArticle.getBoundingClientRect();
+                    if (threadArticleBoundingClientRect.left > searchButtonsWrapperWidth) {
+                        searchButtonsWrapper.style.left = `${threadArticleBoundingClientRect.left - searchButtonsWrapperWidth}px`;
+                        searchButtonsWrapper.style.opacity = '1';
+                        return;
+                    }
+                    if (threadArticleBoundingClientRect.right + searchButtonsWrapperWidth < getWindowSize().width - 5) {
+                        searchButtonsWrapper.style.left = `${threadArticleBoundingClientRect.right + 5}px`;
+                        searchButtonsWrapper.style.opacity = '1';
+                        return;
+                    }
+                    searchButtonsWrapper.style.left = `${threadArticleBoundingClientRect.right - searchButtonsWrapperWidth}px`;
+                    searchButtonsWrapper.style.opacity = '0.5';
+                };
+                setSearchInterfacePosition();
+                document.body.appendChild(searchButtonsWrapper);  // must add before computing position to get computed width: https://stackoverflow.com/questions/2921428/dom-element-width-before-appended-to-dom
+                window.addEventListener('resize', setSearchInterfacePosition);
                 // const voteBox = document.querySelector('.cept-vote-box');
                 // voteBox.parentNode.style.justifyContent = 'space-between';
                 // voteBox.parentNode.style.width = '100%';
