@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.7
+// @version      0.9.8
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -170,7 +170,7 @@
                 line-height: 1.1rem;
             }
         `;
-        (document.head || document.documentElement).insertAdjacentHTML('beforeend', `<style>${css}</style>`);
+        (document.head || document.documentElement).insertAdjacentHTML('afterend', `<style id="pepper-tweaker-style">${css}</style>`);  // cannot be 'beforeend' => <link> elements with CSS can be loaded after the style and override it!
     }
     /*** END: Dark Theme Style ***/
 
@@ -182,6 +182,8 @@
     /**********************************************/
 
     const startPepperTweaker = () => {
+
+        document.head.appendChild(document.getElementById('pepper-tweaker-style'));  // move <style> to the proper position (the end of <head>)
 
         /*** Default configuration ***/
 
@@ -214,14 +216,14 @@
 
         /* Deals Filters */
         const defaultConfigDealsFilters = [
-            { name: 'Alkohol słowa kluczowe', keyword: /\bpiw[oa]\b|\bbeer|alkohol|whiske?y|likier|w[óo]d(ecz)?k[aąieę]|\bwark[aąieę]|\bbols|\bsoplica\b|johnni?(e|y) walker|jim ?beam|gentleman ?jack|beefeater|tequilla|\bmacallan|hennessy|armagnac ducastaing|\bbaczewski|\baperol|\bvodka|carlsberg|kasztelan|okocim|smuggler|martini|\blager[ay]?\b|żywiec|pilsner|\brum[uy]?\b|książęce|\btrunek|amundsen|\bbrandy\b|żubrówk[aąięe]|\bradler\b|\btyskie\b|bourbon|glen moray|\bbrowar|\bgran[td]'?s\b|jagermeister|jack daniel'?s|\blech\b|heineken|\bcalsberg|\bbacardi\b|\bbushmills|\bballantine'?s/i, style: { opacity: '0.3' } },  // don't use: \bwin(a|o)\b <-- to many false positive e.g. Wiedźmin 3 Krew i Wino
-            { name: 'Disco Polo', keyword: /disco polo/i, style: { display: 'none' } },
-            { name: 'Niezdrowe jedzenie', merchant: /mcdonalds|kfc|burger king/i, style: { opacity: '0.3' } },
-            { name: 'Aliexpress/Banggood', merchant: /aliexpress|banggood/i, style: { border: '4px dashed #e00034' } },
-            { name: 'Nieuczciwi sprzedawcy', merchant: /empik|komputronik|proline|super-pharm/i, style: { border: '4px dashed #1f7ecb' } },
-            { name: 'Największe przeceny', discountAbove: 80, style: { border: '4px dashed #51a704' } },
-            { name: 'Spożywcze', groups: /spożywcze/i, style: { opacity: '0.3' } },
-            { name: 'Lokalne', local: true, style: { border: '4px dashed #880088' } },
+            { name: 'Alkohol słowa kluczowe', active: false, keyword: /\bpiw[oa]\b|\bbeer|alkohol|whiske?y|likier|w[óo]d(ecz)?k[aąieę]|\bwark[aąieę]|\bbols|\bsoplica\b|johnni?(e|y) walker|jim ?beam|gentleman ?jack|beefeater|tequilla|\bmacallan|hennessy|armagnac ducastaing|\bbaczewski|\baperol|\bvodka|carlsberg|kasztelan|okocim|smuggler|martini|\blager[ay]?\b|żywiec|pilsner|\brum[uy]?\b|książęce|\btrunek|amundsen|\bbrandy\b|żubrówk[aąięe]|\bradler\b|\btyskie\b|bourbon|glen moray|\bbrowar|\bgran[td]'?s\b|jagermeister|jack daniel'?s|\blech\b|heineken|\bcalsberg|\bbacardi\b|\bbushmills|\bballantine'?s|somersby|gentelman jack/i, style: { opacity: '0.3' } },  // don't use: \bwin(a|o)\b <-- to many false positive e.g. Wiedźmin 3 Krew i Wino
+            { name: 'Disco Polo', active: false, keyword: /disco polo/i, style: { display: 'none' } },
+            { name: 'Niezdrowe jedzenie', active: false, merchant: /mcdonalds|kfc|burger king/i, style: { opacity: '0.3' } },
+            { name: 'Aliexpress/Banggood', active: true, merchant: /aliexpress|banggood/i, style: { border: '4px dashed #e00034' } },
+            { name: 'Nieuczciwi sprzedawcy', active: false, merchant: /empik|komputronik|proline|super-pharm/i, style: { border: '4px dashed #1f7ecb' } },
+            { name: 'Największe przeceny', active: true, discountAbove: 80, style: { border: '4px dashed #51a704' } },
+            { name: 'Spożywcze', active: false, groups: /spożywcze/i, style: { opacity: '0.3' } },
+            { name: 'Lokalne', active: true, local: true, style: { border: '4px dashed #880088' } },
         ];
 
         /* Comments filters */
@@ -1033,7 +1035,7 @@
                                 addSearchInterfaceCheckbox: {
                                     create: createLabeledCheckbox,
                                     params: {
-                                        label: 'Dodaj interfejs wyszukiwania (Google, Ceneo, Skąpiec)',
+                                        label: 'Dodaj interfejs wyszukiwania',
                                         id: 'add-search-interface',
                                         checked: pepperTweakerConfig.improvements.addSearchInterface,
                                         callback: event => setConfig({ improvements: { addSearchInterface: event.target.checked } }, false),
@@ -1950,67 +1952,67 @@
             addProfileInfo(document);
 
             /* Add calendar option */
-            const dateToGoogleCalendarFormat = date => date.toISOString().replace(/-|:|\.\d\d\d/g,"");
-            const extractDealDateFromString = (str, time) => {
-                if (!str) {
-                    return new Date();
-                }
-                let dateResult;
-                const dateString = str.match(/\d+\/\d+\/\d+/);  // date in a format: 15/12/2019
-                if (dateString) {
-                    const parts = dateString[0].split('/');
-                    dateResult = new Date(parts[2], parts[1] - 1, parts[0]);
-                } else if (str.match(/jutro/i)) {
-                    dateResult = new Date();
-                    dateResult.setDate(dateResult.getDate() + 1);
-                // } else if (str.match(/dzisiaj/i)) {
-                } else {
-                    dateResult = new Date();
-                }
-                if (time) {
-                    time = time.split(':');
-                    dateResult.setHours(time[0], time[1], 0);
-                }
-                return dateResult;
-            };
-            const extractDealDates = () => {
-                // const dateSpans = document.querySelectorAll('.cept-thread-content .border--color-borderGrey.bRad--a span');
-                let start = document.querySelector('.cept-thread-content .border--color-borderGrey .icon--clock.text--color-green');
-                start = extractDealDateFromString(start && start.parentNode.parentNode.textContent, '00:01');
-                let end = document.querySelector('.cept-thread-content .border--color-borderGrey .icon--hourglass');
-                end = extractDealDateFromString(end && end.parentNode.parentNode.textContent, '23:59');
-                if (start >= end) {
-                    end.setTime(start.getTime());
-                    end.setDate(start.getDate() + 1);
-                }
-                return { start, end };
-            };
-            let dealTitle = document.querySelector('.thread-title--item');
-            dealTitle = dealTitle && encodeURIComponent(dealTitle.textContent.trim());
-            let dealDescription = document.querySelector('.cept-description-container');
-            dealDescription = dealDescription && encodeURIComponent(`${location.href}<br><br>${dealDescription.innerHTML.trim()}`);
-            let dealMerchant = document.querySelector('.cept-merchant-name');
-            dealMerchant = dealMerchant && encodeURIComponent(dealMerchant.textContent.trim());
-            const dealDates = extractDealDates();
-            console.log(dealTitle, dealDescription);
-            console.log(dealDates.start, dealDates.end);
-            const commentOptionLink = document.querySelector('.thread-userOptionLink');
-            // const calendarOptionLink = repairSvgWithUseChildren(commentOptionLink.cloneNode(true));
-            const calendarOptionLink = commentOptionLink.cloneNode(true);
-            calendarOptionLink.removeAttribute('data-handler');
-            calendarOptionLink.removeAttribute('data-track');
-            calendarOptionLink.target = '_blank';
-            calendarOptionLink.href = `https://www.google.com/calendar/render?action=TEMPLATE&text=${dealTitle}&details=${dealDescription}&location=${dealMerchant}&dates=${dateToGoogleCalendarFormat(dealDates.start)}%2F${dateToGoogleCalendarFormat(dealDates.end)}`;
-            calendarOptionLink.removeChild(calendarOptionLink.lastChild);
-            calendarOptionLink.appendChild(document.createTextNode('Kalendarz'));
-            const calendarOptionImg = document.createElement('IMG');
-            calendarOptionImg.style.width = '18px';
-            calendarOptionImg.style.height = '20px';
-            calendarOptionImg.style.filter = `invert(${pepperTweakerConfig.darkThemeEnabled ? 77 : 28}%)`;
-            calendarOptionImg.classList.add('icon', 'space--mr-2');
-            calendarOptionImg.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAABmJLR0QA/wD/AP+gvaeTAAABAklEQVRIid2WPQ6CMBSAPwx6CokH8Aj+DCYeQTdu4ClcrBdxdtLFGI16FPECJi4mOFDJi4FSlDL4koYC3+vXEtI+yI8LcDK8/5VPI9atEr4BtIAlEBnguKDl8VdAaQcqJzGrbxKZeOUDYcaM2sBZQ0HWpyjJh3mz3ejkANharKiQ98RynUajDkmtIl/0PUeOGP7x09mKTL/2o0qRKe42kF+MADD9uB8CM91f2c6o7C4NyXHwzuvajl9WNBY5ewv+a9FR5ExciUaCvwFNV6KD4OeWOaVFPcE+gY4r0U6wa0tJOr48j5xvqpF+0HcgGehrBNnFSdVtAUkppEhKo6oFabn1Ajsht5QbUQgDAAAAAElFTkSuQmCC';
-            calendarOptionLink.querySelector('svg').replaceWith(calendarOptionImg);
-            commentOptionLink.parentNode.appendChild(calendarOptionLink);
+            if (location.pathname.match(/(promocje|kupony)\//)) {
+                const dateToGoogleCalendarFormat = date => date.toISOString().replace(/-|:|\.\d\d\d/g,"");
+                const extractDealDateFromString = (str, time) => {
+                    if (!str) {
+                        return new Date();
+                    }
+                    let dateResult;
+                    const dateString = str.match(/\d+\/\d+\/\d+/);  // date in the format: 15/12/2019
+                    if (dateString) {
+                        const parts = dateString[0].split('/');
+                        dateResult = new Date(parts[2], parts[1] - 1, parts[0]);
+                    } else if (str.match(/jutro/i)) {
+                        dateResult = new Date();
+                        dateResult.setDate(dateResult.getDate() + 1);
+                    // } else if (str.match(/dzisiaj/i)) {
+                    } else {
+                        dateResult = new Date();
+                    }
+                    if (time) {
+                        time = time.split(':');
+                        dateResult.setHours(time[0], time[1], 0);
+                    }
+                    return dateResult;
+                };
+                const extractDealDates = () => {
+                    // const dateSpans = document.querySelectorAll('.cept-thread-content .border--color-borderGrey.bRad--a span');
+                    let start = document.querySelector('.cept-thread-content .border--color-borderGrey .icon--clock.text--color-green');
+                    start = extractDealDateFromString(start && start.parentNode.parentNode.textContent, '00:01');
+                    let end = document.querySelector('.cept-thread-content .border--color-borderGrey .icon--hourglass');
+                    end = extractDealDateFromString(end && end.parentNode.parentNode.textContent, '23:59');
+                    if (start >= end) {
+                        end.setTime(start.getTime());
+                        end.setDate(start.getDate() + 1);
+                    }
+                    return { start, end };
+                };
+                let dealTitle = document.querySelector('.thread-title--item');
+                dealTitle = dealTitle && encodeURIComponent(dealTitle.textContent.trim());
+                let dealDescription = document.querySelector('.cept-description-container');
+                dealDescription = dealDescription && encodeURIComponent(`${location.href}<br><br>${dealDescription.innerHTML.trim()}`);
+                let dealMerchant = document.querySelector('.cept-merchant-name');
+                dealMerchant = dealMerchant && encodeURIComponent(dealMerchant.textContent.trim());
+                const dealDates = extractDealDates();
+                const commentOptionLink = document.querySelector('.thread-userOptionLink');
+                // const calendarOptionLink = repairSvgWithUseChildren(commentOptionLink.cloneNode(true));
+                const calendarOptionLink = commentOptionLink.cloneNode(true);
+                calendarOptionLink.removeAttribute('data-handler');
+                calendarOptionLink.removeAttribute('data-track');
+                calendarOptionLink.target = '_blank';
+                calendarOptionLink.href = `https://www.google.com/calendar/render?action=TEMPLATE&text=${dealTitle}&details=${dealDescription}&location=${dealMerchant}&dates=${dateToGoogleCalendarFormat(dealDates.start)}%2F${dateToGoogleCalendarFormat(dealDates.end)}`;
+                calendarOptionLink.removeChild(calendarOptionLink.lastChild);
+                calendarOptionLink.appendChild(document.createTextNode('Kalendarz'));
+                const calendarOptionImg = document.createElement('IMG');
+                calendarOptionImg.style.width = '18px';
+                calendarOptionImg.style.height = '20px';
+                calendarOptionImg.style.filter = `invert(${pepperTweakerConfig.darkThemeEnabled ? 77 : 28}%)`;
+                calendarOptionImg.classList.add('icon', 'space--mr-2');
+                calendarOptionImg.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAABmJLR0QA/wD/AP+gvaeTAAABAklEQVRIid2WPQ6CMBSAPwx6CokH8Aj+DCYeQTdu4ClcrBdxdtLFGI16FPECJi4mOFDJi4FSlDL4koYC3+vXEtI+yI8LcDK8/5VPI9atEr4BtIAlEBnguKDl8VdAaQcqJzGrbxKZeOUDYcaM2sBZQ0HWpyjJh3mz3ejkANharKiQ98RynUajDkmtIl/0PUeOGP7x09mKTL/2o0qRKe42kF+MADD9uB8CM91f2c6o7C4NyXHwzuvajl9WNBY5ewv+a9FR5ExciUaCvwFNV6KD4OeWOaVFPcE+gY4r0U6wa0tJOr48j5xvqpF+0HcgGehrBNnFSdVtAUkppEhKo6oFabn1Ajsht5QbUQgDAAAAAElFTkSuQmCC';
+                calendarOptionLink.querySelector('svg').replaceWith(calendarOptionImg);
+                commentOptionLink.parentNode.appendChild(calendarOptionLink);
+            }
 
             /* Repair Deal Details Links */  // and comment links
             if (pepperTweakerConfig.improvements.repairDealDetailsLinks) {
