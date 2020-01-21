@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.8
+// @version      0.9.9
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -183,7 +183,10 @@
 
     const startPepperTweaker = () => {
 
-        document.head.appendChild(document.getElementById('pepper-tweaker-style'));  // move <style> to the proper position (the end of <head>)
+        const pepperTweakerStyleNode = document.getElementById('pepper-tweaker-style');
+        if (pepperTweakerStyleNode) {
+            document.head.appendChild(pepperTweakerStyleNode);  // move <style> to the proper position (the end of <head>) - only if <style> exists
+        }
 
         /*** Default configuration ***/
 
