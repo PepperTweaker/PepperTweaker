@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.9
+// @version      0.9.10
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -289,11 +289,9 @@
             return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
         };
 
-        const removeAllChildren = node => {
-            while (node.hasChildNodes()) {
-                node.removeChild(node.lastChild);
-            }
-        };
+        const removeAllChildren = parent => { while (parent.hasChildNodes()) parent.removeChild(parent.lastChild); };
+        const moveAllChildren = (oldParent, newParent) => { while (oldParent.hasChildNodes()) newParent.appendChild(oldParent.firstChild); };
+        const cloneAttributes = (source, target) => [...source.attributes].forEach(attr => target.setAttribute(attr.nodeName, attr.nodeValue));
 
         /*** Configuration Functions ***/
         const setConfig = (configuration = { pluginEnabled, darkThemeEnabled, improvements, autoUpdate, dealsFilters, commentsFilters }, reload = false) => {
@@ -1924,7 +1922,9 @@
             }
 
             /* Add Profile Info */
-            const addProfileInfo = element => {  // this function is used in comments addition
+            const toggleUnderline = event => event.target.style.textDecoration = (event.target.style.textDecoration !== 'underline') ? 'underline' : 'none';
+
+            const addProfileInfo = element => {  // this function is used in comments addition too
                 const profileLinks = element.querySelectorAll('.cept-thread-main a[href*="/profile/"], .comment-header a[href*="/profile/"]');
                 for (const profileLink of profileLinks) {
                     if (profileLink && profileLink.href) {
@@ -1947,6 +1947,34 @@
                                     spaceBox.remove();
                                 }
                                 profileLinkParent.appendChild(wrapper);
+
+                                /* Add Link to Comment Date */
+                                const commentDateParent = profileLinkParent.nextSibling;
+                                const commentDateElement = commentDateParent.querySelector('time');
+                                const articleElement = profileLinkParent.closest('article[id^="comment-"]');
+                                if (articleElement && articleElement.id) {
+                                    const commentID = articleElement.id.split('-')[1];
+                                    const commentDateLink = document.createElement('A');
+                                    const permalinkAddress = `https://www.pepper.pl/comments/permalink/${commentID}`;
+                                    commentDateLink.href = permalinkAddress;
+                                    commentDateLink.target = '_blank';
+                                    commentDateLink.addEventListener('mouseenter', toggleUnderline);
+                                    commentDateLink.addEventListener('mouseleave', toggleUnderline);
+                                    commentDateLink.appendChild(commentDateElement);
+                                    commentDateParent.appendChild(commentDateLink);
+
+                                    /* Change Premalink Button to an Anchor */
+                                    const permalinkButton = articleElement.querySelector('button[data-popover*="permalink"]');
+                                    if (permalinkButton) {
+                                        const permalinkAnchor = document.createElement('A');
+                                        moveAllChildren(permalinkButton, permalinkAnchor);
+                                        cloneAttributes(permalinkButton, permalinkAnchor);
+                                        permalinkAnchor.removeAttribute('data-handler');
+                                        permalinkAnchor.href = permalinkAddress;
+                                        permalinkAnchor.target = '_blank';
+                                        permalinkButton.parentNode.replaceChild(permalinkAnchor, permalinkButton);
+                                    }
+                                }
                             })
                             .catch(error => console.error(error));
                     }
@@ -2025,7 +2053,7 @@
                 }
             }
 
-            /* Repair Thread Image Link */  // -> to open an image in the box not a deal in new tab
+            /* Repair Thread Image Link */  // -> to open an image in the box, not a deal in new tab
             if (pepperTweakerConfig.improvements.repairDealImageLink) {
                 const replaceClickoutLinkWithPopupImage = clickoutLink => {
                     if (!clickoutLink) return null;
