@@ -2076,6 +2076,25 @@
 
                 const dealImageLink = document.querySelector('article .cept-thread-image-clickout');
                 replaceClickoutLinkWithPopupImage(dealImageLink);
+
+                /* Prevent Cropping Image Height */
+                const lightboxPopoverObserver = new MutationObserver((allMutations, observer) => {
+                    allMutations.every((mutation) => {
+                        for (const addedNode of mutation.addedNodes) {
+                            if (addedNode.classList.contains('popover--lightbox')) {
+                                const heightPopoverObserver = new MutationObserver((allMutations, observer) => {
+                                    allMutations.every((mutation) => {
+                                        const imgHeight = mutation.target.querySelector('img').height;
+                                        mutation.target.style.height = `${imgHeight}px`;
+                                    });
+                                });
+                                heightPopoverObserver.observe(addedNode, { attributes: true });
+                                return false;  // break every()
+                            }
+                        }
+                    });
+                });
+                lightboxPopoverObserver.observe(document.body, { childList: true });
             }
 
             /* Add Like Buttons to Best Comments */
