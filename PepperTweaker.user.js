@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.11
+// @version      0.9.12
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -1887,6 +1887,25 @@
             document.body.appendChild(modalSection);
         }
 
+        /* Prevent Cropping Image Height in Lightbox */
+        const lightboxPopoverObserver = new MutationObserver((allMutations, observer) => {
+            allMutations.every((mutation) => {
+                for (const addedNode of mutation.addedNodes) {
+                    if (addedNode.classList.contains('popover--lightbox')) {
+                        const heightPopoverObserver = new MutationObserver((allMutations, observer) => {
+                            allMutations.every((mutation) => {
+                                const imgHeight = mutation.target.querySelector('img').height;
+                                mutation.target.style.height = `${imgHeight}px`;
+                            });
+                        });
+                        heightPopoverObserver.observe(addedNode, { attributes: true });
+                        return false;  // break every()
+                    }
+                }
+            });
+        });
+        lightboxPopoverObserver.observe(document.body, { childList: true });
+
         /*** Profile Page ***/
         /* Add Comment Preview on Profile Page */
         if (pepperTweakerConfig.improvements.addCommentPreviewOnProfilePage
@@ -2136,25 +2155,6 @@
 
                 const dealImageLink = document.querySelector('article .cept-thread-image-clickout');
                 replaceClickoutLinkWithPopupImage(dealImageLink);
-
-                /* Prevent Cropping Image Height */
-                const lightboxPopoverObserver = new MutationObserver((allMutations, observer) => {
-                    allMutations.every((mutation) => {
-                        for (const addedNode of mutation.addedNodes) {
-                            if (addedNode.classList.contains('popover--lightbox')) {
-                                const heightPopoverObserver = new MutationObserver((allMutations, observer) => {
-                                    allMutations.every((mutation) => {
-                                        const imgHeight = mutation.target.querySelector('img').height;
-                                        mutation.target.style.height = `${imgHeight}px`;
-                                    });
-                                });
-                                heightPopoverObserver.observe(addedNode, { attributes: true });
-                                return false;  // break every()
-                            }
-                        }
-                    });
-                });
-                lightboxPopoverObserver.observe(document.body, { childList: true });
             }
 
             /* Add Like Buttons to Best Comments */
@@ -2488,6 +2488,12 @@
                     element = element.querySelector('article[id^="thread"]');
                 }
                 if (element && (element.nodeName === 'ARTICLE') && element.id && (element.id.indexOf('thread') === 0)) {
+
+                    /* Thread Image to Lightbox */
+                    const threadImage = element.querySelector('.cept-thread-img');
+                    threadImage.dataset.handler = 'lightbox';
+                    threadImage.dataset.lightbox = `{"images":[{"width":640,"height":474,"unattached":"","uid":"","url":"${threadImage.src.replace('thread_large', 'thread_full_screen')}"}]}`;
+                    /* END */
 
                     let title = element.querySelector('.cept-tt');
                     title = title && title.textContent;
