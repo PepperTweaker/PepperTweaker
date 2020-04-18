@@ -1948,8 +1948,9 @@
                                 }
                                 profileLinkParent.appendChild(wrapper);
 
-                                /* Add Link to Comment Date */
+                                /* Add Permalink to Comment Date */
                                 const commentDateParent = profileLinkParent.nextSibling;
+                                if (!commentDateParent) return;
                                 const commentDateElement = commentDateParent.querySelector('time');
                                 const articleElement = profileLinkParent.closest('article[id^="comment-"]');
                                 if (articleElement && articleElement.id) {
@@ -1961,7 +1962,7 @@
                                     commentDateLink.addEventListener('mouseenter', toggleUnderline);
                                     commentDateLink.addEventListener('mouseleave', toggleUnderline);
                                     commentDateLink.appendChild(commentDateElement);
-                                    commentDateParent.appendChild(commentDateLink);
+                                    commentDateParent.insertBefore(commentDateLink, commentDateParent.firstChild);
 
                                     /* Change Premalink Button to an Anchor */
                                     const permalinkButton = articleElement.querySelector('button[data-popover*="permalink"]');
