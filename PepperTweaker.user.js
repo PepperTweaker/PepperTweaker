@@ -16,6 +16,12 @@
     /***** RUN AT DOCUMENT START (BEFORE LOAD) *****/
     /***********************************************/
 
+    /* Hide Groups Bar */
+    if ((JSON.parse(localStorage.getItem('PepperTweaker.config.pluginEnabled')) === true) && (JSON.parse(localStorage.getItem('PepperTweaker.config.improvements')).hideGroupsBar === true)) {
+        const hideGroupsBar = '.subNav .bg--color-greyPanel { display: none; }';
+        (document.head || document.documentElement).insertAdjacentHTML('afterend', `<style id="pepper-tweaker-hide-groups-bar-style">${hideGroupsBar}</style>`);  // cannot be 'beforeend' => <link> elements with CSS can be loaded after the style and override it!
+    }
+
     /*** Dark Theme Style ***/
     // if (pepperTweakerConfig.pluginEnabled && pepperTweakerConfig.darkThemeEnabled) {
     if ((JSON.parse(localStorage.getItem('PepperTweaker.config.pluginEnabled')) === true) && (JSON.parse(localStorage.getItem('PepperTweaker.config.darkThemeEnabled')) === true)) {
@@ -203,6 +209,7 @@
 
         /* Improvements */
         const defaultConfigImprovements = {
+            hideGroupsBar: false,
             repairDealDetailsLinks: true,
             repairDealImageLink: true,
             addLikeButtonsToBestComments: true,
@@ -306,6 +313,7 @@
             }
             if (configuration.improvements !== undefined) {  // only one option can be specified here
                 configuration.improvements = {  // to ensure only these props are in the autoUpdate object
+                    hideGroupsBar: isBoolean(configuration.improvements.hideGroupsBar) ? configuration.improvements.hideGroupsBar : pepperTweakerConfig.improvements.hideGroupsBar,
                     repairDealDetailsLinks: isBoolean(configuration.improvements.repairDealDetailsLinks) ? configuration.improvements.repairDealDetailsLinks : pepperTweakerConfig.improvements.repairDealDetailsLinks,
                     repairDealImageLink: isBoolean(configuration.improvements.repairDealImageLink) ? configuration.improvements.repairDealImageLink : pepperTweakerConfig.improvements.repairDealImageLink,
                     addLikeButtonsToBestComments: isBoolean(configuration.improvements.addLikeButtonsToBestComments) ? configuration.improvements.addLikeButtonsToBestComments : pepperTweakerConfig.improvements.addLikeButtonsToBestComments,
@@ -418,6 +426,7 @@
                 configToReset.resetDarkThemeEnabled = true;
             }
             if (!outputConfig.improvements
+                || !isBoolean(outputConfig.improvements.hideGroupsBar)
                 || !isBoolean(outputConfig.improvements.repairDealDetailsLinks)
                 || !isBoolean(outputConfig.improvements.repairDealImageLink)
                 || !isBoolean(outputConfig.improvements.addLikeButtonsToBestComments)
@@ -1009,6 +1018,15 @@
                         improvements: {
                             label: 'Poprawki / Ulepszenia',
                             entries: {
+                                hideGroupsBar: {
+                                    create: createLabeledCheckbox,
+                                    params: {
+                                        label: 'Ukryj pasek grup',
+                                        id: 'hide-groups-bar',
+                                        checked: pepperTweakerConfig.improvements.hideGroupsBar,
+                                        callback: event => setConfig({ improvements: { hideGroupsBar: event.target.checked } }, false),
+                                    },
+                                },
                                 repairDealDetailsLinksCheckbox: {
                                     create: createLabeledCheckbox,
                                     params: {
