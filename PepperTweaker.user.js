@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.10
+// @version      0.9.11
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -207,6 +207,7 @@
             repairDealImageLink: true,
             addLikeButtonsToBestComments: true,
             addSearchInterface: true,
+            addCommentPreviewOnProfilePage: true,
         };
 
         /* Auto Update */
@@ -309,6 +310,7 @@
                     repairDealImageLink: isBoolean(configuration.improvements.repairDealImageLink) ? configuration.improvements.repairDealImageLink : pepperTweakerConfig.improvements.repairDealImageLink,
                     addLikeButtonsToBestComments: isBoolean(configuration.improvements.addLikeButtonsToBestComments) ? configuration.improvements.addLikeButtonsToBestComments : pepperTweakerConfig.improvements.addLikeButtonsToBestComments,
                     addSearchInterface: isBoolean(configuration.improvements.addSearchInterface) ? configuration.improvements.addSearchInterface : pepperTweakerConfig.improvements.addSearchInterface,
+                    addCommentPreviewOnProfilePage: isBoolean(configuration.improvements.addCommentPreviewOnProfilePage) ? configuration.improvements.addCommentPreviewOnProfilePage : pepperTweakerConfig.improvements.addCommentPreviewOnProfilePage,
                 };
                 localStorage.setItem('PepperTweaker.config.improvements', JSON.stringify(configuration.improvements));
                 pepperTweakerConfig.improvements = configuration.improvements;
@@ -419,7 +421,8 @@
                 || !isBoolean(outputConfig.improvements.repairDealDetailsLinks)
                 || !isBoolean(outputConfig.improvements.repairDealImageLink)
                 || !isBoolean(outputConfig.improvements.addLikeButtonsToBestComments)
-                || !isBoolean(outputConfig.improvements.addSearchInterface)) {
+                || !isBoolean(outputConfig.improvements.addSearchInterface)
+                || !isBoolean(outputConfig.improvements.addCommentPreviewOnProfilePage)) {
                 configToReset.resetImprovements = true;
             }
             if (!outputConfig.autoUpdate
@@ -1040,6 +1043,15 @@
                                         id: 'add-search-interface',
                                         checked: pepperTweakerConfig.improvements.addSearchInterface,
                                         callback: event => setConfig({ improvements: { addSearchInterface: event.target.checked } }, false),
+                                    },
+                                },
+                                addCommentPreviewOnProfilePage: {
+                                    create: createLabeledCheckbox,
+                                    params: {
+                                        label: 'Dodaj podgląd komentarzy na stronie profilu użytkownika',
+                                        id: 'add-comment-preview-on-profile-page',
+                                        checked: pepperTweakerConfig.improvements.addCommentPreviewOnProfilePage,
+                                        callback: event => setConfig({ improvements: { addCommentPreviewOnProfilePage: event.target.checked } }, false),
                                     },
                                 },
                             },
@@ -1855,6 +1867,36 @@
             popoverCover.classList.add('popover-cover');
             modalSection.append(popoverContent, popoverCover);
             document.body.appendChild(modalSection);
+        }
+
+        /*** Profile Page ***/
+        /* Add Comment Preview on Profile Page */
+        if (pepperTweakerConfig.improvements.addCommentPreviewOnProfilePage
+            && pepperTweakerConfig.pluginEnabled && location.pathname.match(/\/profile\//)) {
+            const commentPermalinks = document.querySelectorAll('a[href*="/comments/permalink/"]');
+            for (const commentPermalink of commentPermalinks) {
+                fetch(commentPermalink.href)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text();
+                        }
+                        throw new Error(`fetch() resulted with status ${response.status} for url: ${commentPermalink.href}`);
+                    })
+                    .then(text => {
+                        const splitedPermalink = commentPermalink.href.split('/');
+                        const commentID = splitedPermalink[splitedPermalink.length - 1];
+                        let htmlDoc = (new DOMParser()).parseFromString(text, 'text/html');
+                        const remoteCommentBody = htmlDoc.documentElement.querySelector(`article[id="comment-${commentID}"] .comment-body`);
+                        if (remoteCommentBody) {
+                            const newCommentBody = document.createElement('DIV');
+                            newCommentBody.classList.add('width--all-12');
+                            newCommentBody.style.padding = '15px 5px 0 5px';
+                            moveAllChildren(remoteCommentBody, newCommentBody);
+                            commentPermalink.parentNode.appendChild(newCommentBody);
+                        }
+                    })
+                    .catch(error => console.error(error));
+            }
         }
 
         /*** Deal Details Page ***/
