@@ -279,6 +279,8 @@
         const getCSSBorderColor = borderCSS => borderCSS && isString(borderCSS) && (borderCSS.match(/#[a-fA-F0-9]+/) || [''])[0] || null;  // match returns array or null => null will throw an error for index [0]
         const getCSSBorderStyle = borderCSS => borderCSS && isString(borderCSS) && (borderCSS.match(/dashed|dotted|solid|double|groove|ridge|inset|outset/) || [''])[0] || null;
 
+        const audioIsPlaying = audio => audio && (audio.currentTime > 0) && !audio.paused && !audio.ended && audio.readyState > 2;  // https://stackoverflow.com/questions/9437228/html5-check-if-audio-is-playing/46117824#46117824
+
         const arrayDifference = (array1, array2) => array1.filter(value => !array2.includes(value));
         const arrayIntersection = (array1, array2) => array1.filter(value => array2.includes(value));
 
@@ -1612,7 +1614,25 @@
                 this.stopOnFocus = stopOnFocus;
                 this.delay = delay;
 
-                this._soundSource = (soundSource instanceof HTMLAudioElement) ? soundSource : DEFAULT_NOTIFICATION_SOUND;
+                soundSource = 'https://www.myinstants.com/media/sounds/quack.mp3';
+
+                let newSoundSource = new Audio();
+                newSoundSource.onerror = () => {
+                    console.warn(`${this.constructor.name}: soundSource cannot `);
+                    newSoundSource = DEFAULT_NOTIFICATION_SOUND;
+                };
+                if (isString(soundSource)) {
+                    newSoundSource.src = soundSource;
+                }
+                else if (soundSource instanceof HTMLAudioElement) {
+                    newSoundSource.src = soundSource.src;
+                }
+                else {
+                    newSoundSource.src = null;
+                }
+                this._soundSource = newSoundSource;
+
+                // this._soundSource = (soundSource instanceof HTMLAudioElement) ? soundSource : DEFAULT_NOTIFICATION_SOUND;
             }
             get soundSource() {
                 return this._soundSource;
@@ -1669,7 +1689,7 @@
             _changeTitle(message) {
                 if (this._isOriginalTitle) {
                     document.title = message;
-                    if (this.playSound === true) {
+                    if ((this.playSound === true) && !audioIsPlaying(this._soundSource)) {
                         this._soundSource.play();
                     }
                 } else {
