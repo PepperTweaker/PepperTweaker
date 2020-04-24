@@ -16,10 +16,15 @@
   /***** RUN AT DOCUMENT START (BEFORE LOAD) *****/
   /***********************************************/
 
+  let css = '';
+
   /* Hide Groups Bar */
   if ((JSON.parse(localStorage.getItem('PepperTweaker.config.pluginEnabled')) === true) && (JSON.parse(localStorage.getItem('PepperTweaker.config.improvements')).hideGroupsBar === true)) {
-    const hideGroupsBar = '.subNav .bg--color-greyPanel { display: none; }';
-    (document.head || document.documentElement).insertAdjacentHTML('afterend', `<style id="pepper-tweaker-hide-groups-bar-style">${hideGroupsBar}</style>`);  // cannot be 'beforeend' => <link> elements with CSS can be loaded after the style and override it!
+    css += `
+      .subNav .bg--color-greyPanel {
+        display: none;
+      }
+    `;
   }
 
   /*** Dark Theme Style ***/
@@ -37,148 +42,150 @@
     // const greyButtonColor = '#8f949b';
     // const orangeColor = '#d1d5db';
 
-    const style = document.createElement('STYLE');
-    const css = `
-            .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
-                color: ${textColor};
-            }
-            .speechBubble {
-                background-color: ${darkBackgroundColor};
-                color: ${textColor};
-            }
-            .thread--type-card, .thread--type-list, .conversationList-msg--read:not(.conversationList-msg--active), .card, .threadCardLayout--card article, .threadCardLayout--card article span .threadCardLayout--card article span, .vote-box, .cept-comments-link, .subNavMenu-btn {
-                background-color: ${darkBackgroundColor} !important;
-                border-color: ${darkBorderColor};
-            }
-            .thread--deal, .thread--discussion {
-                background-color: ${darkBackgroundColor};
-                border-color: ${darkBorderColor};
-                border-top: none; /* there is some problem with the top border => whole article goes up */
-                border-radius: 5px;
-            }
-            .input, .inputBox, .secretCode-codeBox, .toolbar, .voucher-code {
-                background-color: ${darkBackgroundColor};
-                border-color: ${lightBorderColor};
-            }
-            /* Arrows */
-            .input-caretLeft {
-                border-right-color: ${lightBorderColor};
-            }
-            .input-caretLeft:before {
-                border-right-color: ${darkBackgroundColor};
-            }
-            .popover--layout-s > .popover-arrow:after, .inputBox:after {
-                border-bottom-color: ${darkBackgroundColor};
-            }
-            .popover--layout-n > .popover-arrow:after {
-                border-top-color: ${darkBackgroundColor};
-            }
-            .popover--layout-w > .popover-arrow:after {
-                border-left-color: ${darkBackgroundColor};
-            }
-            .popover--layout-e > .popover-arrow:after {
-                border-right-color: ${darkBackgroundColor};
-            }
-            /* END: Arrows */
-            /* Faders */
-            .overflow--fade-b-r--l:after, .overflow--fade-b-r--s:after, .overflow--fade-b-r:after, .overflow--fromW3-fade-b-r--l:after, .overflow--fromW3-fade-r--l:after, .thread-title--card:after, .thread-title--list--merchant:after, .thread-title--list:after {
-                background: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 50%,${darkBackgroundColor});
-                background: linear-gradient(90deg,hsla(0,0%,100%,0),${darkBackgroundColor} 50%,${darkBackgroundColor});
-                /* filter: brightness(100%) !important; */
-            }
-            .fadeEdge--r:after, .overflow--fade:after {
-                background: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 80%);
-                background: linear-gradient(90deg,hsla(0,0%,100%,0) 0,${darkBackgroundColor} 80%);
-                filter: brightness(100%) !important;
-            }
-            .text--overlay:before {
-                background-image: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 90%);
-                background-image: linear-gradient(90deg,hsla(0,0%,100%,0),${darkBackgroundColor} 90%);
-                filter: brightness(100%) !important;
-            }
-            /* END: Faders */
-            .btn--border, .bg--off, .boxSec--fromW3:not(.thread-infos), .boxSec, .voucher-codeCopyButton, .search input, .img, .userHtml-placeholder, .userHtml img, .popover--subNavMenu .popover-content {
-                border: 1px solid ${darkBorderColor} !important;  /* need full border definition for .bg--off */
-            }
-            .tabbedInterface-tab--selected, .bg--main, .tabbedInterface-tab--horizontal, .tabbedInterface-tab--selected, .comments-item--in-moderation, .comments-item-inner--active, .comments-item-inner--edit, /*.thread.cept-sale-event-thread.thread--deal,*/ .vote-btn, .notification-item:not(.notification-item--read), .search div, .search input, .text--overlay, .popover--brandAccent .popover-content, .popover--brandPrimary .popover-content, .popover--default .popover-content, .popover--menu .popover-content, .popover--red .popover-content {
-                background-color: ${darkBackgroundColor} !important;
-            }
-            .notification-item:hover, .notification-item--read:hover {
-                filter: brightness(75%);
-            }
-            .speechBubble:before, .speechBubble:after, .text--color-white.threadTempBadge--card, .text--color-white.threadTempBadge {
-                color: ${darkBackgroundColor};
-            }
-            .bg--off, .js-pagi-bottom, .js-sticky-pagi--on, .bg--color-grey, .notification-item--read, #main, .subNavMenu--menu .subNavMenu-list {
-                background-color: ${lightBackgroundColor} !important;
-                color: ${textColor};
-            }
-            .tabbedInterface-tab--transparent {
-                background-color: ${lightBackgroundColor};
-            }
-            .page-divider, .popover-item, .boxSec-divB, .boxSec--fromW3, .cept-comment-link, .border--color-borderGrey, .border--color-greyTint, .staticPageHtml table, .staticPageHtml td, .staticPageHtml th {
-                border-color: ${lightBorderColor};
-            }
-            .listingProfile, .tabbedInterface-tab--primary:not(.tabbedInterface-tab--selected):hover, .navMenu-trigger, .navMenu-trigger--active, .navMenu-trigger--active:focus, .navMenu-trigger--active:hover, .navDropDown-link:focus, .navDropDown-link:hover {
-                background-color: ${veryDarkBackgroundColor} !important;
-            }
-            .softMessages-item, .popover--modal .popover-content, .bg--color-white, .listingProfile-header, .profileHeader, .bg--em, nav.comments-pagination {
-                background-color: ${veryDarkBackgroundColor};
-                color: ${textColor} !important;
-            }
-            .bg--color-greyPanel {
-                background-color: ${darkestBackgroundColor};
-            }
-            .bg--color-greyTint, .thread-divider, .btn--mode-filter {
-                background-color: ${textColor};
-            }
-            img.avatar[src*="placeholder"] {
-                filter: brightness(75%);
-            }
-            .btn--mode-dark-transparent, .btn--mode-dark-transparent:active, .btn--mode-dark-transparent:focus, button:active .btn--mode-dark-transparent, button:focus .btn--mode-dark-transparent {
-                background-color: inherit;
-            }
-            .boxSec-div, .boxSec-div--toW2 {
-                border-top: 1px solid ${darkBorderColor};
-            }
-            .profileHeader, .nav, .navDropDown-item, .navDropDown-link, .navDropDown-pItem, .subNavMenu--menu .subNavMenu-item--separator {
-                border-bottom: 1px solid ${darkBorderColor};
-            }
-            .footer, .subNav, .voteBar, .comment-item {
-                background-color: ${darkBackgroundColor};
-                border-bottom: 1px solid ${darkBorderColor};
-            }
-            .comments-list--top .comments-item:target .comments-item-inner, .comments-list .comments-item, .comments-list .comments-list-item:target .comments-item-inner {
-                border-bottom: 1px solid ${darkBorderColor};
-            }
-            .fadeOuterEdge--l {
-                box-shadow: -20px 0 17px -3px ${darkBackgroundColor};
-            }
-            .vote-box {
-                box-shadow: 10px 0 10px -3px ${darkBackgroundColor};
-            }
-            .btn--mode-boxSec, .btn--mode-boxSec:active, .btn--mode-boxSec:focus, .btn--mode-boxSec:hover, button:active .btn--mode-boxSec, button:focus .btn--mode-boxSec, button:hover .btn--mode-boxSec {
-                background-color: ${textColor};
-            }
-            .overflow--fade:after {
-                background-color: linear-gradient(90deg,hsla(0,0%,100%,0) 0,#242424 80%) !important;
-            }
-            img, .badge, .btn--mode-primary-inverted, .btn--mode-primary-inverted--no-state, .btn--mode-primary-inverted--no-state:active, .btn--mode-primary-inverted--no-state:focus, .btn--mode-primary-inverted--no-state:hover, .btn--mode-primary-inverted:active, .btn--mode-primary-inverted:focus, button:active .btn--mode-primary-inverted, button:active .btn--mode-primary-inverted--no-state, button:focus .btn--mode-primary-inverted, button:focus .btn--mode-primary-inverted--no-state, button:hover .btn--mode-primary-inverted--no-state {
-                filter: invert(5%) brightness(90%);
-            }
-            .thread--expired > * {
-                filter: opacity(40%) brightness(90%);
-            }
-            .icon--overflow {
-                color: ${textColor};
-            }
-            .input {
-                line-height: 1.1rem;
-            }
-        `;
-    (document.head || document.documentElement).insertAdjacentHTML('afterend', `<style id="pepper-tweaker-style">${css}</style>`);  // cannot be 'beforeend' => <link> elements with CSS can be loaded after the style and override it!
+    css += `
+      .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
+        color: ${textColor};
+      }
+      .speechBubble {
+        background-color: ${darkBackgroundColor};
+        color: ${textColor};
+      }
+      .thread--type-card, .thread--type-list, .conversationList-msg--read:not(.conversationList-msg--active), .card, .threadCardLayout--card article, .threadCardLayout--card article span .threadCardLayout--card article span, .vote-box, .cept-comments-link, .subNavMenu-btn {
+        background-color: ${darkBackgroundColor} !important;
+        border-color: ${darkBorderColor};
+      }
+      .thread--deal, .thread--discussion {
+        background-color: ${darkBackgroundColor};
+        border-color: ${darkBorderColor};
+        border-top: none; /* there is some problem with the top border => whole article goes up */
+        border-radius: 5px;
+      }
+      .input, .inputBox, .secretCode-codeBox, .toolbar, .voucher-code {
+        background-color: ${darkBackgroundColor};
+        border-color: ${lightBorderColor};
+      }
+      /* Arrows */
+      .input-caretLeft {
+        border-right-color: ${lightBorderColor};
+      }
+      .input-caretLeft:before {
+        border-right-color: ${darkBackgroundColor};
+      }
+      .popover--layout-s > .popover-arrow:after, .inputBox:after {
+        border-bottom-color: ${darkBackgroundColor};
+      }
+      .popover--layout-n > .popover-arrow:after {
+        border-top-color: ${darkBackgroundColor};
+      }
+      .popover--layout-w > .popover-arrow:after {
+        border-left-color: ${darkBackgroundColor};
+      }
+      .popover--layout-e > .popover-arrow:after {
+        border-right-color: ${darkBackgroundColor};
+      }
+      /* END: Arrows */
+      /* Faders */
+      .overflow--fade-b-r--l:after, .overflow--fade-b-r--s:after, .overflow--fade-b-r:after, .overflow--fromW3-fade-b-r--l:after, .overflow--fromW3-fade-r--l:after, .thread-title--card:after, .thread-title--list--merchant:after, .thread-title--list:after {
+        background: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 50%,${darkBackgroundColor});
+        background: linear-gradient(90deg,hsla(0,0%,100%,0),${darkBackgroundColor} 50%,${darkBackgroundColor});
+        /* filter: brightness(100%) !important; */
+      }
+      .fadeEdge--r:after, .overflow--fade:after {
+        background: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 80%);
+        background: linear-gradient(90deg,hsla(0,0%,100%,0) 0,${darkBackgroundColor} 80%);
+        filter: brightness(100%) !important;
+      }
+      .text--overlay:before {
+        background-image: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 90%);
+        background-image: linear-gradient(90deg,hsla(0,0%,100%,0),${darkBackgroundColor} 90%);
+        filter: brightness(100%) !important;
+      }
+      /* END: Faders */
+      .btn--border, .bg--off, .boxSec--fromW3:not(.thread-infos), .boxSec, .voucher-codeCopyButton, .search input, .img, .userHtml-placeholder, .userHtml img, .popover--subNavMenu .popover-content {
+        border: 1px solid ${darkBorderColor} !important;  /* need full border definition for .bg--off */
+      }
+      .tabbedInterface-tab--selected, .bg--main, .tabbedInterface-tab--horizontal, .tabbedInterface-tab--selected, .comments-item--in-moderation, .comments-item-inner--active, .comments-item-inner--edit, /*.thread.cept-sale-event-thread.thread--deal,*/ .vote-btn, .notification-item:not(.notification-item--read), .search div, .search input, .text--overlay, .popover--brandAccent .popover-content, .popover--brandPrimary .popover-content, .popover--default .popover-content, .popover--menu .popover-content, .popover--red .popover-content {
+        background-color: ${darkBackgroundColor} !important;
+      }
+      .notification-item:hover, .notification-item--read:hover {
+        filter: brightness(75%);
+      }
+      .speechBubble:before, .speechBubble:after, .text--color-white.threadTempBadge--card, .text--color-white.threadTempBadge {
+        color: ${darkBackgroundColor};
+      }
+      .bg--off, .js-pagi-bottom, .js-sticky-pagi--on, .bg--color-grey, .notification-item--read, #main, .subNavMenu--menu .subNavMenu-list {
+        background-color: ${lightBackgroundColor} !important;
+        color: ${textColor};
+      }
+      .tabbedInterface-tab--transparent {
+        background-color: ${lightBackgroundColor};
+      }
+      .page-divider, .popover-item, .boxSec-divB, .boxSec--fromW3, .cept-comment-link, .border--color-borderGrey, .border--color-greyTint, .staticPageHtml table, .staticPageHtml td, .staticPageHtml th {
+        border-color: ${lightBorderColor};
+      }
+      .listingProfile, .tabbedInterface-tab--primary:not(.tabbedInterface-tab--selected):hover, .navMenu-trigger, .navMenu-trigger--active, .navMenu-trigger--active:focus, .navMenu-trigger--active:hover, .navDropDown-link:focus, .navDropDown-link:hover {
+        background-color: ${veryDarkBackgroundColor} !important;
+      }
+      .softMessages-item, .popover--modal .popover-content, .bg--color-white, .listingProfile-header, .profileHeader, .bg--em, nav.comments-pagination {
+        background-color: ${veryDarkBackgroundColor};
+        color: ${textColor} !important;
+      }
+      .bg--color-greyPanel {
+        background-color: ${darkestBackgroundColor};
+      }
+      .bg--color-greyTint, .thread-divider, .btn--mode-filter {
+        background-color: ${textColor};
+      }
+      img.avatar[src*="placeholder"] {
+        filter: brightness(75%);
+      }
+      .btn--mode-dark-transparent, .btn--mode-dark-transparent:active, .btn--mode-dark-transparent:focus, button:active .btn--mode-dark-transparent, button:focus .btn--mode-dark-transparent {
+        background-color: inherit;
+      }
+      .boxSec-div, .boxSec-div--toW2 {
+        border-top: 1px solid ${darkBorderColor};
+      }
+      .profileHeader, .nav, .navDropDown-item, .navDropDown-link, .navDropDown-pItem, .subNavMenu--menu .subNavMenu-item--separator {
+        border-bottom: 1px solid ${darkBorderColor};
+      }
+      .footer, .subNav, .voteBar, .comment-item {
+        background-color: ${darkBackgroundColor};
+        border-bottom: 1px solid ${darkBorderColor};
+      }
+      .comments-list--top .comments-item:target .comments-item-inner, .comments-list .comments-item, .comments-list .comments-list-item:target .comments-item-inner {
+        border-bottom: 1px solid ${darkBorderColor};
+      }
+      .fadeOuterEdge--l {
+        box-shadow: -20px 0 17px -3px ${darkBackgroundColor};
+      }
+      .vote-box {
+        box-shadow: 10px 0 10px -3px ${darkBackgroundColor};
+      }
+      .btn--mode-boxSec, .btn--mode-boxSec:active, .btn--mode-boxSec:focus, .btn--mode-boxSec:hover, button:active .btn--mode-boxSec, button:focus .btn--mode-boxSec, button:hover .btn--mode-boxSec {
+        background-color: ${textColor};
+      }
+      .overflow--fade:after {
+        background-color: linear-gradient(90deg,hsla(0,0%,100%,0) 0,#242424 80%) !important;
+      }
+      img, .badge, .btn--mode-primary-inverted, .btn--mode-primary-inverted--no-state, .btn--mode-primary-inverted--no-state:active, .btn--mode-primary-inverted--no-state:focus, .btn--mode-primary-inverted--no-state:hover, .btn--mode-primary-inverted:active, .btn--mode-primary-inverted:focus, button:active .btn--mode-primary-inverted, button:active .btn--mode-primary-inverted--no-state, button:focus .btn--mode-primary-inverted, button:focus .btn--mode-primary-inverted--no-state, button:hover .btn--mode-primary-inverted--no-state {
+        filter: invert(5%) brightness(90%);
+      }
+      .thread--expired > * {
+        filter: opacity(40%) brightness(90%);
+      }
+      .icon--overflow {
+        color: ${textColor};
+      }
+      .input {
+        line-height: 1.1rem;
+      }
+    `;
   }
   /*** END: Dark Theme Style ***/
+
+  if (css.length > 0) {
+    (document.head || document.documentElement).insertAdjacentHTML('afterend', `<style id="pepper-tweaker-style">${css}</style>`);  // cannot be 'beforeend' => <link> elements with CSS can be loaded after the style and override it!
+  }
 
   /***** END: RUN AT DOCUMENT START (BEFORE LOAD) *****/
 
