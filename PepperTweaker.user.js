@@ -2682,6 +2682,9 @@
                     // },
                 });
 
+                // AJAX deals fetch to console:
+                fetch('https://www.pepper.pl/nowe?page=1&ajax=true', { headers: { 'x-requested-with': 'XMLHttpRequest' } }).then(resp => resp.json()).then(json => console.log(json));
+
                 const autoUpdateCheckbox = createLabeledCheckbox({ label: 'Obserwuj', callback: event => {
                     if (event.target.checked) {
                         newDealsObserver.observe();
