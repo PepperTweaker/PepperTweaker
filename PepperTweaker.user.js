@@ -1910,6 +1910,35 @@
         /* Add Comment Preview on Profile Page */
         if (pepperTweakerConfig.improvements.addCommentPreviewOnProfilePage
             && pepperTweakerConfig.pluginEnabled && location.pathname.match(/\/profile\//)) {
+            // const maskedCss = `
+            //     .masked{
+            //         background: #242424;
+            //         z-index: 1;
+            //         position:relative;
+            //         /* mix-blend-mode: hard-light; */
+            //     }
+            //
+            //     .masked:after {
+            //         content: "";
+            //         position: absolute;
+            //         top:0;
+            //         left:0;
+            //         width: 100%;
+            //         height: 150px;
+            //         z-index: 2;
+            //         /* background: linear-gradient(transparent 0%, #35373b 50%); */
+            //         /*
+            //         background: -webkit-linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 70%);
+            //         background: -moz-linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 70%);
+            //         background: -o-linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 70%);
+            //         */
+            //         background: linear-gradient(transparent 75%, #242424 95%);
+            //     }
+            // `;
+            // const maskedStyleElement = document.createElement('style');
+            // maskedStyleElement.appendChild(document.createTextNode(maskedCss));
+            // document.head.appendChild(maskedStyleElement);
+
             const commentPermalinks = document.querySelectorAll('a[href*="/comments/permalink/"]');
             for (const commentPermalink of commentPermalinks) {
                 fetch(commentPermalink.href)
@@ -1926,11 +1955,56 @@
                         const remoteCommentBody = htmlDoc.documentElement.querySelector(`article[id="comment-${commentID}"] .comment-body`);
                         if (remoteCommentBody) {
                             const newCommentBody = document.createElement('DIV');
+                            // newCommentBody.classList.add('tGrid', 'width--all-12');
                             newCommentBody.classList.add('width--all-12');
                             newCommentBody.style.padding = '15px 5px 0 5px';
+                            // newCommentBody.style.maxHeight = '150px';
+                            // newCommentBody.style.overflow = 'hidden';
                             moveAllChildren(remoteCommentBody, newCommentBody);
+                            // const replaceClickoutLinkWithPopupImage = clickoutLink => {
+                            //     if (!clickoutLink) return null;
+                            //     const img = clickoutLink;
+                            //     const srcFullScreen = img.src.replace('/thread_large/', '/thread_full_screen/');
+                            //     img.setAttribute('data-handler', 'track lightbox');
+                            //     img.setAttribute('data-track', '{"action":"show_full_image","label":"engagement"}');
+                            //     img.setAttribute('data-lightbox', `{"images":[{"width":640,"height":474,"unattached":"","uid":"","url":"${srcFullScreen}"}]}`);
+                            //     // const popupDiv = clickoutLink.querySelector('div.threadItem-imgCell--wide').cloneNode(true);
+                            //     const popupDiv = document.createElement('DIV');
+                            //     // popupDiv.classList.add('threadItem-imgCell--wide');
+                            //     popupDiv.setAttribute('style', 'background-image:url(\'https://static.pepper.pl/live_pl/comments/content/mO2fv/4095838.jpg\');');
+                            //     popupDiv.setAttribute('data-handler', 'track lightbox');
+                            //     popupDiv.setAttribute('data-track', '{"action":"show_full_image","label":"engagement"}');
+                            //     popupDiv.setAttribute('data-lightbox', `{"images":[{"width":640,"height":474,"unattached":"","uid":"","url":"${srcFullScreen}"}]}`);
+                            //     img.parentNode.insertBefore(popupDiv, img.nextSibling);
+                            //     // const imgFrameDiv = document.createElement('DIV');
+                            //     // imgFrameDiv.classList.add('imgFrame', 'imgFrame--noBorder', 'threadItem-imgFrame', 'box--all-b', 'clickable', 'cept-thread-img');
+                            //     // imgFrameDiv.append(img, popupDiv);
+                            //     // clickoutLink.replaceWith(imgFrameDiv);
+                            //     // return imgFrameDiv;
+                            // };
+                            // newCommentBody.querySelectorAll('img').forEach(img => {
+                            //     img.dataset.handler = 'lightbox';
+                            //     img.dataset.lightbox = '{"images":[{"width":640,"height":474,"unattached":"","uid":"","url":"https://static.pepper.pl/live_pl/threads/thread_full_screen/default/254055_1.jpg"}]}';
+                            //     // replaceClickoutLinkWithPopupImage(img);
+                            //     // img.setAttribute('target', '_blank');
+                            //     // img.onclick = () => alert('asd');
+                            //     // img.parentNode.replaceChild(img.cloneNode(false), img);
+                            //     // const srcFullScreen = img.src.replace('/thread_large/', '/thread_full_screen/');
+                            //     // img.setAttribute('data-handler', 'track lightbox');
+                            //     // img.setAttribute('data-track', '{"action":"show_full_image","label":"engagement"}');
+                            //     // img.setAttribute('data-lightbox', `{"images":[{"width":640,"height":474,"unattached":"","uid":"","url":"${srcFullScreen}"}]}`);
+                            //     // console.log(img);
+                            // });
                             commentPermalink.parentNode.appendChild(newCommentBody);
+                            // commentPermalink.appendChild(newCommentBody);
+                            // newCommentBody.classList.add('masked');
                         }
+                        // if (!document.getElementById('template-lightbox')) {
+                        //     const scriptTemplateLightbox = htmlDoc.documentElement.querySelector(`#template-lightbox`);
+                        //     const main = document.querySelector('main');
+                        //     main.insertBefore(scriptTemplateLightbox, main.firstChild);
+                        // }
+
                     })
                     .catch(error => console.error(error));
             }
