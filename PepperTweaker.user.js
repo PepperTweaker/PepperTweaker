@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.12
+// @version      0.9.13
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -492,9 +492,10 @@
     if (pepperTweakerConfig.pluginEnabled) {
 
       /*** Change Theme Button ***/
-      const messagesButton = document.querySelector('.cept-navDropDown--messages');
+      // const messagesButton = document.querySelector('.cept-navDropDown--messages');
+      // if (messagesButton) {
       const searchForm = document.querySelector('form.search');
-      if (messagesButton) {
+      if (searchForm) {
         const themeButtonDiv = document.createElement('DIV');
         themeButtonDiv.classList.add('navDropDown', 'hAlign--all-l', 'vAlign--all-m', 'space--r-3', 'hide--toW2');  // space--r-3 => right space
         const themeButtonLink = document.createElement('A');
