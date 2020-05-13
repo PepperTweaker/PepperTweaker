@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.14
+// @version      0.9.15
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -1919,9 +1919,19 @@
     lightboxPopoverObserver.observe(document.body, { childList: true });
 
     /*** Profile Page ***/
-    /* Add Comment Preview on Profile Page */
     if (pepperTweakerConfig.improvements.addCommentPreviewOnProfilePage
       && pepperTweakerConfig.pluginEnabled && location.pathname.match(/\/profile\//)) {
+      
+      /* Remove 'Escape' Key Binding at Message Page */
+      if (location.pathname.match(/\/messages\//)) {
+        document.addEventListener('keyup', (event) => {
+          if (event.key.match(/Esc|Escape/i)) {  // IE/Edge use 'Esc'
+            event.stopPropagation();
+          }
+        }, true);
+      }
+
+      /* Add Comment Preview on Profile Page */
       const commentPermalinks = document.querySelectorAll('a[href*="/comments/permalink/"]');
       for (const commentPermalink of commentPermalinks) {
         fetch(commentPermalink.href)
