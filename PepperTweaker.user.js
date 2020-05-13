@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.13
+// @version      0.9.14
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2140,8 +2140,9 @@
       /* Repair Deal Details Links */  // and comment links
       if (pepperTweakerConfig.improvements.repairDealDetailsLinks) {
         const links = document.querySelectorAll('a[title^="http"]');
+        const mobileLinkRegExp = /:\/\/(www\.)?m\./i;
         for (const link of links) {
-          link.href = link.title;
+          link.href = link.title.replace(mobileLinkRegExp, '://');  // remove also the part of a mobile link e.g.: m.
         }
       }
 
