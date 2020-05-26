@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.15
+// @version      0.9.16
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -380,6 +380,7 @@
       if (inputConfig) {
         try {
           outputConfig = JSON.parse(inputConfig, JSONRegExpReviver);
+          setConfig(outputConfig, false);  // reload == false --> missing config entries have to be reset first (below)
         } catch (error) {
           return false;
         }
@@ -474,7 +475,7 @@
         const file = fileInput.files[0];
         const reader = new FileReader();
         reader.onload = () => {
-          if (!loadConfig(reader.result)) {
+          if (!loadConfig({}, reader.result, true)) {
             alert('Ten plik nie wygląda jak konfiguracja PepperTweakera :/');
           }
         };
