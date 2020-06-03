@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.16
+// @version      0.9.17
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2177,7 +2177,7 @@
           return imgFrameDiv;
         };
 
-        const dealImageLink = document.querySelector('article .cept-thread-image-clickout');
+        const dealImageLink = document.querySelector('*[id^="thread"] .cept-thread-image-clickout');
         replaceClickoutLinkWithPopupImage(dealImageLink);
       }
 
@@ -2301,7 +2301,7 @@
         const setSearchInterfacePosition = () => {
           // const searchButtonsWrapperWidth = parseInt(window.getComputedStyle(searchButtonsWrapper).width);
           const searchButtonsWrapperWidth = parseInt(searchButtonsWrapper.style.width);
-          const threadArticle = document.querySelector('article[id^="thread"]');
+          const threadArticle = document.querySelector('*[id^="thread"]');
           const threadArticleBoundingClientRect = threadArticle.getBoundingClientRect();
           if (threadArticleBoundingClientRect.left > searchButtonsWrapperWidth) {
             searchButtonsWrapper.style.left = `${threadArticleBoundingClientRect.left - searchButtonsWrapperWidth}px`;
@@ -2556,7 +2556,7 @@
                   groups.push(groupLink.textContent);
                 }
 
-                const local = htmlDoc.documentElement.querySelector('article .cept-thread-content svg.icon--location') !== null;
+                const local = htmlDoc.documentElement.querySelector('*[id^="thread"] .cept-thread-content svg.icon--location') !== null;
 
                 htmlDoc = null; // inform GC to clear parsed doc???
 
