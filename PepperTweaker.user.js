@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.17
+// @version      0.9.18
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -1904,7 +1904,7 @@
     const lightboxPopoverObserver = new MutationObserver((allMutations, observer) => {
       allMutations.every((mutation) => {
         for (const addedNode of mutation.addedNodes) {
-          if (addedNode.classList.contains('popover--lightbox')) {
+          if (addedNode.classList && addedNode.classList.contains('popover--lightbox')) {
             const heightPopoverObserver = new MutationObserver((allMutations, observer) => {
               allMutations.every((mutation) => {
                 const imgHeight = mutation.target.querySelector('img').height;
@@ -2573,7 +2573,8 @@
       }
 
       let dealsSectionSelector;
-      const dealsSection = document.querySelector(dealsSectionSelector = 'section.gridLayout') || document.querySelector(dealsSectionSelector = 'div.gridLayout') || document.querySelector(dealsSectionSelector = 'section.listLayout .js-threadList') || document.querySelector(dealsSectionSelector = 'div.listLayout');
+      const dealsSection = document.querySelector(dealsSectionSelector = '#toc-target-deals .js-threadList') || document.querySelector(dealsSectionSelector = '#toc-target-deals');
+      // const dealsSection = document.querySelector(dealsSectionSelector = 'section.gridLayout') || document.querySelector(dealsSectionSelector = 'div.gridLayout') || document.querySelector(dealsSectionSelector = 'section.listLayout .js-threadList') || document.querySelector(dealsSectionSelector = 'div.listLayout');
       // cannot combine as one selector => div.gridLayout appears before section.gridLayout on the main page
       const isGridLayout = dealsSectionSelector.indexOf('gridLayout') >= 0;
 
