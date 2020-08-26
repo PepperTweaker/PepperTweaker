@@ -2573,7 +2573,8 @@
       }
 
       let dealsSectionSelector;
-      const dealsSection = document.querySelector(dealsSectionSelector = 'section.gridLayout') || document.querySelector(dealsSectionSelector = 'div.gridLayout') || document.querySelector(dealsSectionSelector = 'section.listLayout .js-threadList') || document.querySelector(dealsSectionSelector = 'div.listLayout');
+      const dealsSection = document.querySelector(dealsSectionSelector = '#toc-target-deals .js-threadList') || document.querySelector(dealsSectionSelector = '#toc-target-deals');
+      // const dealsSection = document.querySelector(dealsSectionSelector = 'section.gridLayout') || document.querySelector(dealsSectionSelector = 'div.gridLayout') || document.querySelector(dealsSectionSelector = 'section.listLayout .js-threadList') || document.querySelector(dealsSectionSelector = 'div.listLayout');
       // cannot combine as one selector => div.gridLayout appears before section.gridLayout on the main page
       const isGridLayout = dealsSectionSelector.indexOf('gridLayout') >= 0;
 
