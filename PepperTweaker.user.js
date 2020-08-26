@@ -1904,7 +1904,7 @@
     const lightboxPopoverObserver = new MutationObserver((allMutations, observer) => {
       allMutations.every((mutation) => {
         for (const addedNode of mutation.addedNodes) {
-          if (addedNode.classList.contains('popover--lightbox')) {
+          if (addedNode.classList && addedNode.classList.contains('popover--lightbox')) {
             const heightPopoverObserver = new MutationObserver((allMutations, observer) => {
               allMutations.every((mutation) => {
                 const imgHeight = mutation.target.querySelector('img').height;
