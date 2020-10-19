@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.18
+// @version      0.9.19
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -216,6 +216,7 @@
 
     /* Improvements */
     const defaultConfigImprovements = {
+      listToGrid: true,
       hideGroupsBar: false,
       repairDealDetailsLinks: true,
       repairDealImageLink: true,
@@ -320,6 +321,7 @@
       }
       if (configuration.improvements !== undefined) {  // only one option can be specified here
         configuration.improvements = {  // to ensure only these props are in the autoUpdate object
+          listToGrid: isBoolean(configuration.improvements.listToGrid) ? configuration.improvements.listToGrid : pepperTweakerConfig.improvements.listToGrid,
           hideGroupsBar: isBoolean(configuration.improvements.hideGroupsBar) ? configuration.improvements.hideGroupsBar : pepperTweakerConfig.improvements.hideGroupsBar,
           repairDealDetailsLinks: isBoolean(configuration.improvements.repairDealDetailsLinks) ? configuration.improvements.repairDealDetailsLinks : pepperTweakerConfig.improvements.repairDealDetailsLinks,
           repairDealImageLink: isBoolean(configuration.improvements.repairDealImageLink) ? configuration.improvements.repairDealImageLink : pepperTweakerConfig.improvements.repairDealImageLink,
@@ -434,6 +436,7 @@
         configToReset.resetDarkThemeEnabled = true;
       }
       if (!outputConfig.improvements
+        || !isBoolean(outputConfig.improvements.listToGrid)
         || !isBoolean(outputConfig.improvements.hideGroupsBar)
         || !isBoolean(outputConfig.improvements.repairDealDetailsLinks)
         || !isBoolean(outputConfig.improvements.repairDealImageLink)
@@ -1027,6 +1030,15 @@
             improvements: {
               label: 'Poprawki / Ulepszenia',
               entries: {
+                listToGrid: {
+                  create: createLabeledCheckbox,
+                  params: {
+                    label: 'Zamień listę na siatkę',
+                    id: 'list-to-grid',
+                    checked: pepperTweakerConfig.improvements.listToGrid,
+                    callback: event => setConfig({ improvements: { listToGrid: event.target.checked } }, false),
+                  },
+                },
                 hideGroupsBar: {
                   create: createLabeledCheckbox,
                   params: {
@@ -2598,6 +2610,116 @@
         });
         dealsSectionObserver.observe(dealsSection, { childList: true });
         /* END: Deals Filtering */
+
+        /* List to Grid */
+        if (pepperTweakerConfig.improvements.listToGrid && !isGridLayout) {
+          dealsSection.style.display = 'grid';
+          dealsSection.style.gridGap = '10px';
+          dealsSection.style.gridTemplateColumns = 'repeat(4, 227px)';
+          dealsSection.style.gridAutoRows = '506px';
+
+          const styleNode = document.createElement('style');
+          const styleText = document.createTextNode(`
+            .threadGrid-image {
+              grid-row-start: 2;
+              grid-row-end: 4;
+              -ms-grid-row-span: 3;
+              grid-column: 1;
+              width: 196px !important;
+              padding-top: 8px;
+              // min-width: 0;
+              // min-height: 0;
+            }
+            .threadGrid-headerMeta {
+              grid-column: 1;
+              grid-row: 1;
+              -ms-grid-row-span: 1;
+              width: 196px !important;
+            }
+            .threadGrid-title {
+              grid-column: 1;
+              grid-row-start: 5;
+              grid-row-end: 6;
+              width: 196px !important;
+              padding-top: 8px;
+              // max-width: 100%;
+              // display: flex;
+              // flex-direction: column;
+              // justify-content: center;
+            }
+            .threadGrid-title .thread-title {
+              height: 48px;
+            }
+            .threadGrid-body {
+              grid-column: 1;
+              -ms-grid-column-span: 1;
+              grid-row: 7;
+              padding-top: 8px;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              display: -webkit-box;
+              -webkit-line-clamp: 3;
+              -webkit-box-orient: vertical;
+              // width: 100%;
+            }
+            .threadGrid-body .flex--dir-row-reverse {
+              flex-direction: column;
+            }
+            .threadGrid-body .space--t-2.hide--empty {
+              display: none;
+            }
+            .threadGrid-body .width--fromW2-6 {
+              width: 100%;
+              padding: 0 !important;
+              margin: 5px;
+            }
+            .threadGrid-footerMeta {
+              grid-column: 1;
+              -ms-grid-column-span: 1;
+              grid-row: 8;
+              width: 196px !important;
+            }
+            .threadGrid-footerMeta .footerMeta.fGrid {
+              flex-flow: row wrap;
+            }
+
+            #toc-target-deals div.thread {
+              display: none !important;
+            }
+            .threadGrid-footerMeta .iGrid-item {
+              margin: 10px;
+              padding: 0 !important;
+              width: 100%;
+            }
+            .threadGrid-footerMeta .cept-off {
+              display: none;
+            }
+            // #toc-target-deals .card--type-grid, #toc-target-deals .aGrid
+            .aGrid, .card--type-grid, .userHtml-video-inner, .userHtml-videoDummy .userHtml-videoDummy-img, .userHtml [data-animated-gif] div img {
+              position: static !important;
+            }
+            #toc-target-deals .listLayout-side {
+              position: absolute !important;
+              right: 0;
+              top: 0;
+              bottom: 0;
+            }
+            #toc-target-deals .listLayout-side > div, .card--type-vertical {
+              min-height: 500px;
+              max-height: 500px;
+              // margin-bottom: 5px;
+            }
+            .footerMeta .iGrid-item.width--all-12.width--fromW3-auto.space--l-0.space--fromW3-l-2.space--t-2.space--fromW3-t-0.hide--empty {
+              display: none;
+            }
+            .js-pagi-top {  /* hidding top pagination */
+              display: none;
+            }
+          `);
+          styleNode.appendChild(styleText);
+          document.head.appendChild(styleNode);
+        }
+        /* END: List to Grid */
 
         /* Auto Update */
         const updateGridWidgetsPosition = (isGridLayout, container, dealsSelector) => {
