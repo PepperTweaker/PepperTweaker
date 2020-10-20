@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.19
+// @version      0.9.20
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2516,6 +2516,7 @@
           if ((styleToApply.display === 'none') && element.classList.contains('thread--type-card')) {
             element.parentNode.style.display = 'none';
           } else {
+            delete Object.assign(styleToApply, { ['outline']: styleToApply['border'] })['border'];  // outline instead of border, TODO: it's to heaevy here
             Object.assign(element.style, styleToApply);
           }
         }
@@ -2615,26 +2616,30 @@
         if (pepperTweakerConfig.improvements.listToGrid && !isGridLayout) {
           dealsSection.style.display = 'grid';
           dealsSection.style.gridGap = '10px';
-          dealsSection.style.gridTemplateColumns = 'repeat(4, 227px)';
-          dealsSection.style.gridAutoRows = '506px';
+          dealsSection.style.gridTemplateColumns = 'repeat(6, 227px)';
+          dealsSection.style.gridAutoRows = '514px';
 
           const styleNode = document.createElement('style');
           const styleText = document.createTextNode(`
+            .threadGrid-headerMeta {
+              grid-column: 1;
+              grid-row: 1;
+              -ms-grid-row-span: 1;
+              width: 196px !important;
+            }
+            .cept-meta-ribbon .icon--hourglass, .cept-meta-ribbon .icon--hourglass ~ .hide--toW3,  /* deal starts/ends */
+            .cept-meta-ribbon .icon--location, .cept-meta-ribbon .icon--location ~ .hide--toW3,    /* local deal */
+            .cept-meta-ribbon .icon--world, .cept-meta-ribbon .icon--world ~ .hide--toW3,          /* delievery */
+            .cept-vote-box .cept-show-expired-threads {  /* deal ended text */
+              display: none;
+            }
             .threadGrid-image {
               grid-row-start: 2;
               grid-row-end: 4;
               -ms-grid-row-span: 3;
               grid-column: 1;
               width: 196px !important;
-              padding-top: 8px;
-              // min-width: 0;
-              // min-height: 0;
-            }
-            .threadGrid-headerMeta {
-              grid-column: 1;
-              grid-row: 1;
-              -ms-grid-row-span: 1;
-              width: 196px !important;
+              padding-top: 4px;
             }
             .threadGrid-title {
               grid-column: 1;
@@ -2642,25 +2647,24 @@
               grid-row-end: 6;
               width: 196px !important;
               padding-top: 8px;
-              // max-width: 100%;
-              // display: flex;
-              // flex-direction: column;
-              // justify-content: center;
             }
             .threadGrid-title .thread-title {
-              height: 48px;
+              height: 50px;
+            }
+            .threadGrid-title .overflow--fade {
+              height: 32px;
             }
             .threadGrid-body {
               grid-column: 1;
               -ms-grid-column-span: 1;
               grid-row: 7;
               padding-top: 8px;
+              height: 67px;
               text-overflow: ellipsis;
               overflow: hidden;
               display: -webkit-box;
               -webkit-line-clamp: 3;
               -webkit-box-orient: vertical;
-              // width: 100%;
             }
             .threadGrid-body .flex--dir-row-reverse {
               flex-direction: column;
@@ -2678,42 +2682,51 @@
               -ms-grid-column-span: 1;
               grid-row: 8;
               width: 196px !important;
+              padding-top: 5px;
             }
             .threadGrid-footerMeta .footerMeta.fGrid {
               flex-flow: row wrap;
             }
-
-            #toc-target-deals div.thread {
-              display: none !important;
-            }
             .threadGrid-footerMeta .iGrid-item {
-              margin: 10px;
+              margin: 13px 0;
               padding: 0 !important;
               width: 100%;
             }
+            #toc-target-deals div.thread {
+              display: none !important;
+            }
             .threadGrid-footerMeta .cept-off {
               display: none;
-            }
-            // #toc-target-deals .card--type-grid, #toc-target-deals .aGrid
-            .aGrid, .card--type-grid, .userHtml-video-inner, .userHtml-videoDummy .userHtml-videoDummy-img, .userHtml [data-animated-gif] div img {
-              position: static !important;
             }
             #toc-target-deals .listLayout-side {
               position: absolute !important;
               right: 0;
               top: 0;
-              bottom: 0;
             }
             #toc-target-deals .listLayout-side > div, .card--type-vertical {
               min-height: 500px;
               max-height: 500px;
-              // margin-bottom: 5px;
             }
             .footerMeta .iGrid-item.width--all-12.width--fromW3-auto.space--l-0.space--fromW3-l-2.space--t-2.space--fromW3-t-0.hide--empty {
               display: none;
             }
             .js-pagi-top {  /* hidding top pagination */
               display: none;
+            }
+            .listLayout {
+              position: static;
+              max-width: none;
+            }
+            .listLayout-main {
+              width: max-content;
+              margin: 0 auto;
+            }
+            .listLayout-side {
+              width: 234px;
+              padding: 0 8px;
+            }
+            .thread .threadGrid {
+              padding-bottom: 0;  /* removes padding that appears at the bootm of outline from filters */
             }
           `);
           styleNode.appendChild(styleText);
