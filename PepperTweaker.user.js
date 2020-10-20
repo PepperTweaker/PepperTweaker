@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.21
+// @version      0.9.22
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2616,9 +2616,13 @@
         if (pepperTweakerConfig.improvements.listToGrid && !isGridLayout) {
           const windowSize  = getWindowSize();
           const sideContainerWidth = 234;
+          const sideContainerPadding = 8;
           const columnWidth = 227;
           const gridGapWidth = 10;
-          const numberOfColumns = Math.floor((windowSize.width - 2 * sideContainerWidth) / (columnWidth + gridGapWidth));
+          const gridPadding = 10;
+          const gridMaxWidth = windowSize.width - sideContainerWidth - 2 * sideContainerPadding - 2 * gridPadding;
+          const numberOfColumns = Math.floor(gridMaxWidth / (columnWidth + gridGapWidth));
+          const gridMarginLeft = Math.floor((gridMaxWidth - numberOfColumns * (columnWidth + gridGapWidth)) / 2);
           dealsSection.style.display = 'grid';
           dealsSection.style.gridGap = `${gridGapWidth}px`;
           dealsSection.style.gridTemplateColumns = `repeat(${numberOfColumns}, ${columnWidth}px)`;
@@ -2645,6 +2649,7 @@
               grid-column: 1;
               width: 196px !important;
               padding-top: 4px;
+              padding-left: 2px !important;
             }
             .threadGrid-title {
               grid-column: 1;
@@ -2663,7 +2668,7 @@
               grid-column: 1;
               -ms-grid-column-span: 1;
               grid-row: 7;
-              padding-top: 8px;
+              padding-top: .28571em !important;
               height: 67px;
               text-overflow: ellipsis;
               overflow: hidden;
@@ -2675,6 +2680,10 @@
               flex-direction: column;
             }
             .threadGrid-body .space--t-2.hide--empty {
+              padding-top: 0 !important;
+              /* display: none; */
+            }
+            .threadGrid-body .thread-updates-top {
               display: none;
             }
             .threadGrid-body .width--fromW2-6 {
@@ -2682,7 +2691,8 @@
               padding: 0 !important;
               margin: 5px;
             }
-            .threadGrid-body .cept-threadUpdate {
+            .threadGrid-body .cept-threadUpdate,
+            .threadGrid-body .flex--dir-row-reverse {
               display: none;
             }
             .threadGrid-footerMeta {
@@ -2690,7 +2700,7 @@
               -ms-grid-column-span: 1;
               grid-row: 8;
               width: 196px !important;
-              padding-top: 5px;
+              padding-top: 5px !important;
             }
             .threadGrid-footerMeta .footerMeta.fGrid {
               flex-flow: row wrap;
@@ -2699,6 +2709,9 @@
               margin: 13px 0;
               padding: 0 !important;
               width: 100%;
+            }
+            .threadGrid-footerMeta .cept-flag-mobile-source {
+              display: none;
             }
             #toc-target-deals div.thread {
               display: none !important;
@@ -2727,11 +2740,11 @@
             }
             .listLayout-main {
               width: max-content;
-              margin: 0 auto;
+              margin-left: ${gridMarginLeft}px;
             }
             .listLayout-side {
               width: ${sideContainerWidth}px;
-              padding: 0 8px;
+              padding: 0 ${sideContainerPadding}px;
             }
             .thread .threadGrid {
               padding-bottom: 0;  /* removes padding that appears at the bootm of outline from filters */
