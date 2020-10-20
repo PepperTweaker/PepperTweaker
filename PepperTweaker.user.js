@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.20
+// @version      0.9.21
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -308,6 +308,11 @@
     const removeAllChildren = parent => { while (parent.hasChildNodes()) parent.removeChild(parent.lastChild); };
     const moveAllChildren = (oldParent, newParent) => { while (oldParent.hasChildNodes()) newParent.appendChild(oldParent.firstChild); };
     const cloneAttributes = (source, target) => [...source.attributes].forEach(attr => target.setAttribute(attr.nodeName, attr.nodeValue));
+
+    const getWindowSize = () => ({
+      width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
+      height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
+    });
 
     /*** Configuration Functions ***/
     const setConfig = (configuration = { pluginEnabled, darkThemeEnabled, improvements, autoUpdate, dealsFilters, commentsFilters }, reload = false) => {
@@ -2265,11 +2270,6 @@
           return text;
         };
 
-        const getWindowSize = () => ({
-          width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
-          height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
-        });
-
         // const dealTitleSpan = document.querySelector('article .thread-title--item');
         // const dealTitleInput = createTextInput({ value: dealTitleSpan.textContent.trim() });
         // dealTitleSpan.replaceWith(dealTitleInput);
@@ -2586,7 +2586,7 @@
       }
 
       let dealsSectionSelector;
-      const dealsSection = document.querySelector(dealsSectionSelector = '#toc-target-deals .js-threadList') || document.querySelector(dealsSectionSelector = '#toc-target-deals');
+      const dealsSection = document.querySelector(dealsSectionSelector = '#toc-target-deals .js-threadList') || document.querySelector(dealsSectionSelector = '#toc-target-deals') || document.querySelector(dealsSectionSelector = '.listLayout');
       // const dealsSection = document.querySelector(dealsSectionSelector = 'section.gridLayout') || document.querySelector(dealsSectionSelector = 'div.gridLayout') || document.querySelector(dealsSectionSelector = 'section.listLayout .js-threadList') || document.querySelector(dealsSectionSelector = 'div.listLayout');
       // cannot combine as one selector => div.gridLayout appears before section.gridLayout on the main page
       const isGridLayout = dealsSectionSelector.indexOf('gridLayout') >= 0;
@@ -2614,9 +2614,14 @@
 
         /* List to Grid */
         if (pepperTweakerConfig.improvements.listToGrid && !isGridLayout) {
+          const windowSize  = getWindowSize();
+          const sideContainerWidth = 234;
+          const columnWidth = 227;
+          const gridGapWidth = 10;
+          const numberOfColumns = Math.floor((windowSize.width - 2 * sideContainerWidth) / (columnWidth + gridGapWidth));
           dealsSection.style.display = 'grid';
-          dealsSection.style.gridGap = '10px';
-          dealsSection.style.gridTemplateColumns = 'repeat(6, 227px)';
+          dealsSection.style.gridGap = `${gridGapWidth}px`;
+          dealsSection.style.gridTemplateColumns = `repeat(${numberOfColumns}, ${columnWidth}px)`;
           dealsSection.style.gridAutoRows = '514px';
 
           const styleNode = document.createElement('style');
@@ -2677,6 +2682,9 @@
               padding: 0 !important;
               margin: 5px;
             }
+            .threadGrid-body .cept-threadUpdate {
+              display: none;
+            }
             .threadGrid-footerMeta {
               grid-column: 1;
               -ms-grid-column-span: 1;
@@ -2722,7 +2730,7 @@
               margin: 0 auto;
             }
             .listLayout-side {
-              width: 234px;
+              width: ${sideContainerWidth}px;
               padding: 0 8px;
             }
             .thread .threadGrid {
