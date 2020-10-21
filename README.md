@@ -1,8 +1,8 @@
 # PepperTweaker
 
-Czyli Pepper na resorach...
+Czyli Pepper na resorach :)
 
-Jest to darmowe i otwartoźródłowe rozszerzenie do serwisu Pepper ułatwiające korzystanie z niego. Na razie obsługiwany jest tylko serwis polski Pepper.pl, ale niebawem ma zostać dodane wsparcie pozostałych domen Peppera.
+Jest to darmowe i otwartoźródłowe rozszerzenie do serwisu Pepper, które wzbogaca platformę o dodatkowe funkcjonalności niedostępne w wersji oficjalnej. Na chwilę obecną obsługiwany jest tylko polski serwis Pepper.pl, ale niebawem zostanie dodane wsparcie pozostałych domen Peppera.
 
 
 ## Spis treści
@@ -28,7 +28,7 @@ Jest to darmowe i otwartoźródłowe rozszerzenie do serwisu Pepper ułatwiając
 
 ## Słowem wstępu
 
-PepperTweaker to projekt hobbystyczny, który powstał w celu polepszenia i dodania nowych funkcjonalności do Peppera. Nie jestem pracownikiem Peppera a skrypt powstał i jest aktualizowany dzięki poświęceniu sporej ilości wolnego czasu, więc proszę o uszanowanie tego i nie podchodzenie w sposób roszczeniowy. :)
+PepperTweaker to projekt hobbystyczny, który powstał w celu polepszenia i dodania nowych funkcjonalności do Peppera. Nie jestem pracownikiem Peppera a skrypt powstał i jest aktualizowany dzięki poświęceniu sporej ilości wolnego czasu, więc proszę o uszanowanie tego i nie podchodzenie w sposób roszczeniowy :).
 
 **Dla pewności ostrzegam:
 Nie ponoszę żadnej odpowiedzialności za korzystanie z rozszerzenia oraz nie gwarantuję jego działania, ani że będę go w przyszłości rozwijał.**
@@ -38,13 +38,15 @@ Skrypt działa tylko w przeglądarce (nie działa w aplikacji).
 W razie pytań lub problemów zajrzyj do tej dyskusji:
 [PepperTweaker, czyli Pepper na resorach :)](https://www.pepper.pl/dyskusji/peppertweaker-beta-testy-188008).
 
+Jeśli masz obawy odnośnie prywatności, to zajrzyj do sekcji [Uwagi końcowe](#uwagi-końcowe).
+
 
 ## Instalacja
 
-1. Do korzystania z rozszerzenia potrzebny jest jeden z pluginów do przeglądarki, umożliwiających uruchamianie skryptów JS na stronach www. Do wyboru właściwie są trzy:
+1. Do korzystania z rozszerzenia potrzebny jest jeden z pluginów do przeglądarki, umożliwiających uruchamianie skryptów JS na stronach internetowych. Do wyboru właściwie są trzy:
     * [Tampermonkey](https://www.tampermonkey.net/) - największa kompatybilność z PepperTweakerem, ponieważ sam z niego korzystam;
-    * [Greasemonkey](https://www.greasespot.net/) - ojciec wszystkich pluginów, ale podobno już rzadko aktualizowany;
-    * [Violentmonkey](https://violentmonkey.github.io/get-it/) - najnowszy plugin, który jest open source (bardzo ciekawa alternatywa, ale nie miałem czasu jeszcze się temu przyjrzeć).
+    * [Greasemonkey](https://www.greasespot.net/) - ojciec wszystkich tego typu pluginów, ale podobno już rzadko aktualizowany;
+    * [Violentmonkey](https://violentmonkey.github.io/get-it/) - najnowszy plugin, który jest open source, a zatem bardzo ciekawa alternatywa, ale nie miałem czasu jeszcze się temu przyjrzeć.
 
 2. Po zainstalowaniu jednego z pluginów przechodzisz na [stronę skryptu PepperTweaker w serwise GreasyFork](https://greasyfork.org/en/scripts/390341-peppertweaker) i klikasz zielony przycisk "Zainstaluj skrypt":\
 ![Install Script Button](images/peppertweaker-greasyfork-install-script-button.png)
@@ -85,7 +87,10 @@ Domyślnie ustawionych jest kilka filtrów dodających obramowanie do pewnych ok
 
 Warunki ustawiane w filtrze są ze sobą łączone, tj. jeśli podasz słowo kluczowe **buty** oraz w miejsce użytkownika wstawisz **Jeżew** i dodatkowo w stylu zaznaczysz **ramkę**, oznaczać to będzie, że wszystkie okazje ze słowem buty wstawione przez użytkownika Jeżew zostaną otoczone ramką o wybranym kolorze.
 
-Warto jeszcze zaznaczyć, że wszystkie warunki z polami tekstowymi akceptują wyrażenia regularne, więc można poprawić powyższy filtr, aby akceptował również słowo butów i but, wpisując np.: **buty|butów|but** lub prościej **but(y|ów)?**.
+Warto jeszcze zaznaczyć, że wszystkie warunki z polami tekstowymi akceptują wyrażenia regularne, więc można poprawić powyższy filtr, aby akceptował również słowo butów i but, wpisując np.:\
+**buty|butów|but**\
+lub nawet prościej:\
+**but(y|ów)?**
 
 Do skryptu zostały dołączone przykładowe filtry, w których można sprawdzić sobie przykłady wyrażeń regularnych.
 
@@ -104,7 +109,7 @@ Obecna część ustawień dotyczących filtrów okazji wygląda następująco:
 
 Bardzo podobna funkcja do filtrowania okazji, z tym że dotyczy filtrowania komentarzy. Możemy np. ukryć komentarze zawierające brzydkie słowa lub komentarze danego użytkownika.
 
-Domyślnie włączony jest tylko jeden filtr, który powoduje wyróżnianie zieloną ramką moich komentarzy :D Dla przykładu zostały jeszcze dodane dwa inne, ale nie są aktywne.
+Domyślnie włączony jest tylko jeden filtr, który powoduje wyróżnianie zieloną ramką moich komentarzy :D. Dla przykładu zostały jeszcze dodane dwa inne, ale nie są aktywne.
 
 Obecna wersja ustawień dotyczących filtrów okazji jest następująca:
 
@@ -153,7 +158,7 @@ A tu wynik po kliknięciu w przycisk:
 
 Jest to funkcja eksperymentalna i może jeszcze zawierać błędy.
 
-Pozwala na włączenie obserwowania listy ofert lub komentarzy pod okazją oraz automatyczne ładowanie ich bez odświeżania się strony. dodatkowo możliwe jest włączenie powiadomienia dźwiękowego w przypadku pojawienia się nowej okazji lub nowego komentarza.
+Pozwala na włączenie obserwowania listy ofert lub komentarzy pod okazją oraz automatyczne ładowanie ich bez odświeżania się strony. Dodatkowo możliwe jest włączenie powiadomienia dźwiękowego w przypadku pojawienia się nowej okazji lub nowego komentarza.
 
 ![Autoupdate Deals](images/peppertweaker-autoupdate-deals.png)
 
