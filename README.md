@@ -56,7 +56,8 @@ I gotowe! Od teraz możesz cieszyć się nową funkcjonalnością na Pepperze!
 ## Funkcje PepperTweakera
 
 Do zarządzania Tweakerem służy GUI dobudowane do Peppera w sekcji ustawień.
-Link jest dynamiczny i zależy od nazwy użytkownika, ale ogólna postać jest następująca: https://www.pepper.pl/profile/[TUTAJ_NAZWA_UŻYTKOWNIKA]/settings#peppertweaker
+Link jest dynamiczny i zależy od nazwy użytkownika, ale ogólna postać jest następująca:\
+https://www.pepper.pl/profile/[NAZWA_UŻYTKOWNIKA]/settings#peppertweaker
 
 ![Settings Tab](images/peppertweaker-settings-tab.png)
 

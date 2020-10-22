@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.24
+// @version      0.9.25
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -43,7 +43,7 @@
     // const orangeColor = '#d1d5db';
 
     css += `
-      .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
+      .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .page2-secTitle, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
         color: ${textColor};
       }
       .speechBubble {
@@ -2650,7 +2650,7 @@
           const gridPadding = 10;
           dealsSection.style.display = 'grid';
           dealsSection.style.gridGap = `${gridGapWidth}px`;
-          dealsSection.style.gridAutoRows = '514px';
+          dealsSection.style.gridAutoRows = 'min-content';
           const updateGridView = () => {
             const windowSize  = getWindowSize();
             const gridMaxWidth = windowSize.width - sideContainerWidth - 2 * sideContainerPadding - 2 * gridPadding;
@@ -2664,13 +2664,17 @@
 
           const styleNode = document.createElement('style');
           const styleText = document.createTextNode(`
+            div.listLayout-mainItem.bg--color-brandPrimaryPale {
+              grid-column: 1 / -1;
+            }
             .threadGrid-headerMeta {
               grid-column: 1;
               grid-row: 1;
               -ms-grid-row-span: 1;
               width: 196px !important;
             }
-            .cept-meta-ribbon .icon--hourglass, .cept-meta-ribbon .icon--hourglass ~ .hide--toW3,  /* deal starts/ends */
+            .cept-meta-ribbon .icon--clock.text--color-green, .cept-meta-ribbon .icon--clock.text--color-green ~ .hide--toW3,  /* deal starts */
+            .cept-meta-ribbon .icon--hourglass, .cept-meta-ribbon .icon--hourglass ~ .hide--toW3,  /* deal ends */
             .cept-meta-ribbon .icon--location, .cept-meta-ribbon .icon--location ~ .hide--toW3,    /* local deal */
             .cept-meta-ribbon .icon--world, .cept-meta-ribbon .icon--world ~ .hide--toW3,          /* delievery */
             .cept-vote-box .cept-show-expired-threads {  /* deal ended text */
