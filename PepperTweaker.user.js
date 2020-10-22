@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.23
+// @version      0.9.24
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2522,7 +2522,30 @@
         }
       };
 
-      const processElement = (element, deepSearch = false) => {
+      /* List to grid voucher button update */
+      const updateGridDeal = (dealNode) => {
+        // Voucher button update
+        const buttonToMove = dealNode.querySelector('.threadGrid-body div div.width--fromW2-6:last-child');
+        const threadGridFooterMeta = dealNode.querySelector('.footerMeta .iGrid-item');
+        if (buttonToMove && threadGridFooterMeta) {
+          const viewDealButton = threadGridFooterMeta.querySelector('.iGrid-item .btn');
+          if (viewDealButton) {
+            viewDealButton.remove();
+          }
+          threadGridFooterMeta.appendChild(buttonToMove);
+          buttonToMove.style.width = '100%';
+          buttonToMove.style.paddingRight = '0 !important';
+          buttonToMove.parentNode.style.display = 'block';
+        }
+        // Deal refresh ribbon text
+        const refreshRibbon = dealNode.querySelector('.cept-meta-ribbon .icon--refresh ~ span.hide--toW3');
+        if (refreshRibbon) {
+          refreshRibbon.textContent = refreshRibbon.textContent.replace(/Zaktualizowano|temu/ig, '');
+        }
+      }
+      /* END */
+
+     const processElement = (element, deepSearch = false, isGridLayout = false) => {
         if ((element.nodeName === 'DIV') && element.classList.contains('threadCardLayout--card')) {
           element = element.querySelector('article[id^="thread"]');
         }
@@ -2532,6 +2555,12 @@
           const threadImage = element.querySelector('.cept-thread-img');
           threadImage.dataset.handler = 'lightbox';
           threadImage.dataset.lightbox = `{"images":[{"width":640,"height":474,"unattached":"","uid":"","url":"${threadImage.src.replace('thread_large', 'thread_full_screen')}"}]}`;
+          /* END */
+
+          /* List to grid update */
+          if (pepperTweakerConfig.improvements.listToGrid && !isGridLayout) {
+            updateGridDeal(element);
+          }
           /* END */
 
           let title = element.querySelector('.cept-tt');
@@ -2597,14 +2626,14 @@
 
         /* Process already visible elements */
         for (let childNode of dealsSection.childNodes) {
-          processElement(childNode, deepSearch);
+          processElement(childNode, deepSearch, isGridLayout);
         }
 
         /* Set the observer to process elements on addition */
         const dealsSectionObserver = new MutationObserver(function (allMutations, observer) {
           allMutations.every(function (mutation) {
             for (const addedNode of mutation.addedNodes) {
-              processElement(addedNode, deepSearch);
+              processElement(addedNode, deepSearch, isGridLayout);
             }
             return false;
           });
@@ -2614,19 +2643,24 @@
 
         /* List to Grid */
         if (pepperTweakerConfig.improvements.listToGrid && !isGridLayout) {
-          const windowSize  = getWindowSize();
           const sideContainerWidth = 234;
           const sideContainerPadding = 8;
           const columnWidth = 227;
           const gridGapWidth = 10;
           const gridPadding = 10;
-          const gridMaxWidth = windowSize.width - sideContainerWidth - 2 * sideContainerPadding - 2 * gridPadding;
-          const numberOfColumns = Math.floor(gridMaxWidth / (columnWidth + gridGapWidth));
-          const gridMarginLeft = Math.floor((gridMaxWidth - numberOfColumns * (columnWidth + gridGapWidth)) / 2);
           dealsSection.style.display = 'grid';
           dealsSection.style.gridGap = `${gridGapWidth}px`;
-          dealsSection.style.gridTemplateColumns = `repeat(${numberOfColumns}, ${columnWidth}px)`;
           dealsSection.style.gridAutoRows = '514px';
+          const updateGridView = () => {
+            const windowSize  = getWindowSize();
+            const gridMaxWidth = windowSize.width - sideContainerWidth - 2 * sideContainerPadding - 2 * gridPadding;
+            const numberOfColumns = Math.floor(gridMaxWidth / (columnWidth + gridGapWidth));
+            const gridMarginLeft = Math.floor((gridMaxWidth - numberOfColumns * (columnWidth + gridGapWidth)) / 2);
+            dealsSection.style.gridTemplateColumns = `repeat(${numberOfColumns}, ${columnWidth}px)`;
+            dealsSection.style.marginLeft = `${gridMarginLeft}px`;
+          }
+          updateGridView();
+          window.addEventListener('resize', updateGridView);
 
           const styleNode = document.createElement('style');
           const styleText = document.createTextNode(`
@@ -2641,6 +2675,13 @@
             .cept-meta-ribbon .icon--world, .cept-meta-ribbon .icon--world ~ .hide--toW3,          /* delievery */
             .cept-vote-box .cept-show-expired-threads {  /* deal ended text */
               display: none;
+            }
+            .cept-meta-ribbon .icon--refresh {
+              margin-right: .35em !important;
+            }
+            .cept-vote-box button[data-track*="vote"] {  /* smaller vote box */
+              padding-left: .28em !important;
+              padding-right: .28em !important;
             }
             .threadGrid-image {
               grid-row-start: 2;
@@ -2659,17 +2700,17 @@
               padding-top: 8px;
             }
             .threadGrid-title .thread-title {
-              height: 50px;
+              height: 3.6em;
             }
             .threadGrid-title .overflow--fade {
-              height: 32px;
+              height: 2.1em;
             }
             .threadGrid-body {
               grid-column: 1;
               -ms-grid-column-span: 1;
               grid-row: 7;
               padding-top: .28571em !important;
-              height: 67px;
+              height: 4.6em;
               text-overflow: ellipsis;
               overflow: hidden;
               display: -webkit-box;
@@ -2710,6 +2751,9 @@
               padding: 0 !important;
               width: 100%;
             }
+            .threadGrid-footerMeta .iGrid-item .space--fromW2-r-1 {
+              padding-right: 0 !important;
+            }
             .threadGrid-footerMeta .cept-flag-mobile-source {
               display: none;
             }
@@ -2740,7 +2784,6 @@
             }
             .listLayout-main {
               width: max-content;
-              margin-left: ${gridMarginLeft}px;
             }
             .listLayout-side {
               width: ${sideContainerWidth}px;
@@ -2889,7 +2932,12 @@
   }
   /*** END: startPepperTweaker() ***/
 
-  document.addEventListener("DOMContentLoaded", startPepperTweaker);
+  const isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+  if (isOpera) {
+    window.addEventListener('load', startPepperTweaker);
+  } else {
+    document.addEventListener('DOMContentLoaded', startPepperTweaker);
+  }
 
   /***** END: RUN AFTER DOCUMENT HAS BEEN LOADED *****/
 
