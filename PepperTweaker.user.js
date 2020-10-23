@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.25
+// @version      0.9.26
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -16,176 +16,535 @@
   /***** RUN AT DOCUMENT START (BEFORE LOAD) *****/
   /***********************************************/
 
+  /*** Default configuration ***/
+
+  const backupConfigOnFailureLoad = {
+    dealsFilters: true,
+    commentsFilters: true,
+  };
+
+  /* Plugin Enabled */
+  const defaultConfigPluginEnabled = true;
+
+  /* Dark Theme Enabled */
+  const defaultConfigDarkThemeEnabled = true;
+
+  /* Improvements */
+  const defaultConfigImprovements = {
+    listToGrid: true,
+    transparentPaginationFooter: true,
+    hideTopDealsWidget: false,
+    hideGroupsBar: false,
+    repairDealDetailsLinks: true,
+    repairDealImageLink: true,
+    addLikeButtonsToBestComments: true,
+    addSearchInterface: true,
+    addCommentPreviewOnProfilePage: true,
+  };
+
+  /* Auto Update */
+  const defaultConfigAutoUpdate = {
+    dealsDefaultEnabled: false,
+    commentsDefaultEnabled: false,
+    soundEnabled: true,
+    askBeforeLoad: false,
+  };
+
+  /* Deals Filters */
+  const defaultConfigDealsFilters = [
+    { name: 'Alkohol słowa kluczowe', active: false, keyword: /\bpiw[oa]\b|\bbeer|alkohol|whiske?y|likier|w[óo]d(ecz)?k[aąieę]|\bwark[aąieę]|\bbols|\bsoplica\b|johnni?(e|y) walker|jim ?beam|gentleman ?jack|beefeater|tequilla|\bmacallan|hennessy|armagnac ducastaing|\bbaczewski|\baperol|\bvodka|carlsberg|kasztelan|okocim|smuggler|martini|\blager[ay]?\b|żywiec|pilsner|\brum[uy]?\b|książęce|\btrunek|amundsen|\bbrandy\b|żubrówk[aąięe]|\bradler\b|\btyskie\b|bourbon|glen moray|\bbrowar|\bgran[td]'?s\b|jagermeister|jack daniel'?s|\blech\b|heineken|\bcalsberg|\bbacardi\b|\bbushmills|\bballantine'?s|somersby|gentelman jack/i, style: { opacity: '0.3' } },  // don't use: \bwin(a|o)\b <-- to many false positive e.g. Wiedźmin 3 Krew i Wino
+    { name: 'Disco Polo', active: false, keyword: /disco polo/i, style: { display: 'none' } },
+    { name: 'Niezdrowe jedzenie', active: false, merchant: /mcdonalds|kfc|burger king/i, style: { opacity: '0.3' } },
+    { name: 'Aliexpress/Banggood', active: false, merchant: /aliexpress|banggood/i, style: { border: '4px dashed #e00034' } },
+    { name: 'Nieuczciwi sprzedawcy', active: false, merchant: /empik|komputronik|proline|super-pharm/i, style: { border: '4px dashed #1f7ecb' } },
+    { name: 'Największe przeceny', active: false, discountAbove: 80, style: { border: '4px dashed #51a704' } },
+    { name: 'Spożywcze', active: false, groups: /spożywcze/i, style: { opacity: '0.3' } },
+    { name: 'Lokalne', active: false, local: true, style: { border: '4px dashed #880088' } },
+  ];
+
+  /* Comments filters */
+  const defaultConfigCommentsFilters = [
+    { name: 'SirNiedźwiedź', active: true, user: /SirNiedźwiedź/i, style: { border: '2px dotted #51a704' } },
+    { name: 'G... burze by urtedbo', user: /urtedbo/i, keyword: /poo.*burz[eęaą]/i, style: { display: 'none' } },  // can match emoticons (also in brackets) => <i class="emoji emoji--type-poo" title="(poo)"></i>
+    { name: 'Brzydkie słowa', keyword: /gówno|gowno|dópa|dupa/i, style: { opacity: '0.3' } },
+  ];
+
+  const createNewFilterName = 'Utwórz nowy...';
+
+  const defaultFilterStyleValues = {
+    deals: {
+      display: 'none',
+      opacity: '0.3',
+      borderWidth: '4px',
+      borderStyle: 'dashed',
+      borderColor: '#880088',  // '#ff7900'
+    },
+    comments: {
+      display: 'none',
+      opacity: '0.3',
+      borderWidth: '2px',
+      borderStyle: 'dotted',
+      borderColor: '#880088',
+    },
+  };
+
+  /*** END: Deafult Configuration ***/
+
+  const messageWrongJSONStyle = 'Niewłaściwa składnia w polu stylu. Należy użyć składni JSON.';
+
+  //RegExp.prototype.toJSON = RegExp.prototype.toString;  // to stringify & parse RegExp
+  //const MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+  const newRegExp = (pattern, flags = 'i') => (pattern instanceof RegExp || pattern.constructor.name === 'RegExp') ? pattern : pattern && new RegExp(pattern, flags) || null;
+  // const isEmptyObject = Object.entries(value).length === 0 && value.constructor === Object;
+  const isBoolean = value => value === true || value === false;  // faster than typeof
+  const isNumeric = value => !isNaN(parseFloat(value)) && isFinite(value);
+  const isInteger = value => !isNaN(value) && parseInt(Number(value)) == value && !isNaN(parseInt(value, 10));
+  const isString = value => typeof value === 'string' || value instanceof String;
+
+  const getCSSBorderColor = borderCSS => borderCSS && isString(borderCSS) && (borderCSS.match(/#[a-fA-F0-9]+/) || [''])[0] || null;  // match returns array or null => null will throw an error for index [0]
+  const getCSSBorderStyle = borderCSS => borderCSS && isString(borderCSS) && (borderCSS.match(/dashed|dotted|solid|double|groove|ridge|inset|outset/) || [''])[0] || null;
+
+  const arrayDifference = (array1, array2) => array1.filter(value => !array2.includes(value));
+  const arrayIntersection = (array1, array2) => array1.filter(value => array2.includes(value));
+
+  const JSONRegExpReplacer = (key, value) => (value instanceof RegExp) ? { __type__: 'RegExp', source: value.source, flags: value.flags } : value;
+  const JSONRegExpReviver = (key, value) => (value && value.__type__ === 'RegExp') ? new RegExp(value.source, value.flags) : value;
+
+  const zeroPad = number => (number < 10) ? `0${number}` : number;
+  const getCurrentDateTimeString = () => {
+    const now = new Date(),
+      year = now.getFullYear(),
+      month = zeroPad(now.getMonth() + 1),  // months starting from 0
+      day = zeroPad(now.getDate()),
+      hours = zeroPad(now.getHours()),
+      minutes = zeroPad(now.getMinutes()),
+      seconds = zeroPad(now.getSeconds());
+    return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+  };
+
+  const removeAllChildren = parent => { while (parent.hasChildNodes()) parent.removeChild(parent.lastChild); };
+  const moveAllChildren = (oldParent, newParent) => { while (oldParent.hasChildNodes()) newParent.appendChild(oldParent.firstChild); };
+  const cloneAttributes = (source, target) => [...source.attributes].forEach(attr => target.setAttribute(attr.nodeName, attr.nodeValue));
+
+  const getWindowSize = () => ({
+    width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
+    height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
+  });
+
+  /*** Configuration Functions ***/
+  const setConfig = (configuration = { pluginEnabled, darkThemeEnabled, improvements, autoUpdate, dealsFilters, commentsFilters }, reload = false) => {
+    if ((configuration.pluginEnabled !== undefined) && isBoolean(configuration.pluginEnabled)) {
+      localStorage.setItem('PepperTweaker.config.pluginEnabled', JSON.stringify(configuration.pluginEnabled));
+      pepperTweakerConfig.pluginEnabled = configuration.pluginEnabled;
+    }
+    if ((configuration.darkThemeEnabled !== undefined) && isBoolean(configuration.darkThemeEnabled)) {
+      localStorage.setItem('PepperTweaker.config.darkThemeEnabled', JSON.stringify(configuration.darkThemeEnabled));
+      pepperTweakerConfig.darkThemeEnabled = configuration.darkThemeEnabled;
+    }
+    if (configuration.improvements !== undefined) {  // only one option can be specified here
+      configuration.improvements = {  // to ensure only these props are in the autoUpdate object
+        listToGrid: isBoolean(configuration.improvements.listToGrid) ? configuration.improvements.listToGrid : pepperTweakerConfig.improvements.listToGrid,
+        transparentPaginationFooter: isBoolean(configuration.improvements.transparentPaginationFooter) ? configuration.improvements.transparentPaginationFooter : pepperTweakerConfig.improvements.transparentPaginationFooter,
+        hideTopDealsWidget: isBoolean(configuration.improvements.hideTopDealsWidget) ? configuration.improvements.hideTopDealsWidget : pepperTweakerConfig.improvements.hideTopDealsWidget,
+        hideGroupsBar: isBoolean(configuration.improvements.hideGroupsBar) ? configuration.improvements.hideGroupsBar : pepperTweakerConfig.improvements.hideGroupsBar,
+        repairDealDetailsLinks: isBoolean(configuration.improvements.repairDealDetailsLinks) ? configuration.improvements.repairDealDetailsLinks : pepperTweakerConfig.improvements.repairDealDetailsLinks,
+        repairDealImageLink: isBoolean(configuration.improvements.repairDealImageLink) ? configuration.improvements.repairDealImageLink : pepperTweakerConfig.improvements.repairDealImageLink,
+        addLikeButtonsToBestComments: isBoolean(configuration.improvements.addLikeButtonsToBestComments) ? configuration.improvements.addLikeButtonsToBestComments : pepperTweakerConfig.improvements.addLikeButtonsToBestComments,
+        addSearchInterface: isBoolean(configuration.improvements.addSearchInterface) ? configuration.improvements.addSearchInterface : pepperTweakerConfig.improvements.addSearchInterface,
+        addCommentPreviewOnProfilePage: isBoolean(configuration.improvements.addCommentPreviewOnProfilePage) ? configuration.improvements.addCommentPreviewOnProfilePage : pepperTweakerConfig.improvements.addCommentPreviewOnProfilePage,
+      };
+      localStorage.setItem('PepperTweaker.config.improvements', JSON.stringify(configuration.improvements));
+      pepperTweakerConfig.improvements = configuration.improvements;
+    }
+    if (configuration.autoUpdate !== undefined) {  // only one option can be specified here
+      configuration.autoUpdate = {  // to ensure only these props are in the autoUpdate object
+        dealsDefaultEnabled: isBoolean(configuration.autoUpdate.dealsDefaultEnabled) ? configuration.autoUpdate.dealsDefaultEnabled : pepperTweakerConfig.autoUpdate.dealsDefaultEnabled,
+        commentsDefaultEnabled: isBoolean(configuration.autoUpdate.commentsDefaultEnabled) ? configuration.autoUpdate.commentsDefaultEnabled : pepperTweakerConfig.autoUpdate.commentsDefaultEnabled,
+        soundEnabled: isBoolean(configuration.autoUpdate.soundEnabled) ? configuration.autoUpdate.soundEnabled : pepperTweakerConfig.autoUpdate.soundEnabled,
+        askBeforeLoad: isBoolean(configuration.autoUpdate.askBeforeLoad) ? configuration.autoUpdate.askBeforeLoad : pepperTweakerConfig.autoUpdate.askBeforeLoad,
+      };
+      localStorage.setItem('PepperTweaker.config.autoUpdate', JSON.stringify(configuration.autoUpdate));
+      pepperTweakerConfig.autoUpdate = configuration.autoUpdate;
+    }
+    if ((configuration.dealsFilters !== undefined) && Array.isArray(configuration.dealsFilters)) {
+      localStorage.setItem('PepperTweaker.config.dealsFilters', JSON.stringify(configuration.dealsFilters, JSONRegExpReplacer));
+      pepperTweakerConfig.dealsFilters = configuration.dealsFilters;
+    }
+    if ((configuration.commentsFilters !== undefined) && Array.isArray(configuration.commentsFilters)) {
+      localStorage.setItem('PepperTweaker.config.commentsFilters', JSON.stringify(configuration.commentsFilters, JSONRegExpReplacer));
+      pepperTweakerConfig.commentsFilters = configuration.commentsFilters;
+    }
+    if (reload) {
+      location.reload();
+    }
+  };
+
+  const resetConfig = (resetConfiguration = { resetPluginEnabled: true, resetDarkThemeEnabled: true, resetImprovements: true, resetAutoUpdate: true, resetDealsFilters: true, resetCommentsFilters: true }, reload = true) => {
+    const setConfigObject = {};
+    if (!resetConfiguration || resetConfiguration.resetPluginEnabled === true) {
+      setConfigObject.pluginEnabled = defaultConfigPluginEnabled;
+    }
+    if (!resetConfiguration || resetConfiguration.resetDarkThemeEnabled === true) {
+      setConfigObject.darkThemeEnabled = defaultConfigDarkThemeEnabled;
+    }
+    if (!resetConfiguration || resetConfiguration.resetImprovements === true) {
+      setConfigObject.improvements = defaultConfigImprovements;
+    }
+    if (!resetConfiguration || resetConfiguration.resetAutoUpdate === true) {
+      setConfigObject.autoUpdate = defaultConfigAutoUpdate;
+    }
+    if (!resetConfiguration || resetConfiguration.resetDealsFilters === true) {
+      setConfigObject.dealsFilters = defaultConfigDealsFilters;
+    }
+    if (!resetConfiguration || resetConfiguration.resetCommentsFilters === true) {
+      setConfigObject.commentsFilters = defaultConfigCommentsFilters;
+    }
+    setConfig(setConfigObject, reload);
+  };
+
+  const loadConfig = (outputConfig, inputConfig, reload = false) => {
+    if (inputConfig) {
+      try {
+        outputConfig = JSON.parse(inputConfig, JSONRegExpReviver);
+        setConfig(outputConfig, false);  // reload == false --> missing config entries have to be reset first (below)
+      } catch (error) {
+        return false;
+      }
+    } else {
+      const failedSettings = [];
+      try {
+        outputConfig.pluginEnabled = JSON.parse(localStorage.getItem('PepperTweaker.config.pluginEnabled'));
+      } catch (error) {
+        failedSettings.push({ name: 'pluginEnabled', error: error.message });
+      }
+      try {
+        outputConfig.darkThemeEnabled = JSON.parse(localStorage.getItem('PepperTweaker.config.darkThemeEnabled'));
+      } catch (error) {
+        failedSettings.push({ name: 'darkThemeEnabled', error: error.message });
+      }
+      try {
+        outputConfig.improvements = JSON.parse(localStorage.getItem('PepperTweaker.config.improvements'));
+      } catch (error) {
+        failedSettings.push({ name: 'improvements', error: error.message });
+      }
+      try {
+        outputConfig.autoUpdate = JSON.parse(localStorage.getItem('PepperTweaker.config.autoUpdate'));
+      } catch (error) {
+        failedSettings.push({ name: 'autoUpdate', error: error.message });
+      }
+      try {
+        outputConfig.dealsFilters = JSON.parse(localStorage.getItem('PepperTweaker.config.dealsFilters'), JSONRegExpReviver);
+      } catch (error) {
+        failedSettings.push({ name: 'dealsFilters', error: error.message });
+      }
+      try {
+        outputConfig.commentsFilters = JSON.parse(localStorage.getItem('PepperTweaker.config.commentsFilters'), JSONRegExpReviver);
+      } catch (error) {
+        failedSettings.push({ name: 'commentsFilters', error: error.message });
+      }
+      for (const failed of failedSettings) {
+        console.error(`Cannot parse PepperTweaker.config.${failed.name}: ${failed.error}`);
+        console.error(`Value of ${failed.name}: ` + localStorage.getItem(`PepperTweaker.config.${failed.name}`));
+        if (backupConfigOnFailureLoad[failed.name] === true) {
+          localStorage.setItem(`PepperTweaker.config.${failed.name}-backup`, localStorage.getItem(`PepperTweaker.config.${failed.name}`));
+          console.error(`Current ${failed.name} value saved as PepperTweaker.config.${failed.name}-backup`);
+        }
+        outputConfig[failed.name] = null;
+      }
+    }
+    const configToReset = {};
+    if (!isBoolean(outputConfig.pluginEnabled)) {
+      configToReset.resetPluginEnabled = true;
+    }
+    if (!isBoolean(outputConfig.darkThemeEnabled)) {
+      configToReset.resetDarkThemeEnabled = true;
+    }
+    if (!outputConfig.improvements
+      || !isBoolean(outputConfig.improvements.listToGrid)
+      || !isBoolean(outputConfig.improvements.transparentPaginationFooter)
+      || !isBoolean(outputConfig.improvements.hideTopDealsWidget)
+      || !isBoolean(outputConfig.improvements.hideGroupsBar)
+      || !isBoolean(outputConfig.improvements.repairDealDetailsLinks)
+      || !isBoolean(outputConfig.improvements.repairDealImageLink)
+      || !isBoolean(outputConfig.improvements.addLikeButtonsToBestComments)
+      || !isBoolean(outputConfig.improvements.addSearchInterface)
+      || !isBoolean(outputConfig.improvements.addCommentPreviewOnProfilePage)) {
+      configToReset.resetImprovements = true;
+    }
+    if (!outputConfig.autoUpdate
+      || !isBoolean(outputConfig.autoUpdate.dealsDefaultEnabled)
+      || !isBoolean(outputConfig.autoUpdate.commentsDefaultEnabled)
+      || !isBoolean(outputConfig.autoUpdate.soundEnabled)
+      || !isBoolean(outputConfig.autoUpdate.askBeforeLoad)) {
+      configToReset.resetAutoUpdate = true;
+    }
+    if (!Array.isArray(outputConfig.dealsFilters)) {
+      configToReset.resetDealsFilters = true;
+    }
+    if (!Array.isArray(outputConfig.commentsFilters)) {
+      configToReset.resetCommentsFilters = true;
+    }
+    resetConfig(configToReset, reload);
+    return true;
+  }
+
+  const saveConfigFile = () => {
+    const link = document.createElement('A');
+    const file = new Blob([JSON.stringify(pepperTweakerConfig, JSONRegExpReplacer)], { type: 'text/plain' });
+    link.href = URL.createObjectURL(file);
+    link.download = `PepperTweaker-config-[${getCurrentDateTimeString()}].json`;
+    link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+  };
+
+  const importConfigFromFile = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'application/json';
+    fileInput.onchange = event => {
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (!loadConfig({}, reader.result, true)) {
+          alert('Ten plik nie wygląda jak konfiguracja PepperTweakera :/');
+        }
+      };
+      reader.readAsText(file);
+    };
+    fileInput.click();
+  };
+  /*** END: Configuration Functions ***/
+
+  /*** Load Configuration from Local Storage ***/
+  const pepperTweakerConfig = {};
+  loadConfig(pepperTweakerConfig);
+  /*** END: Load configuration ***/
+
+  /*** Setting CSS ***/
   let css = '';
 
-  /* Hide Groups Bar */
-  if ((JSON.parse(localStorage.getItem('PepperTweaker.config.pluginEnabled')) === true) && (JSON.parse(localStorage.getItem('PepperTweaker.config.improvements')).hideGroupsBar === true)) {
-    css += `
-      .subNav .bg--color-greyPanel {
-        display: none;
+  if (pepperTweakerConfig.pluginEnabled) {
+
+    /* Hide Groups Bar */
+    if (pepperTweakerConfig.improvements.hideTopDealsWidget) {
+      css += `
+        .cept-hottest-widget-position-top, .cept-hottest-widget-position-side {
+          display: none !important;
+        }
+      `;
+    }
+
+    /* Hide Top Deals Widget */
+    if (pepperTweakerConfig.improvements.hideGroupsBar) {
+      css += `
+        .subNav .bg--color-greyPanel {
+          display: none !important;
+        }
+      `;
+    }
+
+    /* Dark Theme Style */
+    if (pepperTweakerConfig.darkThemeEnabled) {
+    
+      // const invertColor = color => '#' + (Number(`0x1${ color.replace('#', '') }`) ^ 0xFFFFFF).toString(16).substr(1);
+      const darkBorderColor = '#121212';
+      const lightBorderColor = '#5c5c5c';
+      const darkBackgroundColor = '#242424';
+      const veryDarkBackgroundColor = '#1d1f20';
+      const darkestBackgroundColor = '#050c13';
+      const lightBackgroundColor = '#35373b';
+      const textColor = '#bfbfbf';
+      // const greyButtonColor = '#8f949b';
+      // const orangeColor = '#d1d5db';
+
+      css += `
+        .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .page2-secTitle, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
+          color: ${textColor};
+        }
+        .speechBubble {
+          background-color: ${darkBackgroundColor};
+          color: ${textColor};
+        }
+        .thread--type-card, .thread--type-list, .conversationList-msg--read:not(.conversationList-msg--active), .card, .threadCardLayout--card article, .threadCardLayout--card article span .threadCardLayout--card article span, .vote-box, .cept-comments-link, .subNavMenu-btn {
+          background-color: ${darkBackgroundColor} !important;
+          border-color: ${darkBorderColor};
+        }
+        .thread--deal, .thread--discussion {
+          background-color: ${darkBackgroundColor};
+          border-color: ${darkBorderColor};
+          border-top: none; /* there is some problem with the top border => whole article goes up */
+          border-radius: 5px;
+        }
+        .input, .inputBox, .secretCode-codeBox, .toolbar, .voucher-code {
+          background-color: ${darkBackgroundColor};
+          border-color: ${lightBorderColor};
+        }
+        /* Arrows */
+        .input-caretLeft {
+          border-right-color: ${lightBorderColor};
+        }
+        .input-caretLeft:before {
+          border-right-color: ${darkBackgroundColor};
+        }
+        .popover--layout-s > .popover-arrow:after, .inputBox:after {
+          border-bottom-color: ${darkBackgroundColor};
+        }
+        .popover--layout-n > .popover-arrow:after {
+          border-top-color: ${darkBackgroundColor};
+        }
+        .popover--layout-w > .popover-arrow:after {
+          border-left-color: ${darkBackgroundColor};
+        }
+        .popover--layout-e > .popover-arrow:after {
+          border-right-color: ${darkBackgroundColor};
+        }
+        /* END: Arrows */
+        /* Faders */
+        .overflow--fade-b-r--l:after, .overflow--fade-b-r--s:after, .overflow--fade-b-r:after, .overflow--fromW3-fade-b-r--l:after, .overflow--fromW3-fade-r--l:after, .thread-title--card:after, .thread-title--list--merchant:after, .thread-title--list:after {
+          background: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 50%,${darkBackgroundColor});
+          background: linear-gradient(90deg,hsla(0,0%,100%,0),${darkBackgroundColor} 50%,${darkBackgroundColor});
+          /* filter: brightness(100%) !important; */
+        }
+        .fadeEdge--r:after, .overflow--fade:after {
+          background: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 80%);
+          background: linear-gradient(90deg,hsla(0,0%,100%,0) 0,${darkBackgroundColor} 80%);
+          filter: brightness(100%) !important;
+        }
+        .text--overlay:before {
+          background-image: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 90%);
+          background-image: linear-gradient(90deg,hsla(0,0%,100%,0),${darkBackgroundColor} 90%);
+          filter: brightness(100%) !important;
+        }
+        /* END: Faders */
+        .btn--border, .bg--off, .boxSec--fromW3:not(.thread-infos), .boxSec, .voucher-codeCopyButton, .search input, .img, .userHtml-placeholder, .userHtml img, .popover--subNavMenu .popover-content {
+          border: 1px solid ${darkBorderColor} !important;  /* need full border definition for .bg--off */
+        }
+        .tabbedInterface-tab--selected, .bg--main, .tabbedInterface-tab--horizontal, .tabbedInterface-tab--selected, .comments-item--in-moderation, .comments-item-inner--active, .comments-item-inner--edit, /*.thread.cept-sale-event-thread.thread--deal,*/ .vote-btn, .notification-item:not(.notification-item--read), .search div, .search input, .text--overlay, .popover--brandAccent .popover-content, .popover--brandPrimary .popover-content, .popover--default .popover-content, .popover--menu .popover-content, .popover--red .popover-content {
+          background-color: ${darkBackgroundColor} !important;
+        }
+        .notification-item:hover, .notification-item--read:hover {
+          filter: brightness(75%);
+        }
+        .speechBubble:before, .speechBubble:after, .text--color-white.threadTempBadge--card, .text--color-white.threadTempBadge {
+          color: ${darkBackgroundColor};
+        }
+        .bg--off, .js-pagi-bottom, .js-sticky-pagi--on, .bg--color-grey, .notification-item--read, #main, .subNavMenu--menu .subNavMenu-list {
+          background-color: ${lightBackgroundColor} !important;
+          color: ${textColor};
+        }
+        .tabbedInterface-tab--transparent {
+          background-color: ${lightBackgroundColor};
+        }
+        .page-divider, .popover-item, .boxSec-divB, .boxSec--fromW3, .cept-comment-link, .border--color-borderGrey, .border--color-greyTint, .staticPageHtml table, .staticPageHtml td, .staticPageHtml th {
+          border-color: ${lightBorderColor};
+        }
+        .listingProfile, .tabbedInterface-tab--primary:not(.tabbedInterface-tab--selected):hover, .navMenu-trigger, .navMenu-trigger--active, .navMenu-trigger--active:focus, .navMenu-trigger--active:hover, .navDropDown-link:focus, .navDropDown-link:hover {
+          background-color: ${veryDarkBackgroundColor} !important;
+        }
+        .softMessages-item, .popover--modal .popover-content, .bg--color-white, .listingProfile-header, .profileHeader, .bg--em, nav.comments-pagination {
+          background-color: ${veryDarkBackgroundColor};
+          color: ${textColor} !important;
+        }
+        .bg--color-greyPanel {
+          background-color: ${darkestBackgroundColor};
+        }
+        .bg--color-greyTint, .thread-divider, .btn--mode-filter {
+          background-color: ${textColor};
+        }
+        img.avatar[src*="placeholder"] {
+          filter: brightness(75%);
+        }
+        .btn--mode-dark-transparent, .btn--mode-dark-transparent:active, .btn--mode-dark-transparent:focus, button:active .btn--mode-dark-transparent, button:focus .btn--mode-dark-transparent {
+          background-color: inherit;
+        }
+        .boxSec-div, .boxSec-div--toW2 {
+          border-top: 1px solid ${darkBorderColor};
+        }
+        .profileHeader, .nav, .navDropDown-item, .navDropDown-link, .navDropDown-pItem, .subNavMenu--menu .subNavMenu-item--separator {
+          border-bottom: 1px solid ${darkBorderColor};
+        }
+        .footer, .subNav, .voteBar, .comment-item {
+          background-color: ${darkBackgroundColor};
+          border-bottom: 1px solid ${darkBorderColor};
+        }
+        .comments-list--top .comments-item:target .comments-item-inner, .comments-list .comments-item, .comments-list .comments-list-item:target .comments-item-inner {
+          border-bottom: 1px solid ${darkBorderColor};
+        }
+        .fadeOuterEdge--l {
+          box-shadow: -20px 0 17px -3px ${darkBackgroundColor};
+        }
+        .vote-box {
+          box-shadow: 10px 0 10px -3px ${darkBackgroundColor};
+        }
+        .btn--mode-boxSec, .btn--mode-boxSec:active, .btn--mode-boxSec:focus, .btn--mode-boxSec:hover, button:active .btn--mode-boxSec, button:focus .btn--mode-boxSec, button:hover .btn--mode-boxSec {
+          background-color: ${textColor};
+        }
+        .overflow--fade:after {
+          background-color: linear-gradient(90deg,hsla(0,0%,100%,0) 0,#242424 80%) !important;
+        }
+        img, .badge, .btn--mode-primary-inverted, .btn--mode-primary-inverted--no-state, .btn--mode-primary-inverted--no-state:active, .btn--mode-primary-inverted--no-state:focus, .btn--mode-primary-inverted--no-state:hover, .btn--mode-primary-inverted:active, .btn--mode-primary-inverted:focus, button:active .btn--mode-primary-inverted, button:active .btn--mode-primary-inverted--no-state, button:focus .btn--mode-primary-inverted, button:focus .btn--mode-primary-inverted--no-state, button:hover .btn--mode-primary-inverted--no-state {
+          filter: invert(5%) brightness(90%);
+        }
+        .thread--expired > * {
+          filter: opacity(40%) brightness(90%);
+        }
+        .icon--overflow {
+          color: ${textColor};
+        }
+        .input {
+          line-height: 1.1rem;
+        }
+      `;
+
+      /* Transparent Footer */
+      if (pepperTweakerConfig.improvements.transparentPaginationFooter) {  // must be after dark theme
+        css += `
+          .js-sticky-pagi--on {
+            background-color: transparent !important;
+            border-top: none !important;
+          }
+          .js-sticky-pagi--on .tGrid-cell:not(:first-child):not(:last-child) {
+            background-color: ${lightBackgroundColor} !important;
+            border-top: 1px solid ${darkBorderColor};
+            border-bottom: 1px solid ${darkBorderColor};
+            padding-top: 0.7em;
+            padding-bottom: 0.6em;
+          }
+          .js-sticky-pagi--on .tGrid-cell:first-child .hide--toW3, .js-sticky-pagi--on .tGrid-cell:last-child .hide--toW3 {
+            visibility: hidden;
+          }
+          .js-sticky-pagi--on .tGrid-cell:first-child .hide--toW3 svg, .js-sticky-pagi--on .tGrid-cell:last-child .hide--toW3 svg {
+            background-color: ${lightBackgroundColor} !important;
+            height: 3em !important;
+            width: 3em !important;
+            padding: 1em !important;
+            margin: 0 !important;
+            border: 1px solid ${darkBorderColor};
+            border-radius: 5px;
+            visibility: visible;
+          }
+          .js-sticky-pagi--on .tGrid-cell:nth-child(2) {
+            padding-left: 1em !important;
+            border-left: 1px solid ${darkBorderColor};
+            border-radius: 5px 0 0 5px;
+          }
+          .js-sticky-pagi--on .tGrid-cell:nth-last-child(2) {
+            padding-right: 1em !important;
+            border-right: 1px solid ${darkBorderColor};
+            border-radius: 0 5px 5px 0;
+          }
+        `;
       }
-    `;
+      /* END: Transparent Footer */
+    }
+    /* END: Dark Theme Style */
   }
 
-  /*** Dark Theme Style ***/
-  // if (pepperTweakerConfig.pluginEnabled && pepperTweakerConfig.darkThemeEnabled) {
-  if ((JSON.parse(localStorage.getItem('PepperTweaker.config.pluginEnabled')) === true) && (JSON.parse(localStorage.getItem('PepperTweaker.config.darkThemeEnabled')) === true)) {
-
-    // const invertColor = color => '#' + (Number(`0x1${ color.replace('#', '') }`) ^ 0xFFFFFF).toString(16).substr(1);
-    const darkBorderColor = '#121212';
-    const lightBorderColor = '#5c5c5c';
-    const darkBackgroundColor = '#242424';
-    const veryDarkBackgroundColor = '#1d1f20';
-    const darkestBackgroundColor = '#050c13';
-    const lightBackgroundColor = '#35373b';
-    const textColor = '#bfbfbf';
-    // const greyButtonColor = '#8f949b';
-    // const orangeColor = '#d1d5db';
-
-    css += `
-      .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .page2-secTitle, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
-        color: ${textColor};
-      }
-      .speechBubble {
-        background-color: ${darkBackgroundColor};
-        color: ${textColor};
-      }
-      .thread--type-card, .thread--type-list, .conversationList-msg--read:not(.conversationList-msg--active), .card, .threadCardLayout--card article, .threadCardLayout--card article span .threadCardLayout--card article span, .vote-box, .cept-comments-link, .subNavMenu-btn {
-        background-color: ${darkBackgroundColor} !important;
-        border-color: ${darkBorderColor};
-      }
-      .thread--deal, .thread--discussion {
-        background-color: ${darkBackgroundColor};
-        border-color: ${darkBorderColor};
-        border-top: none; /* there is some problem with the top border => whole article goes up */
-        border-radius: 5px;
-      }
-      .input, .inputBox, .secretCode-codeBox, .toolbar, .voucher-code {
-        background-color: ${darkBackgroundColor};
-        border-color: ${lightBorderColor};
-      }
-      /* Arrows */
-      .input-caretLeft {
-        border-right-color: ${lightBorderColor};
-      }
-      .input-caretLeft:before {
-        border-right-color: ${darkBackgroundColor};
-      }
-      .popover--layout-s > .popover-arrow:after, .inputBox:after {
-        border-bottom-color: ${darkBackgroundColor};
-      }
-      .popover--layout-n > .popover-arrow:after {
-        border-top-color: ${darkBackgroundColor};
-      }
-      .popover--layout-w > .popover-arrow:after {
-        border-left-color: ${darkBackgroundColor};
-      }
-      .popover--layout-e > .popover-arrow:after {
-        border-right-color: ${darkBackgroundColor};
-      }
-      /* END: Arrows */
-      /* Faders */
-      .overflow--fade-b-r--l:after, .overflow--fade-b-r--s:after, .overflow--fade-b-r:after, .overflow--fromW3-fade-b-r--l:after, .overflow--fromW3-fade-r--l:after, .thread-title--card:after, .thread-title--list--merchant:after, .thread-title--list:after {
-        background: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 50%,${darkBackgroundColor});
-        background: linear-gradient(90deg,hsla(0,0%,100%,0),${darkBackgroundColor} 50%,${darkBackgroundColor});
-        /* filter: brightness(100%) !important; */
-      }
-      .fadeEdge--r:after, .overflow--fade:after {
-        background: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 80%);
-        background: linear-gradient(90deg,hsla(0,0%,100%,0) 0,${darkBackgroundColor} 80%);
-        filter: brightness(100%) !important;
-      }
-      .text--overlay:before {
-        background-image: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 90%);
-        background-image: linear-gradient(90deg,hsla(0,0%,100%,0),${darkBackgroundColor} 90%);
-        filter: brightness(100%) !important;
-      }
-      /* END: Faders */
-      .btn--border, .bg--off, .boxSec--fromW3:not(.thread-infos), .boxSec, .voucher-codeCopyButton, .search input, .img, .userHtml-placeholder, .userHtml img, .popover--subNavMenu .popover-content {
-        border: 1px solid ${darkBorderColor} !important;  /* need full border definition for .bg--off */
-      }
-      .tabbedInterface-tab--selected, .bg--main, .tabbedInterface-tab--horizontal, .tabbedInterface-tab--selected, .comments-item--in-moderation, .comments-item-inner--active, .comments-item-inner--edit, /*.thread.cept-sale-event-thread.thread--deal,*/ .vote-btn, .notification-item:not(.notification-item--read), .search div, .search input, .text--overlay, .popover--brandAccent .popover-content, .popover--brandPrimary .popover-content, .popover--default .popover-content, .popover--menu .popover-content, .popover--red .popover-content {
-        background-color: ${darkBackgroundColor} !important;
-      }
-      .notification-item:hover, .notification-item--read:hover {
-        filter: brightness(75%);
-      }
-      .speechBubble:before, .speechBubble:after, .text--color-white.threadTempBadge--card, .text--color-white.threadTempBadge {
-        color: ${darkBackgroundColor};
-      }
-      .bg--off, .js-pagi-bottom, .js-sticky-pagi--on, .bg--color-grey, .notification-item--read, #main, .subNavMenu--menu .subNavMenu-list {
-        background-color: ${lightBackgroundColor} !important;
-        color: ${textColor};
-      }
-      .tabbedInterface-tab--transparent {
-        background-color: ${lightBackgroundColor};
-      }
-      .page-divider, .popover-item, .boxSec-divB, .boxSec--fromW3, .cept-comment-link, .border--color-borderGrey, .border--color-greyTint, .staticPageHtml table, .staticPageHtml td, .staticPageHtml th {
-        border-color: ${lightBorderColor};
-      }
-      .listingProfile, .tabbedInterface-tab--primary:not(.tabbedInterface-tab--selected):hover, .navMenu-trigger, .navMenu-trigger--active, .navMenu-trigger--active:focus, .navMenu-trigger--active:hover, .navDropDown-link:focus, .navDropDown-link:hover {
-        background-color: ${veryDarkBackgroundColor} !important;
-      }
-      .softMessages-item, .popover--modal .popover-content, .bg--color-white, .listingProfile-header, .profileHeader, .bg--em, nav.comments-pagination {
-        background-color: ${veryDarkBackgroundColor};
-        color: ${textColor} !important;
-      }
-      .bg--color-greyPanel {
-        background-color: ${darkestBackgroundColor};
-      }
-      .bg--color-greyTint, .thread-divider, .btn--mode-filter {
-        background-color: ${textColor};
-      }
-      img.avatar[src*="placeholder"] {
-        filter: brightness(75%);
-      }
-      .btn--mode-dark-transparent, .btn--mode-dark-transparent:active, .btn--mode-dark-transparent:focus, button:active .btn--mode-dark-transparent, button:focus .btn--mode-dark-transparent {
-        background-color: inherit;
-      }
-      .boxSec-div, .boxSec-div--toW2 {
-        border-top: 1px solid ${darkBorderColor};
-      }
-      .profileHeader, .nav, .navDropDown-item, .navDropDown-link, .navDropDown-pItem, .subNavMenu--menu .subNavMenu-item--separator {
-        border-bottom: 1px solid ${darkBorderColor};
-      }
-      .footer, .subNav, .voteBar, .comment-item {
-        background-color: ${darkBackgroundColor};
-        border-bottom: 1px solid ${darkBorderColor};
-      }
-      .comments-list--top .comments-item:target .comments-item-inner, .comments-list .comments-item, .comments-list .comments-list-item:target .comments-item-inner {
-        border-bottom: 1px solid ${darkBorderColor};
-      }
-      .fadeOuterEdge--l {
-        box-shadow: -20px 0 17px -3px ${darkBackgroundColor};
-      }
-      .vote-box {
-        box-shadow: 10px 0 10px -3px ${darkBackgroundColor};
-      }
-      .btn--mode-boxSec, .btn--mode-boxSec:active, .btn--mode-boxSec:focus, .btn--mode-boxSec:hover, button:active .btn--mode-boxSec, button:focus .btn--mode-boxSec, button:hover .btn--mode-boxSec {
-        background-color: ${textColor};
-      }
-      .overflow--fade:after {
-        background-color: linear-gradient(90deg,hsla(0,0%,100%,0) 0,#242424 80%) !important;
-      }
-      img, .badge, .btn--mode-primary-inverted, .btn--mode-primary-inverted--no-state, .btn--mode-primary-inverted--no-state:active, .btn--mode-primary-inverted--no-state:focus, .btn--mode-primary-inverted--no-state:hover, .btn--mode-primary-inverted:active, .btn--mode-primary-inverted:focus, button:active .btn--mode-primary-inverted, button:active .btn--mode-primary-inverted--no-state, button:focus .btn--mode-primary-inverted, button:focus .btn--mode-primary-inverted--no-state, button:hover .btn--mode-primary-inverted--no-state {
-        filter: invert(5%) brightness(90%);
-      }
-      .thread--expired > * {
-        filter: opacity(40%) brightness(90%);
-      }
-      .icon--overflow {
-        color: ${textColor};
-      }
-      .input {
-        line-height: 1.1rem;
-      }
-    `;
-  }
-  /*** END: Dark Theme Style ***/
-
+  // Apply CSS
   if (css.length > 0) {
     (document.head || document.documentElement).insertAdjacentHTML('afterend', `<style id="pepper-tweaker-style">${css}</style>`);  // cannot be 'beforeend' => <link> elements with CSS can be loaded after the style and override it!
   }
+
+  /*** END: Setting CSS ***/
 
   /***** END: RUN AT DOCUMENT START (BEFORE LOAD) *****/
 
@@ -200,303 +559,6 @@
     if (pepperTweakerStyleNode) {
       document.head.appendChild(pepperTweakerStyleNode);  // move <style> to the proper position (the end of <head>) - only if <style> exists
     }
-
-    /*** Default configuration ***/
-
-    const backupConfigOnFailureLoad = {
-      dealsFilters: true,
-      commentsFilters: true,
-    };
-
-    /* Plugin Enabled */
-    const defaultConfigPluginEnabled = true;
-
-    /* Dark Theme Enabled */
-    const defaultConfigDarkThemeEnabled = true;
-
-    /* Improvements */
-    const defaultConfigImprovements = {
-      listToGrid: true,
-      hideGroupsBar: false,
-      repairDealDetailsLinks: true,
-      repairDealImageLink: true,
-      addLikeButtonsToBestComments: true,
-      addSearchInterface: true,
-      addCommentPreviewOnProfilePage: true,
-    };
-
-    /* Auto Update */
-    const defaultConfigAutoUpdate = {
-      dealsDefaultEnabled: false,
-      commentsDefaultEnabled: false,
-      soundEnabled: true,
-      askBeforeLoad: false,
-    };
-
-    /* Deals Filters */
-    const defaultConfigDealsFilters = [
-      { name: 'Alkohol słowa kluczowe', active: false, keyword: /\bpiw[oa]\b|\bbeer|alkohol|whiske?y|likier|w[óo]d(ecz)?k[aąieę]|\bwark[aąieę]|\bbols|\bsoplica\b|johnni?(e|y) walker|jim ?beam|gentleman ?jack|beefeater|tequilla|\bmacallan|hennessy|armagnac ducastaing|\bbaczewski|\baperol|\bvodka|carlsberg|kasztelan|okocim|smuggler|martini|\blager[ay]?\b|żywiec|pilsner|\brum[uy]?\b|książęce|\btrunek|amundsen|\bbrandy\b|żubrówk[aąięe]|\bradler\b|\btyskie\b|bourbon|glen moray|\bbrowar|\bgran[td]'?s\b|jagermeister|jack daniel'?s|\blech\b|heineken|\bcalsberg|\bbacardi\b|\bbushmills|\bballantine'?s|somersby|gentelman jack/i, style: { opacity: '0.3' } },  // don't use: \bwin(a|o)\b <-- to many false positive e.g. Wiedźmin 3 Krew i Wino
-      { name: 'Disco Polo', active: false, keyword: /disco polo/i, style: { display: 'none' } },
-      { name: 'Niezdrowe jedzenie', active: false, merchant: /mcdonalds|kfc|burger king/i, style: { opacity: '0.3' } },
-      { name: 'Aliexpress/Banggood', active: true, merchant: /aliexpress|banggood/i, style: { border: '4px dashed #e00034' } },
-      { name: 'Nieuczciwi sprzedawcy', active: false, merchant: /empik|komputronik|proline|super-pharm/i, style: { border: '4px dashed #1f7ecb' } },
-      { name: 'Największe przeceny', active: true, discountAbove: 80, style: { border: '4px dashed #51a704' } },
-      { name: 'Spożywcze', active: false, groups: /spożywcze/i, style: { opacity: '0.3' } },
-      { name: 'Lokalne', active: true, local: true, style: { border: '4px dashed #880088' } },
-    ];
-
-    /* Comments filters */
-    const defaultConfigCommentsFilters = [
-      { name: 'SirNiedźwiedź', active: true, user: /SirNiedźwiedź/i, style: { border: '2px dotted #51a704' } },
-      { name: 'G... burze by urtedbo', user: /urtedbo/i, keyword: /poo.*burz[eęaą]/i, style: { display: 'none' } },  // can match emoticons (also in brackets) => <i class="emoji emoji--type-poo" title="(poo)"></i>
-      { name: 'Brzydkie słowa', keyword: /gówno|gowno|dópa|dupa/i, style: { opacity: '0.3' } },
-    ];
-
-    const createNewFilterName = 'Utwórz nowy...';
-
-    const defaultFilterStyleValues = {
-      deals: {
-        display: 'none',
-        opacity: '0.3',
-        borderWidth: '4px',
-        borderStyle: 'dashed',
-        borderColor: '#880088',  // '#ff7900'
-      },
-      comments: {
-        display: 'none',
-        opacity: '0.3',
-        borderWidth: '2px',
-        borderStyle: 'dotted',
-        borderColor: '#880088',
-      },
-    };
-
-    /*** END: Deafult Configuration ***/
-
-    const messageWrongJSONStyle = 'Niewłaściwa składnia w polu stylu. Należy użyć składni JSON.';
-
-    //RegExp.prototype.toJSON = RegExp.prototype.toString;  // to stringify & parse RegExp
-    //const MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-    const newRegExp = (pattern, flags = 'i') => (pattern instanceof RegExp || pattern.constructor.name === 'RegExp') ? pattern : pattern && new RegExp(pattern, flags) || null;
-    // const isEmptyObject = Object.entries(value).length === 0 && value.constructor === Object;
-    const isBoolean = value => value === true || value === false;  // faster than typeof
-    const isNumeric = value => !isNaN(parseFloat(value)) && isFinite(value);
-    const isInteger = value => !isNaN(value) && parseInt(Number(value)) == value && !isNaN(parseInt(value, 10));
-    const isString = value => typeof value === 'string' || value instanceof String;
-
-    const getCSSBorderColor = borderCSS => borderCSS && isString(borderCSS) && (borderCSS.match(/#[a-fA-F0-9]+/) || [''])[0] || null;  // match returns array or null => null will throw an error for index [0]
-    const getCSSBorderStyle = borderCSS => borderCSS && isString(borderCSS) && (borderCSS.match(/dashed|dotted|solid|double|groove|ridge|inset|outset/) || [''])[0] || null;
-
-    const arrayDifference = (array1, array2) => array1.filter(value => !array2.includes(value));
-    const arrayIntersection = (array1, array2) => array1.filter(value => array2.includes(value));
-
-    const JSONRegExpReplacer = (key, value) => (value instanceof RegExp) ? { __type__: 'RegExp', source: value.source, flags: value.flags } : value;
-    const JSONRegExpReviver = (key, value) => (value && value.__type__ === 'RegExp') ? new RegExp(value.source, value.flags) : value;
-
-    const zeroPad = number => (number < 10) ? `0${number}` : number;
-    const getCurrentDateTimeString = () => {
-      const now = new Date(),
-        year = now.getFullYear(),
-        month = zeroPad(now.getMonth() + 1),  // months starting from 0
-        day = zeroPad(now.getDate()),
-        hours = zeroPad(now.getHours()),
-        minutes = zeroPad(now.getMinutes()),
-        seconds = zeroPad(now.getSeconds());
-      return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
-    };
-
-    const removeAllChildren = parent => { while (parent.hasChildNodes()) parent.removeChild(parent.lastChild); };
-    const moveAllChildren = (oldParent, newParent) => { while (oldParent.hasChildNodes()) newParent.appendChild(oldParent.firstChild); };
-    const cloneAttributes = (source, target) => [...source.attributes].forEach(attr => target.setAttribute(attr.nodeName, attr.nodeValue));
-
-    const getWindowSize = () => ({
-      width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
-      height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
-    });
-
-    /*** Configuration Functions ***/
-    const setConfig = (configuration = { pluginEnabled, darkThemeEnabled, improvements, autoUpdate, dealsFilters, commentsFilters }, reload = false) => {
-      if ((configuration.pluginEnabled !== undefined) && isBoolean(configuration.pluginEnabled)) {
-        localStorage.setItem('PepperTweaker.config.pluginEnabled', JSON.stringify(configuration.pluginEnabled));
-        pepperTweakerConfig.pluginEnabled = configuration.pluginEnabled;
-      }
-      if ((configuration.darkThemeEnabled !== undefined) && isBoolean(configuration.darkThemeEnabled)) {
-        localStorage.setItem('PepperTweaker.config.darkThemeEnabled', JSON.stringify(configuration.darkThemeEnabled));
-        pepperTweakerConfig.darkThemeEnabled = configuration.darkThemeEnabled;
-      }
-      if (configuration.improvements !== undefined) {  // only one option can be specified here
-        configuration.improvements = {  // to ensure only these props are in the autoUpdate object
-          listToGrid: isBoolean(configuration.improvements.listToGrid) ? configuration.improvements.listToGrid : pepperTweakerConfig.improvements.listToGrid,
-          hideGroupsBar: isBoolean(configuration.improvements.hideGroupsBar) ? configuration.improvements.hideGroupsBar : pepperTweakerConfig.improvements.hideGroupsBar,
-          repairDealDetailsLinks: isBoolean(configuration.improvements.repairDealDetailsLinks) ? configuration.improvements.repairDealDetailsLinks : pepperTweakerConfig.improvements.repairDealDetailsLinks,
-          repairDealImageLink: isBoolean(configuration.improvements.repairDealImageLink) ? configuration.improvements.repairDealImageLink : pepperTweakerConfig.improvements.repairDealImageLink,
-          addLikeButtonsToBestComments: isBoolean(configuration.improvements.addLikeButtonsToBestComments) ? configuration.improvements.addLikeButtonsToBestComments : pepperTweakerConfig.improvements.addLikeButtonsToBestComments,
-          addSearchInterface: isBoolean(configuration.improvements.addSearchInterface) ? configuration.improvements.addSearchInterface : pepperTweakerConfig.improvements.addSearchInterface,
-          addCommentPreviewOnProfilePage: isBoolean(configuration.improvements.addCommentPreviewOnProfilePage) ? configuration.improvements.addCommentPreviewOnProfilePage : pepperTweakerConfig.improvements.addCommentPreviewOnProfilePage,
-        };
-        localStorage.setItem('PepperTweaker.config.improvements', JSON.stringify(configuration.improvements));
-        pepperTweakerConfig.improvements = configuration.improvements;
-      }
-      if (configuration.autoUpdate !== undefined) {  // only one option can be specified here
-        configuration.autoUpdate = {  // to ensure only these props are in the autoUpdate object
-          dealsDefaultEnabled: isBoolean(configuration.autoUpdate.dealsDefaultEnabled) ? configuration.autoUpdate.dealsDefaultEnabled : pepperTweakerConfig.autoUpdate.dealsDefaultEnabled,
-          commentsDefaultEnabled: isBoolean(configuration.autoUpdate.commentsDefaultEnabled) ? configuration.autoUpdate.commentsDefaultEnabled : pepperTweakerConfig.autoUpdate.commentsDefaultEnabled,
-          soundEnabled: isBoolean(configuration.autoUpdate.soundEnabled) ? configuration.autoUpdate.soundEnabled : pepperTweakerConfig.autoUpdate.soundEnabled,
-          askBeforeLoad: isBoolean(configuration.autoUpdate.askBeforeLoad) ? configuration.autoUpdate.askBeforeLoad : pepperTweakerConfig.autoUpdate.askBeforeLoad,
-        };
-        localStorage.setItem('PepperTweaker.config.autoUpdate', JSON.stringify(configuration.autoUpdate));
-        pepperTweakerConfig.autoUpdate = configuration.autoUpdate;
-      }
-      if ((configuration.dealsFilters !== undefined) && Array.isArray(configuration.dealsFilters)) {
-        localStorage.setItem('PepperTweaker.config.dealsFilters', JSON.stringify(configuration.dealsFilters, JSONRegExpReplacer));
-        pepperTweakerConfig.dealsFilters = configuration.dealsFilters;
-      }
-      if ((configuration.commentsFilters !== undefined) && Array.isArray(configuration.commentsFilters)) {
-        localStorage.setItem('PepperTweaker.config.commentsFilters', JSON.stringify(configuration.commentsFilters, JSONRegExpReplacer));
-        pepperTweakerConfig.commentsFilters = configuration.commentsFilters;
-      }
-      if (reload) {
-        location.reload();
-      }
-    };
-
-    const resetConfig = (resetConfiguration = { resetPluginEnabled: true, resetDarkThemeEnabled: true, resetImprovements: true, resetAutoUpdate: true, resetDealsFilters: true, resetCommentsFilters: true }, reload = true) => {
-      const setConfigObject = {};
-      if (!resetConfiguration || resetConfiguration.resetPluginEnabled === true) {
-        setConfigObject.pluginEnabled = defaultConfigPluginEnabled;
-      }
-      if (!resetConfiguration || resetConfiguration.resetDarkThemeEnabled === true) {
-        setConfigObject.darkThemeEnabled = defaultConfigDarkThemeEnabled;
-      }
-      if (!resetConfiguration || resetConfiguration.resetImprovements === true) {
-        setConfigObject.improvements = defaultConfigImprovements;
-      }
-      if (!resetConfiguration || resetConfiguration.resetAutoUpdate === true) {
-        setConfigObject.autoUpdate = defaultConfigAutoUpdate;
-      }
-      if (!resetConfiguration || resetConfiguration.resetDealsFilters === true) {
-        setConfigObject.dealsFilters = defaultConfigDealsFilters;
-      }
-      if (!resetConfiguration || resetConfiguration.resetCommentsFilters === true) {
-        setConfigObject.commentsFilters = defaultConfigCommentsFilters;
-      }
-      setConfig(setConfigObject, reload);
-    };
-
-    const loadConfig = (outputConfig, inputConfig, reload = false) => {
-      if (inputConfig) {
-        try {
-          outputConfig = JSON.parse(inputConfig, JSONRegExpReviver);
-          setConfig(outputConfig, false);  // reload == false --> missing config entries have to be reset first (below)
-        } catch (error) {
-          return false;
-        }
-      } else {
-        const failedSettings = [];
-        try {
-          outputConfig.pluginEnabled = JSON.parse(localStorage.getItem('PepperTweaker.config.pluginEnabled'));
-        } catch (error) {
-          failedSettings.push({ name: 'pluginEnabled', error: error.message });
-        }
-        try {
-          outputConfig.darkThemeEnabled = JSON.parse(localStorage.getItem('PepperTweaker.config.darkThemeEnabled'));
-        } catch (error) {
-          failedSettings.push({ name: 'darkThemeEnabled', error: error.message });
-        }
-        try {
-          outputConfig.improvements = JSON.parse(localStorage.getItem('PepperTweaker.config.improvements'));
-        } catch (error) {
-          failedSettings.push({ name: 'improvements', error: error.message });
-        }
-        try {
-          outputConfig.autoUpdate = JSON.parse(localStorage.getItem('PepperTweaker.config.autoUpdate'));
-        } catch (error) {
-          failedSettings.push({ name: 'autoUpdate', error: error.message });
-        }
-        try {
-          outputConfig.dealsFilters = JSON.parse(localStorage.getItem('PepperTweaker.config.dealsFilters'), JSONRegExpReviver);
-        } catch (error) {
-          failedSettings.push({ name: 'dealsFilters', error: error.message });
-        }
-        try {
-          outputConfig.commentsFilters = JSON.parse(localStorage.getItem('PepperTweaker.config.commentsFilters'), JSONRegExpReviver);
-        } catch (error) {
-          failedSettings.push({ name: 'commentsFilters', error: error.message });
-        }
-        for (const failed of failedSettings) {
-          console.error(`Cannot parse PepperTweaker.config.${failed.name}: ${failed.error}`);
-          console.error(`Value of ${failed.name}: ` + localStorage.getItem(`PepperTweaker.config.${failed.name}`));
-          if (backupConfigOnFailureLoad[failed.name] === true) {
-            localStorage.setItem(`PepperTweaker.config.${failed.name}-backup`, localStorage.getItem(`PepperTweaker.config.${failed.name}`));
-            console.error(`Current ${failed.name} value saved as PepperTweaker.config.${failed.name}-backup`);
-          }
-          outputConfig[failed.name] = null;
-        }
-      }
-      const configToReset = {};
-      if (!isBoolean(outputConfig.pluginEnabled)) {
-        configToReset.resetPluginEnabled = true;
-      }
-      if (!isBoolean(outputConfig.darkThemeEnabled)) {
-        configToReset.resetDarkThemeEnabled = true;
-      }
-      if (!outputConfig.improvements
-        || !isBoolean(outputConfig.improvements.listToGrid)
-        || !isBoolean(outputConfig.improvements.hideGroupsBar)
-        || !isBoolean(outputConfig.improvements.repairDealDetailsLinks)
-        || !isBoolean(outputConfig.improvements.repairDealImageLink)
-        || !isBoolean(outputConfig.improvements.addLikeButtonsToBestComments)
-        || !isBoolean(outputConfig.improvements.addSearchInterface)
-        || !isBoolean(outputConfig.improvements.addCommentPreviewOnProfilePage)) {
-        configToReset.resetImprovements = true;
-      }
-      if (!outputConfig.autoUpdate
-        || !isBoolean(outputConfig.autoUpdate.dealsDefaultEnabled)
-        || !isBoolean(outputConfig.autoUpdate.commentsDefaultEnabled)
-        || !isBoolean(outputConfig.autoUpdate.soundEnabled)
-        || !isBoolean(outputConfig.autoUpdate.askBeforeLoad)) {
-        configToReset.resetAutoUpdate = true;
-      }
-      if (!Array.isArray(outputConfig.dealsFilters)) {
-        configToReset.resetDealsFilters = true;
-      }
-      if (!Array.isArray(outputConfig.commentsFilters)) {
-        configToReset.resetCommentsFilters = true;
-      }
-      resetConfig(configToReset, reload);
-      return true;
-    }
-
-    const saveConfigFile = () => {
-      const link = document.createElement('A');
-      const file = new Blob([JSON.stringify(pepperTweakerConfig, JSONRegExpReplacer)], { type: 'text/plain' });
-      link.href = URL.createObjectURL(file);
-      link.download = `PepperTweaker-config-[${getCurrentDateTimeString()}].json`;
-      link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
-    };
-
-    const importConfigFromFile = () => {
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = 'application/json';
-      fileInput.onchange = event => {
-        const file = fileInput.files[0];
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (!loadConfig({}, reader.result, true)) {
-            alert('Ten plik nie wygląda jak konfiguracja PepperTweakera :/');
-          }
-        };
-        reader.readAsText(file);
-      };
-      fileInput.click();
-    };
-    /*** END: Configuration Functions ***/
-
-    /*** Load Configuration from Local Storage ***/
-    const pepperTweakerConfig = {};
-    loadConfig(pepperTweakerConfig);
-    /*** END: Load configuration ***/
 
     if (pepperTweakerConfig.pluginEnabled) {
 
@@ -1042,6 +1104,24 @@
                     id: 'list-to-grid',
                     checked: pepperTweakerConfig.improvements.listToGrid,
                     callback: event => setConfig({ improvements: { listToGrid: event.target.checked } }, false),
+                  },
+                },
+                transparentPaginationFooter: {
+                  create: createLabeledCheckbox,
+                  params: {
+                    label: 'Przezroczysta stopka z paginacją',
+                    id: 'transparent-pagination-footer',
+                    checked: pepperTweakerConfig.improvements.transparentPaginationFooter,
+                    callback: event => setConfig({ improvements: { transparentPaginationFooter: event.target.checked } }, false),
+                  },
+                },
+                hideTopDealsWidget: {
+                  create: createLabeledCheckbox,
+                  params: {
+                    label: 'Ukryj wigdet najgorętszych okazji',
+                    id: 'hide-top-deals',
+                    checked: pepperTweakerConfig.improvements.hideTopDealsWidget,
+                    callback: event => setConfig({ improvements: { hideTopDealsWidget: event.target.checked } }, false),
                   },
                 },
                 hideGroupsBar: {
@@ -1977,7 +2057,7 @@
     }
 
     /*** Deal Details Page ***/
-    if (pepperTweakerConfig.pluginEnabled && location.pathname.match(/promocje|kupony|dyskusji|feedback/)) {
+    if (pepperTweakerConfig.pluginEnabled && location.pathname.match(/promocje|kupony|dyskusji|feedback/) && location.pathname.match(/-\d+$/)) {  // ends with ID
 
       const hideCommentMessage = 'Ten komentarz został ukryty (kliknij, aby go pokazać)';
       const showCommentMessage = 'Kliknij ponownie, aby ukryć poniższy komentarz';
@@ -2484,7 +2564,7 @@
     /*** END: Deal Details Page ***/
 
     /*** Deals List ***/
-    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/\?page=|search\?|gor%C4%85ce|nowe|grupa|om%C3%B3wione|profile/))) {
+    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/\?page=|search\?|gor%C4%85ce|nowe|grupa|om%C3%B3wione|kupony|dyskusji|profile/))) {
 
       /* Deals Filtering */
       const checkFilters = (filters, deal) => {
@@ -2542,10 +2622,41 @@
         if (refreshRibbon) {
           refreshRibbon.textContent = refreshRibbon.textContent.replace(/Zaktualizowano|temu/ig, '');
         }
+        // Number of comments in discussion
+        const headerMetaIconComment = dealNode.querySelector('.threadGrid-headerMeta .icon--comment');
+        if (headerMetaIconComment) {
+          headerMetaIconComment.parentNode.lastChild.textContent = headerMetaIconComment.parentNode.lastChild.textContent.replace(/ Komentarz(y|e)?/, '');
+        }
       }
       /* END */
 
-     const processElement = (element, deepSearch = false, isGridLayout = false) => {
+      let dealCount = 0;
+      const startPage = Number((new URLSearchParams(location.search)).get('page') || 1);
+      const getVerticalScrollPercentage = (node) => (node.scrollTop || node.parentNode.scrollTop) / (node.parentNode.scrollHeight - node.parentNode.clientHeight ) * 100;
+      document.addEventListener('scroll', () => {
+        if (dealCount % 20 === 0) {
+          const position = getVerticalScrollPercentage(document.body);
+          console.log(position);
+          const currentPage = Math.max(1, Math.round((dealCount / 20) * (position / 100)));
+
+          const searchParams = new URLSearchParams(location.search);
+          searchParams.set('page', startPage + currentPage - 1);
+          const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
+          history.pushState(null, '', newRelativePathQuery);
+
+          const pagination = document.getElementById('pagination');
+          const paginationPageText = pagination.querySelector('.pagination-page .hide--toW2');
+          if (paginationPageText) {
+            paginationPageText.textContent = paginationPageText.textContent.replace(/\d+/, startPage + currentPage - 1);
+          }
+          const nextButton = pagination.querySelector('.cept-next-page button');
+          if (nextButton) {
+            nextButton.dataset.pagination = nextButton.dataset.pagination.replace(/\d+/, currentPage + startPage);
+          }
+        }
+    });
+
+      const processElement = (element, deepSearch = false, isGridLayout = false) => {
         if ((element.nodeName === 'DIV') && element.classList.contains('threadCardLayout--card')) {
           element = element.querySelector('article[id^="thread"]');
         }
@@ -2553,14 +2664,18 @@
 
           /* Thread Image to Lightbox */
           const threadImage = element.querySelector('.cept-thread-img');
-          threadImage.dataset.handler = 'lightbox';
-          threadImage.dataset.lightbox = `{"images":[{"width":640,"height":474,"unattached":"","uid":"","url":"${threadImage.src.replace('thread_large', 'thread_full_screen')}"}]}`;
+          if (threadImage) {
+            threadImage.dataset.handler = 'lightbox';
+            threadImage.dataset.lightbox = `{"images":[{"width":640,"height":474,"unattached":"","uid":"","url":"${threadImage.src.replace('thread_large', 'thread_full_screen')}"}]}`;
+          }
           /* END */
 
           /* List to grid update */
           if (pepperTweakerConfig.improvements.listToGrid && !isGridLayout) {
             updateGridDeal(element);
           }
+          // Pagination
+          dealCount++;
           /* END */
 
           let title = element.querySelector('.cept-tt');
@@ -2643,7 +2758,8 @@
 
         /* List to Grid */
         if (pepperTweakerConfig.improvements.listToGrid && !isGridLayout) {
-          const sideContainerWidth = 234;
+          const sideContainer = document.querySelector('.listLayout-side');
+          const sideContainerWidth = (sideContainer && sideContainer.querySelector('.listLayout-sideItem')) ? 234 : 0;
           const sideContainerPadding = 8;
           const columnWidth = 227;
           const gridGapWidth = 10;
@@ -2657,7 +2773,7 @@
             const numberOfColumns = Math.floor(gridMaxWidth / (columnWidth + gridGapWidth));
             const gridMarginLeft = Math.floor((gridMaxWidth - numberOfColumns * (columnWidth + gridGapWidth)) / 2);
             dealsSection.style.gridTemplateColumns = `repeat(${numberOfColumns}, ${columnWidth}px)`;
-            dealsSection.style.marginLeft = `${gridMarginLeft}px`;
+            dealsSection.style.setProperty('margin-left', `${gridMarginLeft}px`, 'important');
           }
           updateGridView();
           window.addEventListener('resize', updateGridView);
@@ -2677,7 +2793,8 @@
             .cept-meta-ribbon .icon--hourglass, .cept-meta-ribbon .icon--hourglass ~ .hide--toW3,  /* deal ends */
             .cept-meta-ribbon .icon--location, .cept-meta-ribbon .icon--location ~ .hide--toW3,    /* local deal */
             .cept-meta-ribbon .icon--world, .cept-meta-ribbon .icon--world ~ .hide--toW3,          /* delievery */
-            .cept-vote-box .cept-show-expired-threads {  /* deal ended text */
+            .cept-vote-box .cept-show-expired-threads,  /* deal ended text */
+            .cept-vote-box .hide--toW3 {  /* Discussion ended text */
               display: none;
             }
             .cept-meta-ribbon .icon--refresh {
@@ -2704,22 +2821,35 @@
               padding-top: 8px;
             }
             .threadGrid-title .thread-title {
-              height: 3.6em;
+              padding-top: 0.2em;
+              height: 3.3em;
             }
             .threadGrid-title .overflow--fade {
-              height: 2.1em;
+              height: 1.9em;
             }
             .threadGrid-body {
               grid-column: 1;
               -ms-grid-column-span: 1;
               grid-row: 7;
               padding-top: .28571em !important;
-              height: 4.6em;
+              height: 3.8em;
               text-overflow: ellipsis;
               overflow: hidden;
               display: -webkit-box;
               -webkit-line-clamp: 3;
               -webkit-box-orient: vertical;
+            }
+            .threadGrid-title .userHtml-content {  /* Discussion description */
+              height: 6.2em;
+              margin-bottom: 0.5em;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              display: -webkit-box;
+              -webkit-line-clamp: 4;
+              -webkit-box-orient: vertical;
+            }
+            .threadGrid-body.threadGrid--row--collapsed {
+              display: none;
             }
             .threadGrid-body .flex--dir-row-reverse {
               flex-direction: column;
@@ -2782,9 +2912,14 @@
             .js-pagi-top {  /* hidding top pagination */
               display: none;
             }
-            .listLayout {
+            .listLayout, .tGrid-row.height--all-full .page-content {
               position: static;
               max-width: none;
+            }
+            .tabbedInterface-tabs.width--max-listLayoutWidth, .cept-hottest-widget-position-top {
+              width: 85.4em;
+              margin-left: auto;
+              margin-right: auto;
             }
             .listLayout-main {
               width: max-content;
@@ -2795,6 +2930,22 @@
             }
             .thread .threadGrid {
               padding-bottom: 0;  /* removes padding that appears at the bootm of outline from filters */
+            }
+            /* Font Size */
+            .cept-description-container {
+              font-size: 0.75rem !important;
+              line-height: 1rem !important;
+            }
+            .thread-title--list {
+              font-size: 0.875rem !important;
+              line-height: 1.25rem !important;
+            }
+            .thread-title--list::after {
+              top: 20px;
+            }
+            .size--all-l {
+              font-size: 1rem !important;
+              line-height: 1.5rem !important;
             }
           `);
           styleNode.appendChild(styleText);
