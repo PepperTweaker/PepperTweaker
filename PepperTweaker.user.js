@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.26
+// @version      0.9.27
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -32,6 +32,7 @@
   /* Improvements */
   const defaultConfigImprovements = {
     listToGrid: true,
+    gridColumnCount: 0,
     transparentPaginationFooter: true,
     hideTopDealsWidget: false,
     hideGroupsBar: false,
@@ -144,6 +145,7 @@
     if (configuration.improvements !== undefined) {  // only one option can be specified here
       configuration.improvements = {  // to ensure only these props are in the autoUpdate object
         listToGrid: isBoolean(configuration.improvements.listToGrid) ? configuration.improvements.listToGrid : pepperTweakerConfig.improvements.listToGrid,
+        gridColumnCount: isInteger(configuration.improvements.gridColumnCount) ? parseInt(configuration.improvements.gridColumnCount) : parseInt(pepperTweakerConfig.improvements.gridColumnCount),
         transparentPaginationFooter: isBoolean(configuration.improvements.transparentPaginationFooter) ? configuration.improvements.transparentPaginationFooter : pepperTweakerConfig.improvements.transparentPaginationFooter,
         hideTopDealsWidget: isBoolean(configuration.improvements.hideTopDealsWidget) ? configuration.improvements.hideTopDealsWidget : pepperTweakerConfig.improvements.hideTopDealsWidget,
         hideGroupsBar: isBoolean(configuration.improvements.hideGroupsBar) ? configuration.improvements.hideGroupsBar : pepperTweakerConfig.improvements.hideGroupsBar,
@@ -261,6 +263,7 @@
     }
     if (!outputConfig.improvements
       || !isBoolean(outputConfig.improvements.listToGrid)
+      || !isInteger(outputConfig.improvements.gridColumnCount)
       || !isBoolean(outputConfig.improvements.transparentPaginationFooter)
       || !isBoolean(outputConfig.improvements.hideTopDealsWidget)
       || !isBoolean(outputConfig.improvements.hideGroupsBar)
@@ -780,14 +783,9 @@
         return select;
       };
 
-      const createLabeledInput = ({ id, beforeLabel = '', afterLabel = '', min, max, step } = {}) => {
+      const createLabeledInput = ({ id, callback, beforeLabel = '', afterLabel = '', min, max, step, value } = {}) => {
         const wrapperDiv = document.createElement('DIV');
         wrapperDiv.classList.add('space--v-2');
-
-        const spanElement = document.createElement('SPAN');
-        spanElement.classList.add('formList-label-content', 'lbox--v-1');
-        const spanText = document.createTextNode(beforeLabel);
-        spanElement.appendChild(spanText);
 
         const divElement = document.createElement('DIV');
         divElement.classList.add('tGrid', 'tGrid--auto', 'width--all-12');
@@ -796,6 +794,9 @@
         inputElement.type = 'number';
         if (id) {
           inputElement.id = id;
+        }
+        if (callback) {
+          inputElement.onchange = callback;
         }
         if (isNumeric(min)) {
           inputElement.min = min;
@@ -806,14 +807,27 @@
         if (isNumeric(step)) {
           inputElement.step = step;
         }
-        const labelElement = document.createElement('LABEL');
-        labelElement.classList.add('tGrid-cell', 'tGrid-cell--shrink', 'btn', 'bRad--l-r', 'vAlign--all-m');
-        const labelText = document.createTextNode(afterLabel);
-        labelElement.appendChild(labelText);
+        if (isNumeric(value) && (!isNumeric(min) || value >= min) && (!isNumeric(max) || value <= max)) {
+          inputElement.value = value;
+        }
         divElement.appendChild(inputElement);
-        divElement.appendChild(labelElement);
 
-        wrapperDiv.appendChild(spanElement);
+        if (afterLabel && afterLabel.length > 0) {
+          const labelElement = document.createElement('LABEL');
+          labelElement.classList.add('tGrid-cell', 'tGrid-cell--shrink', 'btn', 'bRad--l-r', 'vAlign--all-m');
+          const labelText = document.createTextNode(afterLabel);
+          labelElement.appendChild(labelText);
+          divElement.appendChild(labelElement);
+        }
+
+        if (beforeLabel && beforeLabel.length > 0) {
+          const spanElement = document.createElement('SPAN');
+          spanElement.classList.add('formList-label-content', 'lbox--v-1');
+          const spanText = document.createTextNode(beforeLabel);
+          spanElement.appendChild(spanText);
+          wrapperDiv.appendChild(spanElement);
+        }
+        
         wrapperDiv.appendChild(divElement);
         return wrapperDiv;
       };
@@ -1104,6 +1118,17 @@
                     id: 'list-to-grid',
                     checked: pepperTweakerConfig.improvements.listToGrid,
                     callback: event => setConfig({ improvements: { listToGrid: event.target.checked } }, false),
+                  },
+                },
+                gridColumnCount: {
+                  create: createLabeledInput,
+                  params: {
+                    id: 'grid-column-count',
+                    afterLabel: 'Liczba kolumn',
+                    min: 0,
+                    step: 1,
+                    value: pepperTweakerConfig.improvements.gridColumnCount,
+                    callback: event => setConfig({ improvements: { gridColumnCount: event.target.value } }, false),
                   },
                 },
                 transparentPaginationFooter: {
@@ -2633,10 +2658,9 @@
       let dealCount = 0;
       const startPage = Number((new URLSearchParams(location.search)).get('page') || 1);
       const getVerticalScrollPercentage = (node) => (node.scrollTop || node.parentNode.scrollTop) / (node.parentNode.scrollHeight - node.parentNode.clientHeight ) * 100;
-      document.addEventListener('scroll', () => {
+      const updatePagination = () => {
         if (dealCount % 20 === 0) {
           const position = getVerticalScrollPercentage(document.body);
-          console.log(position);
           const currentPage = Math.max(1, Math.round((dealCount / 20) * (position / 100)));
 
           const searchParams = new URLSearchParams(location.search);
@@ -2654,7 +2678,8 @@
             nextButton.dataset.pagination = nextButton.dataset.pagination.replace(/\d+/, currentPage + startPage);
           }
         }
-    });
+      };
+      document.addEventListener('scroll', updatePagination);
 
       const processElement = (element, deepSearch = false, isGridLayout = false) => {
         if ((element.nodeName === 'DIV') && element.classList.contains('threadCardLayout--card')) {
@@ -2707,7 +2732,7 @@
               })
               .then(text => {
                 let htmlDoc = (new DOMParser()).parseFromString(text, 'text/html');
-                const groupLinks = htmlDoc.documentElement.querySelectorAll('section.card--type-horizontal a.cept-thread-groups-in-carousel');
+                const groupLinks = htmlDoc.documentElement.querySelectorAll('.overflow--ellipsis a[href*="/grupa/"]');
                 const groups = [];
                 for (const groupLink of groupLinks) {
                   groups.push(groupLink.textContent);
@@ -2770,9 +2795,9 @@
           const updateGridView = () => {
             const windowSize  = getWindowSize();
             const gridMaxWidth = windowSize.width - sideContainerWidth - 2 * sideContainerPadding - 2 * gridPadding;
-            const numberOfColumns = Math.floor(gridMaxWidth / (columnWidth + gridGapWidth));
-            const gridMarginLeft = Math.floor((gridMaxWidth - numberOfColumns * (columnWidth + gridGapWidth)) / 2);
-            dealsSection.style.gridTemplateColumns = `repeat(${numberOfColumns}, ${columnWidth}px)`;
+            const gridColumnCount = Math.min(pepperTweakerConfig.improvements.gridColumnCount || Infinity, Math.floor(gridMaxWidth / (columnWidth + gridGapWidth)));
+            const gridMarginLeft = Math.floor((gridMaxWidth - gridColumnCount * (columnWidth + gridGapWidth)) / 2);
+            dealsSection.style.gridTemplateColumns = `repeat(${gridColumnCount}, ${columnWidth}px)`;
             dealsSection.style.setProperty('margin-left', `${gridMarginLeft}px`, 'important');
           }
           updateGridView();
@@ -2789,12 +2814,12 @@
               -ms-grid-row-span: 1;
               width: 196px !important;
             }
-            .cept-meta-ribbon .icon--clock.text--color-green, .cept-meta-ribbon .icon--clock.text--color-green ~ .hide--toW3,  /* deal starts */
-            .cept-meta-ribbon .icon--hourglass, .cept-meta-ribbon .icon--hourglass ~ .hide--toW3,  /* deal ends */
-            .cept-meta-ribbon .icon--location, .cept-meta-ribbon .icon--location ~ .hide--toW3,    /* local deal */
-            .cept-meta-ribbon .icon--world, .cept-meta-ribbon .icon--world ~ .hide--toW3,          /* delievery */
+            .cept-meta-ribbon .icon--clock.text--color-green, .cept-meta-ribbon .icon--clock.text--color-green ~ span[class^="hide--"],  /* deal starts */
+            .cept-meta-ribbon .icon--hourglass, .cept-meta-ribbon .icon--hourglass ~ span[class^="hide--"],  /* deal ends */
+            .cept-meta-ribbon .icon--location, .cept-meta-ribbon .icon--location ~ span[class^="hide--"],    /* local deal */
+            .cept-meta-ribbon .icon--world, .cept-meta-ribbon .icon--world ~ span[class^="hide--"],          /* delievery */
             .cept-vote-box .cept-show-expired-threads,  /* deal ended text */
-            .cept-vote-box .hide--toW3 {  /* Discussion ended text */
+            .cept-vote-box span[class^="hide--"] {  /* Discussion ended text */
               display: none;
             }
             .cept-meta-ribbon .icon--refresh {
@@ -2810,15 +2835,16 @@
               -ms-grid-row-span: 3;
               grid-column: 1;
               width: 196px !important;
-              padding-top: 4px;
-              padding-left: 2px !important;
+              padding: 0.35em 0 0.65em 0 !important;
+            }
+            .thread-listImgCell, .thread-listImgCell--medium {
+              width: 100%;
             }
             .threadGrid-title {
               grid-column: 1;
               grid-row-start: 5;
               grid-row-end: 6;
               width: 196px !important;
-              padding-top: 8px;
             }
             .threadGrid-title .thread-title {
               padding-top: 0.2em;
