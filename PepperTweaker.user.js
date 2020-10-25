@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.27
+// @version      0.9.28
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -515,15 +515,18 @@
           .js-sticky-pagi--on .tGrid-cell:first-child .hide--toW3, .js-sticky-pagi--on .tGrid-cell:last-child .hide--toW3 {
             visibility: hidden;
           }
-          .js-sticky-pagi--on .tGrid-cell:first-child .hide--toW3 svg, .js-sticky-pagi--on .tGrid-cell:last-child .hide--toW3 svg {
+          .js-sticky-pagi--on .tGrid-cell:first-child .hide--toW3, .js-sticky-pagi--on .tGrid-cell:last-child .hide--toW3 {
+            display: none !important;
+          }
+          .js-sticky-pagi--on .tGrid-cell:first-child .hide--fromW3, .js-sticky-pagi--on .tGrid-cell:last-child .hide--fromW3 {
+            display: inline-flex !important;
             background-color: ${lightBackgroundColor} !important;
-            height: 3em !important;
-            width: 3em !important;
-            padding: 1em !important;
-            margin: 0 !important;
             border: 1px solid ${darkBorderColor};
-            border-radius: 5px;
-            visibility: visible;
+            width: 42px;
+            height: 42px;
+          }
+          .js-sticky-pagi--on .tGrid-cell:first-child .hide--fromW3 svg, .js-sticky-pagi--on .tGrid-cell:last-child .hide--fromW3 svg {
+            color: #ff7900;
           }
           .js-sticky-pagi--on .tGrid-cell:nth-child(2) {
             padding-left: 1em !important;
@@ -1719,7 +1722,6 @@
         const subNavMenu = document.querySelector('.subNavMenu--menu');
         subNavMenu.parentNode.insertBefore(createSearchButton(searchEngine.google, searchQuery, { label: 'Szukaj przez Google' }), subNavMenu);
       }
-      return;
     }
     /*** END: Search Page ***/
 
@@ -2589,7 +2591,7 @@
     /*** END: Deal Details Page ***/
 
     /*** Deals List ***/
-    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/\?page=|search\?|gor%C4%85ce|nowe|grupa|om%C3%B3wione|kupony|dyskusji|profile/))) {
+    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/search|gor%C4%85ce|nowe|grupa|om%C3%B3wione|kupony[^\/]|dyskusji|profile/))) {
 
       /* Deals Filtering */
       const checkFilters = (filters, deal) => {
@@ -2784,7 +2786,7 @@
         /* List to Grid */
         if (pepperTweakerConfig.improvements.listToGrid && !isGridLayout) {
           const sideContainer = document.querySelector('.listLayout-side');
-          const sideContainerWidth = (sideContainer && sideContainer.querySelector('.listLayout-sideItem')) ? 234 : 0;
+          const sideContainerWidth = sideContainer && sideContainer.querySelector('.listLayout-sideItem') && sideContainer.offsetWidth > 200 ? 234 : 0;
           const sideContainerPadding = 8;
           const columnWidth = 227;
           const gridGapWidth = 10;
@@ -2793,7 +2795,7 @@
           dealsSection.style.gridGap = `${gridGapWidth}px`;
           dealsSection.style.gridAutoRows = 'min-content';
           const updateGridView = () => {
-            const windowSize  = getWindowSize();
+            const windowSize = getWindowSize();
             const gridMaxWidth = windowSize.width - sideContainerWidth - 2 * sideContainerPadding - 2 * gridPadding;
             const gridColumnCount = Math.min(pepperTweakerConfig.improvements.gridColumnCount || Infinity, Math.floor(gridMaxWidth / (columnWidth + gridGapWidth)));
             const gridMarginLeft = Math.floor((gridMaxWidth - gridColumnCount * (columnWidth + gridGapWidth)) / 2);
@@ -2858,7 +2860,7 @@
               -ms-grid-column-span: 1;
               grid-row: 7;
               padding-top: .28571em !important;
-              height: 3.8em;
+              height: 3.7em;
               text-overflow: ellipsis;
               overflow: hidden;
               display: -webkit-box;
@@ -2880,11 +2882,11 @@
             .threadGrid-body .flex--dir-row-reverse {
               flex-direction: column;
             }
-            .threadGrid-body .space--t-2.hide--empty {
+            .threadGrid-body .space--t-2 {
               padding-top: 0 !important;
-              /* display: none; */
             }
-            .threadGrid-body .thread-updates-top {
+            .threadGrid-body .thread-updates-top,
+            .threadGrid-body .voucher {
               display: none;
             }
             .threadGrid-body .width--fromW2-6 {
@@ -2901,7 +2903,7 @@
               -ms-grid-column-span: 1;
               grid-row: 8;
               width: 196px !important;
-              padding-top: 5px !important;
+              padding-top: 0.5em !important;
             }
             .threadGrid-footerMeta .footerMeta.fGrid {
               flex-flow: row wrap;
@@ -2966,12 +2968,16 @@
               font-size: 0.875rem !important;
               line-height: 1.25rem !important;
             }
+            /* END: Font Size */
             .thread-title--list::after {
               top: 20px;
             }
             .size--all-l {
               font-size: 1rem !important;
               line-height: 1.5rem !important;
+            }
+            .listLayout-main > div:empty {
+              display: none;
             }
           `);
           styleNode.appendChild(styleText);
