@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.32
+// @version      0.9.33
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -501,13 +501,21 @@
           line-height: 1.1rem;
         }
         /* White Covers/Seals etc. */
-        .comments-list--top .comments-item:target .comments-item-inner, .comments-list .comments-list-item:target .comments-item-inner {
-          -webkit-animation: none;
-          animation: none;
-        }
         .progress--cover, .seal--cover:after {
           opacity: 0.8;
           background-color: ${veryDarkBackgroundColor} !important;
+        }
+        @-webkit-keyframes pulseBgColor {
+          0%  { background-color: transparent; filter: contrast(100%); }
+          15% { background-color: ${veryDarkBackgroundColor}; filter: contrast(105%); }
+          85% { background-color: ${veryDarkBackgroundColor}; filter: contrast(105%); }
+          to  { background-color: transparent; filter: contrast(100%); }
+        }
+        @keyframes pulseBgColor {
+          0%  { background-color: transparent; filter: contrast(100%); }
+          15% { background-color: ${veryDarkBackgroundColor}; filter: contrast(105%); }
+          85% { background-color: ${veryDarkBackgroundColor}; filter: contrast(105%); }
+          to  { background-color: transparent; filter: contrast(100%); }
         }
         /* END */
       `;
