@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.28
+// @version      0.9.29
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -330,7 +330,8 @@
     /* Hide Groups Bar */
     if (pepperTweakerConfig.improvements.hideTopDealsWidget) {
       css += `
-        .cept-hottest-widget-position-top, .cept-hottest-widget-position-side {
+        .listLayout .vue-portal-target, .listLayout-side .vue-portal-target,
+        .js-vue2[data-vue2*="HottestWidget"] {
           display: none !important;
         }
       `;
@@ -456,6 +457,9 @@
         img.avatar[src*="placeholder"] {
           filter: brightness(75%);
         }
+        .btn--mode-primary, .btn--mode-highlight, .bg--color-brandPrimary {  /* Orange Buttons/Backgrounds */
+          filter: brightness(90%);
+        }
         .btn--mode-dark-transparent, .btn--mode-dark-transparent:active, .btn--mode-dark-transparent:focus, button:active .btn--mode-dark-transparent, button:focus .btn--mode-dark-transparent {
           background-color: inherit;
         }
@@ -488,7 +492,7 @@
           filter: invert(5%) brightness(90%);
         }
         .thread--expired > * {
-          filter: opacity(40%) brightness(90%);
+          filter: opacity(50%) brightness(95%);
         }
         .icon--overflow {
           color: ${textColor};
@@ -522,6 +526,7 @@
             display: inline-flex !important;
             background-color: ${lightBackgroundColor} !important;
             border: 1px solid ${darkBorderColor};
+            border-radius: 5px;
             width: 42px;
             height: 42px;
           }
@@ -2084,7 +2089,7 @@
     }
 
     /*** Deal Details Page ***/
-    if (pepperTweakerConfig.pluginEnabled && location.pathname.match(/promocje|kupony|dyskusji|feedback/) && location.pathname.match(/-\d+$/)) {  // ends with ID
+    if (pepperTweakerConfig.pluginEnabled && location.pathname.match(/promocje|kupony|dyskusji|feedback/) && location.pathname.match(/-\d+\/?$/)) {  // ends with ID
 
       const hideCommentMessage = 'Ten komentarz został ukryty (kliknij, aby go pokazać)';
       const showCommentMessage = 'Kliknij ponownie, aby ukryć poniższy komentarz';
@@ -2591,7 +2596,7 @@
     /*** END: Deal Details Page ***/
 
     /*** Deals List ***/
-    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/search|gor%C4%85ce|nowe|grupa|om%C3%B3wione|kupony[^\/]|dyskusji|profile/))) {
+    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/search|gor%C4%85ce|nowe|grupa|om%C3%B3wione|promocje|kupony[^\/]|dyskusji|profile/))) {
 
       /* Deals Filtering */
       const checkFilters = (filters, deal) => {
@@ -2660,24 +2665,27 @@
       let dealCount = 0;
       const startPage = Number((new URLSearchParams(location.search)).get('page') || 1);
       const getVerticalScrollPercentage = (node) => (node.scrollTop || node.parentNode.scrollTop) / (node.parentNode.scrollHeight - node.parentNode.clientHeight ) * 100;
+      const rescale = (v, rMin, rMax, tMin, tMax) => ((v - rMin) / (rMax - rMin)) * (tMax - tMin) + tMin;
       const updatePagination = () => {
         if (dealCount % 20 === 0) {
           const position = getVerticalScrollPercentage(document.body);
-          const currentPage = Math.max(1, Math.round((dealCount / 20) * (position / 100)));
+          const currentPage = startPage - 1 + Math.round(rescale((dealCount / 20) * (position / 100), 0, 10, 1, 10));
 
           const searchParams = new URLSearchParams(location.search);
-          searchParams.set('page', startPage + currentPage - 1);
-          const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
-          history.pushState(null, '', newRelativePathQuery);
+          if (searchParams.get('page') != currentPage) {
+            searchParams.set('page', currentPage);
+            const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
+            history.replaceState(null, '', newRelativePathQuery);
 
-          const pagination = document.getElementById('pagination');
-          const paginationPageText = pagination.querySelector('.pagination-page .hide--toW2');
-          if (paginationPageText) {
-            paginationPageText.textContent = paginationPageText.textContent.replace(/\d+/, startPage + currentPage - 1);
-          }
-          const nextButton = pagination.querySelector('.cept-next-page button');
-          if (nextButton) {
-            nextButton.dataset.pagination = nextButton.dataset.pagination.replace(/\d+/, currentPage + startPage);
+            const pagination = document.getElementById('pagination');
+            const paginationPageText = pagination.querySelector('.pagination-page .hide--toW2');
+            if (paginationPageText) {
+              paginationPageText.textContent = paginationPageText.textContent.replace(/\d+/, currentPage);
+            }
+            const nextButton = pagination.querySelector('.cept-next-page button');
+            if (nextButton) {
+              nextButton.dataset.pagination = nextButton.dataset.pagination.replace(/\d+/, currentPage + 1);
+            }
           }
         }
       };
@@ -2785,8 +2793,9 @@
 
         /* List to Grid */
         if (pepperTweakerConfig.improvements.listToGrid && !isGridLayout) {
-          const sideContainer = document.querySelector('.listLayout-side');
-          const sideContainerWidth = sideContainer && sideContainer.querySelector('.listLayout-sideItem') && sideContainer.offsetWidth > 200 ? 234 : 0;
+          const sideWidgets = document.querySelectorAll('.listLayout-side .listLayout-sideItem');
+          const sideWidgetsWidth = Array.from(sideWidgets).map((widget) => parseFloat(window.getComputedStyle(widget).width));
+          const sideContainerWidth = sideWidgetsWidth.reduce((acc, cur) => acc || (isNumeric(cur) && cur > 0), false) ? 234 : 0;
           const sideContainerPadding = 8;
           const columnWidth = 227;
           const gridGapWidth = 10;
