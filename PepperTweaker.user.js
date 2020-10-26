@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.31
+// @version      0.9.32
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -500,6 +500,16 @@
         .input {
           line-height: 1.1rem;
         }
+        /* White Covers/Seals etc. */
+        .comments-list--top .comments-item:target .comments-item-inner, .comments-list .comments-list-item:target .comments-item-inner {
+          -webkit-animation: none;
+          animation: none;
+        }
+        .progress--cover, .seal--cover:after {
+          opacity: 0.8;
+          background-color: ${veryDarkBackgroundColor} !important;
+        }
+        /* END */
       `;
 
       /* Transparent Footer */
