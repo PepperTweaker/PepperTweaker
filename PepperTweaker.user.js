@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.30
+// @version      0.9.31
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -550,24 +550,19 @@
     /* END: Dark Theme Style */
   }
 
-  /* Is it Opera browser? */
+  /* Check What Browser */
+  const isFirefoxBrowser = typeof InstallTrigger !== 'undefined';
   const isOperaBrowser = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
 
   // Apply CSS
   if (css.length > 0) {
-    if (document.hidden || !document.hasFocus()) {
+    if (isFirefoxBrowser && (document.hidden || !document.hasFocus())) {
       const appendStyle = () => {
         const style = document.createElement('style');
         style.appendChild(document.createTextNode(css));
         document.head.appendChild(style);
       };
-
-      if (isOperaBrowser) {
-        window.addEventListener('load', appendStyle);
-      } else {
-        document.addEventListener('DOMContentLoaded', appendStyle);
-      }
-
+      document.addEventListener('DOMContentLoaded', appendStyle);
     } else {
       (document.head || document.documentElement).insertAdjacentHTML('afterend', `<style id="pepper-tweaker-style">${css}</style>`);  // cannot be 'beforeend' => <link> elements with CSS can be loaded after the style and override it!
     }
