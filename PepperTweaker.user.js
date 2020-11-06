@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.33
+// @version      0.9.34
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -361,6 +361,7 @@
       // const orangeColor = '#d1d5db';
 
       css += `
+        .comments-pagi--header .comments-pagi-pages:not(:disabled),
         .page2-subTitle2.mute--text2, .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .page2-secTitle, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
           color: ${textColor};
         }
@@ -449,7 +450,7 @@
           color: ${textColor} !important;
         }
         .bg--color-greyPanel {
-          background-color: ${darkestBackgroundColor};
+          background-color: ${veryDarkBackgroundColor};
         }
         .bg--color-greyTint, .thread-divider, .btn--mode-filter {
           background-color: ${textColor};
@@ -473,6 +474,7 @@
           background-color: ${darkBackgroundColor};
           border-bottom: 1px solid ${darkBorderColor};
         }
+        .commentList-item:not(:last-child),  /* New comment list class */
         .comments-list--top .comments-item:target .comments-item-inner, .comments-list .comments-item, .comments-list .comments-list-item:target .comments-item-inner {
           border-bottom: 1px solid ${darkBorderColor};
         }
@@ -2122,6 +2124,7 @@
     /*** Deal Details Page ***/
     if (pepperTweakerConfig.pluginEnabled && location.pathname.match(/promocje|kupony|dyskusji|feedback/) && location.pathname.match(/-\d+\/?$/)) {  // ends with ID
 
+      /* Comment Filtering */
       const hideCommentMessage = 'Ten komentarz został ukryty (kliknij, aby go pokazać)';
       const showCommentMessage = 'Kliknij ponownie, aby ukryć poniższy komentarz';
 
@@ -2159,26 +2162,27 @@
         return hiddenCommentBar;
       };
 
-      const comments = document.querySelectorAll('article[id^="comment-"]');
-      for (const comment of comments) {
-        for (const filter of pepperTweakerConfig.commentsFilters) {
-          //if (Object.keys(filter).length === 0) continue;  // if the filter is empty => continue (otherwise empty filter will remove all elements!)
-          if ((filter.active === false) || !filter.keyword && !filter.user) {
-            continue;
-          }
-
-          let commentAuthor = comment.querySelector('.comment-header a[href*="/profile/"');
-          commentAuthor = commentAuthor && commentAuthor.textContent;
-
-          if ((!filter.user || commentAuthor && commentAuthor.match(newRegExp(filter.user, 'i')))
-            && (!filter.keyword || comment.innerHTML.match(newRegExp(filter.keyword, 'i')))) {  // innerHTML here for emoticon match too (e.g. <i class="emoji emoji--type-poo" title="(poo)"></i>)
-
-            if (filter.style.display === 'none') {
-              comment.insertBefore(createHiddenCommentBar(hideCommentMessage, showCommentOnClick), comment.firstChild);
+      const filterComments = (node) => {
+        const comments = node.querySelectorAll('.commentList-comment');
+        for (const comment of comments) {
+          for (const filter of pepperTweakerConfig.commentsFilters) {
+            //if (Object.keys(filter).length === 0) continue;  // if the filter is empty => continue (otherwise empty filter will remove all elements!)
+            if ((filter.active === false) || !filter.keyword && !filter.user) {
+              continue;
             }
-            const commentContent = comment.querySelector('.comments-item-inner');
-            Object.assign(commentContent.style, filter.style);
-            break;  // comment has style applied => stop checking next filters
+  
+            let commentAuthor = comment.querySelector('.comment-header a.user');
+            commentAuthor = commentAuthor && commentAuthor.textContent;
+  
+            if ((!filter.user || commentAuthor && commentAuthor.match(newRegExp(filter.user, 'i')))
+              && (!filter.keyword || comment.innerHTML.match(newRegExp(filter.keyword, 'i')))) {  // innerHTML here for emoticon match too (e.g. <i class="emoji emoji--type-poo" title="(poo)"></i>)
+  
+              if (filter.style.display === 'none') {
+                comment.insertBefore(createHiddenCommentBar(hideCommentMessage, showCommentOnClick), comment.firstChild);
+              }
+              Object.assign(comment.style, filter.style);
+              break;  // comment style has been applied => stop checking next filters
+            }
           }
         }
       }
@@ -2187,10 +2191,13 @@
       const toggleUnderline = event => event.target.style.textDecoration = (event.target.style.textDecoration !== 'underline') ? 'underline' : 'none';
 
       const addProfileInfo = element => {  // this function is used in comments addition too
-        const profileLinks = element.querySelectorAll('.cept-thread-main a[href*="/profile/"], .comment-header a[href*="/profile/"]');
+        // const profileLinks = element.querySelectorAll('.cept-thread-main a[href*="/profile/"], .comment-header a[href*="/profile/"]');
+        const profileLinks = element.querySelectorAll('.cept-thread-main a[href*="/profile/"], .comment-header a.user');
         for (const profileLink of profileLinks) {
-          if (profileLink && profileLink.href) {
-            fetch(profileLink.href)
+          const profileLinkHref = profileLink.href || `${location.protocol}//${location.hostname}/profile/${profileLink.textContent}`;
+          console.log(profileLinkHref);
+          if (profileLinkHref) {
+            fetch(profileLinkHref)
               .then(response => response.text())
               .then(text => {
                 let htmlDoc = (new DOMParser()).parseFromString(text, 'text/html');
@@ -2309,11 +2316,13 @@
       }
 
       /* Repair Deal Details Links */  // and comment links
-      if (pepperTweakerConfig.improvements.repairDealDetailsLinks) {
-        const links = document.querySelectorAll('a[title^="http"]');
-        const mobileLinkRegExp = /:\/\/(www\.)?m\./i;
-        for (const link of links) {
-          link.href = link.title.replace(mobileLinkRegExp, '://');  // remove also the part of a mobile link e.g.: m.
+      const repairDealDetailsLinks = (node) => {
+        if (pepperTweakerConfig.improvements.repairDealDetailsLinks) {
+          const links = node.querySelectorAll('a[title^="http"]');
+          const mobileLinkRegExp = /:\/\/(www\.)?m\./i;
+          for (const link of links) {
+            link.href = link.title.replace(mobileLinkRegExp, '://');  // remove also the part of a mobile link e.g.: m.
+          }
         }
       }
 
@@ -2342,37 +2351,56 @@
       }
 
       /* Add Like Buttons to Best Comments */
-      if (pepperTweakerConfig.improvements.addLikeButtonsToBestComments) {
-        const firstLikeButtonNotBlue = document.querySelector('.cept-like-comment');
-        if (firstLikeButtonNotBlue) {  // only if any like button exists
-          const bestComments = document.querySelectorAll('.comments-list--top article[id]');
-          for (const bestComment of bestComments) {
-            const newLikeButton = repairSvgWithUseChildren(firstLikeButtonNotBlue.cloneNode(true));
-            const bestCommentId = bestComment.id.replace('comment-', '');
-            const likeCountButton = bestComment.querySelector('.cept-like-comment-count');
-            let buttonAction, buttonLabel;
-            if (likeCountButton.classList.contains('text--color-blue')) {
-              newLikeButton.classList.add('linkBlue');
-              newLikeButton.classList.remove('linkMute');
-              buttonAction = 'unlike';
-              buttonLabel = 'Nie lubię';
-            } else {
-              newLikeButton.classList.add('linkMute');
-              newLikeButton.classList.remove('linkBlue');
-              buttonAction = 'like';
-              buttonLabel = 'Lubię to';
+      const addLikeButtonsToBestComments = () => {
+        return;
+        if (pepperTweakerConfig.improvements.addLikeButtonsToBestComments) {
+          let firstLikeButtonNotBlue = document.querySelector('.comment-footer .icon--thumb-up');
+          firstLikeButtonNotBlue = firstLikeButtonNotBlue && firstLikeButtonNotBlue.closest('button');
+          if (firstLikeButtonNotBlue) {  // only if any like button exists
+            const bestComments = document.querySelectorAll('#comments .commentList:not(.commentList--anchored) .commentList-item article.comment');
+            for (const bestComment of bestComments) {
+              const newLikeButton = repairSvgWithUseChildren(firstLikeButtonNotBlue.cloneNode(true));
+              const bestCommentId = bestComment.id.replace('comment-', '');
+              const likeCountButton = bestComment.querySelector('.cept-like-comment-count');
+              let buttonAction, buttonLabel;
+              if (likeCountButton.classList.contains('text--color-blue')) {
+                newLikeButton.classList.add('linkBlue');
+                newLikeButton.classList.remove('linkMute');
+                buttonAction = 'unlike';
+                buttonLabel = 'Nie lubię';
+              } else {
+                newLikeButton.classList.add('linkMute');
+                newLikeButton.classList.remove('linkBlue');
+                buttonAction = 'like';
+                buttonLabel = 'Lubię to';
+              }
+              newLikeButton.querySelector('span span').textContent = buttonLabel;
+              newLikeButton.setAttribute('data-track', newLikeButton.getAttribute('data-track').replace(/(un)?like/, buttonAction));
+              //data-replace="{"endpoint":"https://www.pepper.pl/promocje/lenovo-ideapad-s340-15iwl-156-intel-core-i5-8265u-8gb-ram-256gb-dysk-mx250-grafika-win10-194390/comments/2997677/like","replaces":["$self",{"target":"body/.js-like-comment-2997677","key":"option","seal":null}]}"
+              let dataReplaceAttribute = newLikeButton.getAttribute('data-replace');
+              dataReplaceAttribute = dataReplaceAttribute.replace(/\/comments\/\d+\/(un)?like/, `/comments/${bestCommentId}/${buttonAction}`).replace(/like-comment-\d+/, `like-comment-${bestCommentId}`);
+              newLikeButton.setAttribute('data-replace', dataReplaceAttribute);
+              const permalinkButton = bestComment.querySelector('button[data-popover*="permalink"]');
+              permalinkButton.parentNode.insertBefore(newLikeButton, permalinkButton);
             }
-            newLikeButton.querySelector('span span').textContent = buttonLabel;
-            newLikeButton.setAttribute('data-track', newLikeButton.getAttribute('data-track').replace(/(un)?like/, buttonAction));
-            //data-replace="{"endpoint":"https://www.pepper.pl/promocje/lenovo-ideapad-s340-15iwl-156-intel-core-i5-8265u-8gb-ram-256gb-dysk-mx250-grafika-win10-194390/comments/2997677/like","replaces":["$self",{"target":"body/.js-like-comment-2997677","key":"option","seal":null}]}"
-            let dataReplaceAttribute = newLikeButton.getAttribute('data-replace');
-            dataReplaceAttribute = dataReplaceAttribute.replace(/\/comments\/\d+\/(un)?like/, `/comments/${bestCommentId}/${buttonAction}`).replace(/like-comment-\d+/, `like-comment-${bestCommentId}`);
-            newLikeButton.setAttribute('data-replace', dataReplaceAttribute);
-            const permalinkButton = bestComment.querySelector('button[data-popover*="permalink"]');
-            permalinkButton.parentNode.insertBefore(newLikeButton, permalinkButton);
           }
         }
       }
+
+      const layoutChangeObserver = new MutationObserver((allMutations, observer) => {
+        allMutations.every((mutation) => {
+          for (const addedNode of mutation.addedNodes) {
+            // if (addedNode.id === 'comments') {
+            //   addLikeButtonsToBestComments();
+            // }
+            repairDealDetailsLinks(addedNode);
+            addProfileInfo(addedNode);
+            filterComments(addedNode);
+          }
+          return true;
+        });
+      });
+      layoutChangeObserver.observe(document.querySelector('.listLayout-main'), { childList: true, subtree: true });
 
       /* Add Search Interface */
       if (pepperTweakerConfig.improvements.addSearchInterface && location.pathname.match(/promocje|kupony|dyskusji\//)) {
@@ -2779,7 +2807,8 @@
                   groups.push(groupLink.textContent);
                 }
 
-                const local = htmlDoc.documentElement.querySelector('*[id^="thread"] .cept-thread-content svg.icon--location') !== null;
+                const locationIcon = htmlDoc.documentElement.querySelector('*[id^="thread"] .cept-thread-content svg.icon--location');
+                const local = locationIcon !== null && locationIcon.parentNode.parentNode.textContent.search(/Ogólnopolska/i) < 0;
 
                 htmlDoc = null; // inform GC to clear parsed doc???
 
