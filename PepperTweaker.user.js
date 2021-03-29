@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.34
+// @version      0.9.35
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -646,6 +646,7 @@
           subNavMenu.appendChild(savedThreadsElement);
         }
         let linkElement;
+        // nie ma już takich linków na stronie...
         if (!subNav.querySelector('a[href$="/keyword-alarms"]') && (linkElement = document.querySelector('a[href$="/keyword-alarms"]'))) {
           addSubNavMenuItem('Lista alertów', linkElement.href);
         }
@@ -2296,23 +2297,29 @@
         let dealMerchant = document.querySelector('.cept-merchant-name');
         dealMerchant = dealMerchant && encodeURIComponent(dealMerchant.textContent.trim());
         const dealDates = extractDealDates();
-        const commentOptionLink = document.querySelector('.thread-userOptionLink');
-        // const calendarOptionLink = repairSvgWithUseChildren(commentOptionLink.cloneNode(true));
-        const calendarOptionLink = commentOptionLink.cloneNode(true);
-        calendarOptionLink.removeAttribute('data-handler');
-        calendarOptionLink.removeAttribute('data-track');
+
+        const timeFrameBox = document.querySelector('.cept-thread-content div div.border');
+        const calendarOptionLink = document.createElement('A');
+        // calendarOptionLink.classList.add('btn', 'space--h-3', 'btn--mode-secondary');
+        calendarOptionLink.classList.add('thread-userOptionLink');
+        calendarOptionLink.style.cssFloat = 'right';
+        calendarOptionLink.style.fontWeight = '900';
+        calendarOptionLink.style.setProperty('margin-right', '7px', 'important');
         calendarOptionLink.target = '_blank';
         calendarOptionLink.href = `https://www.google.com/calendar/render?action=TEMPLATE&text=${dealTitle}&details=${dealDescription}&location=${dealMerchant}&dates=${dateToGoogleCalendarFormat(dealDates.start)}%2F${dateToGoogleCalendarFormat(dealDates.end)}`;
-        calendarOptionLink.removeChild(calendarOptionLink.lastChild);
-        calendarOptionLink.appendChild(document.createTextNode('Kalendarz'));
         const calendarOptionImg = document.createElement('IMG');
         calendarOptionImg.style.width = '18px';
         calendarOptionImg.style.height = '20px';
         calendarOptionImg.style.filter = `invert(${pepperTweakerConfig.darkThemeEnabled ? 77 : 28}%)`;
+        calendarOptionImg.style.verticalAlign = 'middle';
         calendarOptionImg.classList.add('icon', 'space--mr-2');
         calendarOptionImg.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAABmJLR0QA/wD/AP+gvaeTAAABAklEQVRIid2WPQ6CMBSAPwx6CokH8Aj+DCYeQTdu4ClcrBdxdtLFGI16FPECJi4mOFDJi4FSlDL4koYC3+vXEtI+yI8LcDK8/5VPI9atEr4BtIAlEBnguKDl8VdAaQcqJzGrbxKZeOUDYcaM2sBZQ0HWpyjJh3mz3ejkANharKiQ98RynUajDkmtIl/0PUeOGP7x09mKTL/2o0qRKe42kF+MADD9uB8CM91f2c6o7C4NyXHwzuvajl9WNBY5ewv+a9FR5ExciUaCvwFNV6KD4OeWOaVFPcE+gY4r0U6wa0tJOr48j5xvqpF+0HcgGehrBNnFSdVtAUkppEhKo6oFabn1Ajsht5QbUQgDAAAAAElFTkSuQmCC';
-        calendarOptionLink.querySelector('svg').replaceWith(calendarOptionImg);
-        commentOptionLink.parentNode.appendChild(calendarOptionLink);
+        calendarOptionLink.appendChild(calendarOptionImg);
+        const calendarOptionSpan = document.createElement('SPAN');
+        calendarOptionSpan.classList.add('space--t-1');
+        calendarOptionSpan.appendChild(document.createTextNode('Kalendarz'))
+        calendarOptionLink.appendChild(calendarOptionSpan);
+        timeFrameBox.appendChild(calendarOptionLink);
       }
 
       /* Repair Deal Details Links */  // and comment links
