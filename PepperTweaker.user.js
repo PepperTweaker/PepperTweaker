@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.35
+// @version      0.9.36
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2196,7 +2196,6 @@
         const profileLinks = element.querySelectorAll('.cept-thread-main a[href*="/profile/"], .comment-header a.user');
         for (const profileLink of profileLinks) {
           const profileLinkHref = profileLink.href || `${location.protocol}//${location.hostname}/profile/${profileLink.textContent}`;
-          console.log(profileLinkHref);
           if (profileLinkHref) {
             fetch(profileLinkHref)
               .then(response => response.text())
@@ -2397,12 +2396,14 @@
       const layoutChangeObserver = new MutationObserver((allMutations, observer) => {
         allMutations.every((mutation) => {
           for (const addedNode of mutation.addedNodes) {
-            // if (addedNode.id === 'comments') {
-            //   addLikeButtonsToBestComments();
-            // }
-            repairDealDetailsLinks(addedNode);
-            addProfileInfo(addedNode);
-            filterComments(addedNode);
+            if (addedNode.id?.match(/comment-\d+/)) {
+              // if (addedNode.id === 'comments') {
+              //   addLikeButtonsToBestComments();
+              // }
+              repairDealDetailsLinks(addedNode);
+              addProfileInfo(addedNode);
+              filterComments(addedNode);
+            }
           }
           return true;
         });
