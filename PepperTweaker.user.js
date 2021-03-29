@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.37
+// @version      0.9.38
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2779,6 +2779,9 @@
           // Pagination
           dealCount++;
           /* END */
+
+          // No deals filtering at search and profile pages (profile => alerts/saved etc.)
+          if (location.pathname.match(/search|profile/)) return;
 
           let title = element.querySelector('.cept-tt');
           title = title && title.textContent;
