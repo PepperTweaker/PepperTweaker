@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.40
+// @version      0.9.41
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2887,7 +2887,7 @@
 
           const styleNode = document.createElement('style');
           const styleText = document.createTextNode(`
-            div.listLayout-mainItem.bg--color-brandPrimaryPale {
+            .listLayout-box.bg--color-brandPrimaryPale {
               grid-column: 1 / -1;
             }
             .threadGrid-headerMeta {
