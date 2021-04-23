@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.38
+// @version      0.9.39
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2864,7 +2864,7 @@
 
         /* List to Grid */
         if (pepperTweakerConfig.improvements.listToGrid && !isGridLayout) {
-          const sideWidgets = document.querySelectorAll('.listLayout-side .listLayout-sideItem');
+          const sideWidgets = document.querySelectorAll('.listLayout-side .listLayout-box');
           const sideWidgetsWidth = Array.from(sideWidgets).map((widget) => parseFloat(window.getComputedStyle(widget).width));
           const sideContainerWidth = sideWidgetsWidth.reduce((acc, cur) => acc || (isNumeric(cur) && cur > 0), false) ? 234 : 0;
           const sideContainerPadding = 8;
