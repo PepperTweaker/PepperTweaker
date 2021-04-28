@@ -46,7 +46,8 @@ Jeśli masz obawy odnośnie prywatności, to zajrzyj do sekcji [Uwagi końcowe](
 1. Do korzystania z rozszerzenia potrzebny jest jeden z pluginów do przeglądarki, umożliwiających uruchamianie skryptów JS na stronach internetowych. Do wyboru właściwie są trzy:
     * [Tampermonkey](https://www.tampermonkey.net/) - największa kompatybilność z PepperTweakerem, ponieważ sam z niego korzystam;
     * [Greasemonkey](https://www.greasespot.net/) - ojciec wszystkich tego typu pluginów, ale podobno już rzadko aktualizowany;
-    * [Violentmonkey](https://violentmonkey.github.io/get-it/) - najnowszy plugin, który jest open source, a zatem bardzo ciekawa alternatywa, ale nie miałem czasu jeszcze się temu przyjrzeć.
+    * [Violentmonkey](https://violentmonkey.github.io/get-it/) - najnowszy plugin, który jest open source, a zatem bardzo ciekawa alternatywa, ale nie miałem czasu jeszcze się temu przyjrzeć; **uwaga:** jeśli masz problem z działeniem Tweakera pod Violentmonkey zmień parametr `@run at` na wartość `document-body` (linia 8) i zerknij do tego wątku:
+    [Not working on Violentmonkey #1](https://github.com/PepperTweaker/PepperTweaker/issues/1).
 
 2. Po zainstalowaniu jednego z pluginów przechodzisz na [stronę skryptu PepperTweaker w serwise GreasyFork](https://greasyfork.org/en/scripts/390341-peppertweaker) i klikasz zielony przycisk "Zainstaluj skrypt":\
 ![Install Script Button](images/peppertweaker-greasyfork-install-script-button.png)
