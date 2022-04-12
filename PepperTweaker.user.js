@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.42
+// @version      0.9.43
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -584,7 +584,14 @@
       };
       document.addEventListener('DOMContentLoaded', appendStyle);
     } else {
-      (document.head || document.documentElement).insertAdjacentHTML('afterend', `<style id="pepper-tweaker-style">${css}</style>`);  // cannot be 'beforeend' => <link> elements with CSS can be loaded after the style and override it!
+      const appendStyle = () => {
+        if (document.head !== null || document.documentElement !== null) {
+          (document.head || document.documentElement).insertAdjacentHTML('afterend', `<style id="pepper-tweaker-style">${css}</style>`);  // cannot be 'beforeend' => <link> elements with CSS can be loaded after the style and override it!
+        } else {
+          setTimeout(appendStyle, 10);
+        }
+      }
+      appendStyle();
     }
   }
 
