@@ -2679,10 +2679,10 @@
             && (!filter.user || (deal.user && deal.user.search(newRegExp(filter.user, 'i')) >= 0))
             && (!filter.groups || (deal.groups && (deal.groups.length > 0) && deal.groups.findIndex(group => newRegExp(filter.groups, 'i').test(group)) >= 0))
             && (!filter.local || deal.local)
-            && (!filter.priceBelow || (deal.price && deal.price < filter.priceBelow))
-            && (!filter.priceAbove || (deal.price && deal.price > filter.priceAbove))
-            && (!filter.discountBelow || (deal.discount && deal.discount < filter.discountBelow))
-            && (!filter.discountAbove || (deal.discount && deal.discount > filter.discountAbove))) {
+            && (!filter.priceBelow || (deal.price !== null && deal.price < filter.priceBelow))
+            && (!filter.priceAbove || (deal.price !== null && deal.price > filter.priceAbove))
+            && (!filter.discountBelow || (deal.discount !== null && deal.discount < filter.discountBelow))
+            && (!filter.discountAbove || (deal.discount !== null && deal.discount > filter.discountAbove))) {
             Object.assign(resultStyle, filter.style);
           }
         }
@@ -2795,11 +2795,28 @@
           let user = element.querySelector('.thread-username');
           user = user && user.textContent;
 
-          let price = element.querySelector('.cept-tp');
-          price = price && parseFloat(price.textContent.replace('.', '').replace(',', '.'));
+          let priceOrDiscount = element.querySelector('.cept-tp');
+          let price, discount;
+          if (priceOrDiscount) {
+            let priceOrDiscountText = priceOrDiscount.textContent;
 
-          let discount = element.querySelector('.threadCardLayout--row--small.overflow--fade.space--l-3 .space--ml-1.size--all-l');
-          discount = discount && parseInt(discount.textContent.replace(/[-%]/, ''));
+            if (priceOrDiscountText === 'ZA DARMO') {
+              price = 0;
+            } else if(priceOrDiscountText.includes('%')) {
+              discount = parseInt(priceOrDiscountText.replace(/[-%]/, ''));
+            } else {
+              price = parseFloat(priceOrDiscountText.replace('.', '').replace(',', '.'));
+            }
+
+            if (!discount) {
+              let nextBestPrice = element.querySelector('.cept-next-best-price');
+              nextBestPrice = nextBestPrice && parseFloat(nextBestPrice.textContent.replace('.', '').replace(',', '.'));
+
+              if (nextBestPrice) {
+                discount = (nextBestPrice - price) / nextBestPrice * 100;
+              }
+            }
+          }
 
           const link = element.querySelector('a.cept-tt');
           if (deepSearch && link && link.href && link.href.length > 0) {
