@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.43
+// @version      0.9.44
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3223,10 +3223,15 @@
   }
   /*** END: startPepperTweaker() ***/
 
-  if (isOperaBrowser) {
-    window.addEventListener('load', startPepperTweaker);
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    // call on next available tick
+    setTimeout(startPepperTweaker, 1);
   } else {
-    document.addEventListener('DOMContentLoaded', startPepperTweaker);
+    if (isOperaBrowser) {
+      window.addEventListener('load', startPepperTweaker);
+    } else {
+      document.addEventListener('DOMContentLoaded', startPepperTweaker);
+    }
   }
 
   /***** END: RUN AFTER DOCUMENT HAS BEEN LOADED *****/
