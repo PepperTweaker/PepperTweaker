@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.44
+// @version      0.9.45
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2775,7 +2775,20 @@
           const threadImage = element.querySelector('.cept-thread-img');
           if (threadImage) {
             threadImage.dataset.handler = 'lightbox';
-            threadImage.dataset.lightbox = `{"images":[{"width":640,"height":474,"unattached":"","uid":"","url":"${threadImage.src.replace('thread_large', 'thread_full_screen')}"}]}`;
+            // threadImage.dataset.lightbox = `{"images":[{"width":640,"height":474,"unattached":"","uid":"","url":"${threadImage.src.replace('thread_large', 'thread_full_screen')}"}]}`;
+            // image links have beed changed:
+            // threadImage.src.replace(/\/re.*/, '.jpg') => original image
+            // threadImage.src.replace('300x300/qt/60', '768x768/qt/90') => scaled image to 768x768 with 90 quality (original scale: 300x300 / 60)
+            // there are other sizes too: 1024x1024, 1200x1200 (more?)
+            threadImage.dataset.lightbox = `{"images":[{"width":640,"height":474,"unattached":"","uid":"","url":"${threadImage.src.replace('300x300/qt/60', '768x768/qt/90')}"}]}`;
+
+            // remove go to the thread behavior after clicking
+            try {
+              const dataHistory = JSON.parse(element.dataset.history);
+              dataHistory.delegate = undefined;
+              dataHistory.endpoint = undefined;
+              element.dataset.history = JSON.stringify(dataHistory);
+            } catch { }
           }
           /* END */
 
