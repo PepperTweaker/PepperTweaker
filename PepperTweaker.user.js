@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.46
+// @version      0.9.47
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -357,6 +357,8 @@
       const darkestBackgroundColor = '#050c13';
       const lightBackgroundColor = '#35373b';
       const textColor = '#bfbfbf';
+      const secondaryTextColor = '#8f949b';
+      const orangeColor = '#ff7900';
       // const greyButtonColor = '#8f949b';
       // const orangeColor = '#d1d5db';
 
@@ -364,6 +366,9 @@
         .comments-pagi--header .comments-pagi-pages:not(:disabled),
         .page2-center .mute--text2, .page2-subTitle2.mute--text2, .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .page2-secTitle, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
           color: ${textColor};
+        }
+        .vote-temp--inert {
+          color: ${secondaryTextColor}
         }
         .speechBubble {
           background-color: ${darkBackgroundColor};
@@ -419,11 +424,17 @@
           background-image: linear-gradient(90deg,hsla(0,0%,100%,0),${darkBackgroundColor} 90%);
           filter: brightness(100%) !important;
         }
+        .no-touch .carousel-list--air.carousel--isPrev:before {
+          background: linear-gradient(-270deg, rgba(36, 36, 36, .98) 10%, hsla(0, 0%, 100%, 0));
+        }
+        .no-touch .carousel-list--air.carousel--isNext:after {
+          background: linear-gradient(270deg, rgba(36, 36, 36, .98) 10%, hsla(0, 0%, 100%, 0));
+        }
         /* END: Faders */
         .btn--border, .bg--off, .boxSec--fromW3:not(.thread-infos), .boxSec, .voucher-codeCopyButton, .search input, .img, .userHtml-placeholder, .userHtml img, .popover--subNavMenu .popover-content {
           border: 1px solid ${darkBorderColor} !important;  /* need full border definition for .bg--off */
         }
-        .tabbedInterface-tab--selected, .bg--main, .tabbedInterface-tab--horizontal, .tabbedInterface-tab--selected, .comment--selected, .comments-item--in-moderation, .comments-item-inner--active, .comments-item-inner--edit, /*.thread.cept-sale-event-thread.thread--deal,*/ .vote-btn, .notification-item:not(.notification-item--read), .search div, .search input, .text--overlay, .popover--brandAccent .popover-content, .popover--brandPrimary .popover-content, .popover--default .popover-content, .popover--menu .popover-content, .popover--red .popover-content {
+        .carousel-list--air, .tabbedInterface-tab--selected, .bg--main, .tabbedInterface-tab--horizontal, .tabbedInterface-tab--selected, .comment--selected, .comments-item--in-moderation, .comments-item-inner--active, .comments-item-inner--edit, /*.thread.cept-sale-event-thread.thread--deal,*/ .vote-btn, .notification-item:not(.notification-item--read), .search div, .search input, .text--overlay, .popover--brandAccent .popover-content, .popover--brandPrimary .popover-content, .popover--default .popover-content, .popover--menu .popover-content, .popover--red .popover-content {
           background-color: ${darkBackgroundColor} !important;
         }
         .notification-item:hover, .notification-item--read:hover {
@@ -518,6 +529,49 @@
           15% { background-color: ${veryDarkBackgroundColor}; filter: contrast(105%); }
           85% { background-color: ${veryDarkBackgroundColor}; filter: contrast(105%); }
           to  { background-color: transparent; filter: contrast(100%); }
+        }
+        /* END */
+        /* Reactions */
+        .popover--reactions .popover-content {
+          background-color: ${veryDarkBackgroundColor};
+          border: 1px solid ${lightBorderColor};
+        }
+        /* END */
+        /* Buttons: coupons, comments, alerts */
+        .btn--mode-boxSec,
+        .btn--mode-primary-inverted,
+        .btn--mode-primary-inverted--no-state {
+          /* color: ${secondaryTextColor}; */
+          background-color: ${darkBackgroundColor} !important;
+          border: 1px solid ${lightBorderColor} !important;
+        }
+        .footerMeta-actionSlot .btn--mode-boxSec { /* comment buttons in the grid list */
+          color: ${secondaryTextColor};
+          padding-left: 0.57143em !important;
+          padding-right: 0.57143em !important;
+        }
+        .btn--mode-boxSec:hover,
+        .btn--mode-primary-inverted:hover,
+        .btn--mode-primary-inverted--no-state:hover,
+        .btn--mode-boxSec:active,
+        .btn--mode-primary-inverted:active,
+        .btn--mode-primary-inverted--no-state:active,
+        .btn--mode-boxSec:focus,
+        .btn--mode-primary-inverted:focus,
+        .btn--mode-primary-inverted--no-state:focus {
+          background-color: ${veryDarkBackgroundColor} !important;
+          border: 1px solid ${lightBorderColor} !important;
+        }
+        .btn--mode-white--dark,
+        .btn--mode-white--dark:hover,
+        .btn--mode-white--dark:active,
+        .btn--mode-white--dark:focus {
+          background-color: ${veryDarkBackgroundColor} !important;
+        }
+        .btn--mode-white--dark:hover,
+        .btn--mode-white--dark:active,
+        .btn--mode-white--dark:focus {
+          color: ${orangeColor} !important;
         }
         /* END */
       `;
@@ -2728,6 +2782,13 @@
         if (refreshRibbon) {
           refreshRibbon.textContent = refreshRibbon.textContent.replace(/Zaktualizowano|temu/ig, '');
         }
+        // Remove some ribbons
+        const metaRibbons = dealNode.querySelectorAll('.threadGrid-headerMeta .metaRibbon');
+        metaRibbons.forEach(ribbon => {
+          if (ribbon.querySelector('svg.icon--clock') === null) {
+            ribbon.remove();
+          }
+        });
         // Number of comments in discussion
         const headerMetaIconComment = dealNode.querySelector('.threadGrid-headerMeta .icon--comment');
         if (headerMetaIconComment) {
@@ -3043,9 +3104,9 @@
             #toc-target-deals div.thread {
               display: none !important;
             }
-            .threadGrid-footerMeta .cept-off {
+            /* .threadGrid-footerMeta .cept-off {
               display: none;
-            }
+            } */
             #toc-target-deals .listLayout-side {
               position: absolute !important;
               right: 0;
