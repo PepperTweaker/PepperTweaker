@@ -2724,7 +2724,7 @@
     /*** END: Deal Details Page ***/
 
     /*** Deals List ***/
-    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/search|gor%C4%85ce|nowe|grupa|om%C3%B3wione|promocje|kupony[^\/]|dyskusji|profile/))) {
+    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/search|gor%C4%85ce|nowe|dlaciebie|grupa|om%C3%B3wione|promocje|kupony[^\/]|dyskusji|profile/))) {
 
       /* Deals Filtering */
       const checkFilters = (filters, deal) => {
