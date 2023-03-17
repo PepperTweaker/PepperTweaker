@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.50
+// @version      0.9.51
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -1809,6 +1809,7 @@
         wrapper.style.height = '40px';
         searchLink.style.height = '34px';
         searchLink.style.padding = '5px';
+        searchLink.style.borderRadius = '5px';
         searchLink.title = engine.name;
       } else {
         nodeToAppend = document.createTextNode(engine.name);
