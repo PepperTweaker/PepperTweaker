@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.52
+// @version      0.9.53
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -370,9 +370,13 @@
         .page2-center .mute--text2, .page2-subTitle2.mute--text2, .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .page2-secTitle, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
           color: ${textColor};
         }
+        .redactor button,
+        .redactor button.button--disabled svg,
+        .redactor button.button--disabled span,
+        .button--type-primary.button--mode-brand.button--disabled,
         .button--type-secondary:not(.cept-on),
         .vote-temp--inert {
-          color: ${secondaryTextColor}
+          color: ${secondaryTextColor} !important;
         }
         .speechBubble {
           background-color: ${darkBackgroundColor};
@@ -555,6 +559,10 @@
           padding-left: 0.57143em !important;
           padding-right: 0.57143em !important;
         }
+        .redactor,
+        .redactor button,
+        .button--type-primary.button--mode-brand.button--disabled,
+        .button--emoji,
         .button--type-secondary,
         .btn--mode-boxSec:hover,
         .btn--mode-primary-inverted:hover,
@@ -574,6 +582,7 @@
         .btn--mode-white--dark:focus {
           background-color: ${veryDarkBackgroundColor} !important;
         }
+        .redactor button.button--mode-brand:hover,
         .btn--mode-white--dark:hover,
         .btn--mode-white--dark:active,
         .btn--mode-white--dark:focus {
