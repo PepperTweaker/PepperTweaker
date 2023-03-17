@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.49
+// @version      0.9.50
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2363,7 +2363,7 @@
         dealMerchant = dealMerchant && encodeURIComponent(dealMerchant.textContent.trim());
         const dealDates = extractDealDates();
 
-        const timeFrameBox = document.querySelector('.cept-thread-content div div.border');
+        const timeFrameBox = document.querySelector('.cept-thread-content button');
         const calendarOptionLink = document.createElement('A');
         // calendarOptionLink.classList.add('btn', 'space--h-3', 'btn--mode-secondary');
         calendarOptionLink.classList.add('thread-userOptionLink');
@@ -2384,7 +2384,7 @@
         calendarOptionSpan.classList.add('space--t-1');
         calendarOptionSpan.appendChild(document.createTextNode('Kalendarz'))
         calendarOptionLink.appendChild(calendarOptionSpan);
-        timeFrameBox.appendChild(calendarOptionLink);
+        timeFrameBox.parentNode.appendChild(calendarOptionLink);
       }
 
       /* Repair Deal Details Links */  // and comment links
