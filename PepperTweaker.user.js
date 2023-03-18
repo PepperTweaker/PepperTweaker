@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.56
+// @version      0.9.57
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -560,6 +560,7 @@
           padding-left: 0.57143em !important;
           padding-right: 0.57143em !important;
         }
+        .popover--dropdown .popover-content,
         .redactor,
         .redactor button,
         .button--type-primary.button--mode-brand.button--disabled,
