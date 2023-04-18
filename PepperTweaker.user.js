@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.59
+// @version      0.9.60
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -325,6 +325,29 @@
   /*** Setting CSS ***/
   let css = '';
 
+  /* Theme independent style */
+  css += `
+    body {
+      font-family: Arial;
+    }
+
+    /* Font Size */
+    .userHtml {
+      font-size: 0.925rem !important;
+    }
+    .size--fromW3-xxl, .thread-title--item, .userHtml--subtitles h3 {
+      font-size: 1.25rem !important;
+    }
+    .threadItemCard-price {
+      font-size: 1.5rem !important;
+    }
+    /* END: Font Size */
+
+    .button--fromW3-size-l {
+      height: 40px !important;
+    }
+  `;
+
   if (pepperTweakerConfig.pluginEnabled) {
 
     /* Hide Groups Bar */
@@ -363,9 +386,6 @@
       // const orangeColor = '#d1d5db';
 
       css += `
-        body {
-          font-family: Arial;
-        }
         .comments-pagi--header .comments-pagi-pages:not(:disabled),
         .page2-center .mute--text2, .page2-subTitle2.mute--text2, .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .page2-secTitle, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
           color: ${textColor};
