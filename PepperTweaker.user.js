@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.60
+// @version      0.9.61
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -798,7 +798,7 @@
       const spanCheckboxBox = document.createElement('SPAN');
       spanCheckboxBox.classList.add('checkbox-box', 'flex--inline', 'boxAlign-jc--all-c', 'boxAlign-ai--all-c');
       const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svgElement.classList.add('icon', 'icon--tick', 'text--color-white', 'checkbox-tick');
+      svgElement.classList.add('icon', 'icon--tick', 'text--color-brandPrimary', 'checkbox-tick');
       svgElement.setAttribute('width', '20');
       svgElement.setAttribute('height', '16');
       const useElement = document.createElementNS('http://www.w3.org/2000/svg', 'use');
