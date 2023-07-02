@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.61
+// @version      0.9.62
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2780,7 +2780,7 @@
     /*** END: Deal Details Page ***/
 
     /*** Deals List ***/
-    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/search|gor%C4%85ce|nowe|grupa|om%C3%B3wione|promocje|kupony[^\/]|dyskusji|profile/))) {
+    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/search|gor%C4%85ce|nowe|grupa|om%C3%B3wione|promocje|kupony[^\/]|dyskusji|profile/) || 1 == 1)) {
 
       /* Deals Filtering */
       const checkFilters = (filters, deal) => {
@@ -2990,7 +2990,7 @@
       }
 
       let dealsSectionSelector;
-      const dealsSection = document.querySelector(dealsSectionSelector = '#toc-target-deals .js-threadList') || document.querySelector(dealsSectionSelector = '#toc-target-deals') || document.querySelector(dealsSectionSelector = '.listLayout');
+      const dealsSection = document.querySelector(dealsSectionSelector = '#toc-target-deals .js-threadList') || document.querySelector(dealsSectionSelector = '#toc-target-deals') || document.querySelector(dealsSectionSelector = '.listLayout') || document.querySelector(dealsSectionSelector = '.listLayout-scrollBox');
       // const dealsSection = document.querySelector(dealsSectionSelector = 'section.gridLayout') || document.querySelector(dealsSectionSelector = 'div.gridLayout') || document.querySelector(dealsSectionSelector = 'section.listLayout .js-threadList') || document.querySelector(dealsSectionSelector = 'div.listLayout');
       // cannot combine as one selector => div.gridLayout appears before section.gridLayout on the main page
       const isGridLayout = dealsSectionSelector.indexOf('gridLayout') >= 0;
@@ -3032,7 +3032,7 @@
             const windowSize = getWindowSize();
             const gridMaxWidth = windowSize.width - sideContainerWidth - 2 * sideContainerPadding - 2 * gridPadding;
             const gridColumnCount = Math.min(pepperTweakerConfig.improvements.gridColumnCount || Infinity, Math.floor(gridMaxWidth / (columnWidth + gridGapWidth)));
-            const gridMarginLeft = Math.floor((gridMaxWidth - gridColumnCount * (columnWidth + gridGapWidth)) / 2);
+            const gridMarginLeft = (document.querySelector('.tabbedInterface') != null) ? 0 : Math.floor((gridMaxWidth - gridColumnCount * (columnWidth + gridGapWidth)) / 2);
             dealsSection.style.gridTemplateColumns = `repeat(${gridColumnCount}, ${columnWidth}px)`;
             dealsSection.style.setProperty('margin-left', `${gridMarginLeft}px`, 'important');
           }
@@ -3219,6 +3219,20 @@
             .listLayout-main > div:empty {
               display: none;
             }
+            /* Alert page */
+            .flex--expand-v .page-content.page-center {
+              max-width: 100%;
+            }
+            .tabbedInterface-tabs {
+              max-width: 60em;
+              min-width: 20em;
+              margin-left: auto;
+              margin-right: auto;
+            }
+            #tab-manage {
+              width: 60em; /* TODO: for some reason alert manage tab doesn't keep width set in the '.tabbedInterface-tabs' class */
+            }
+            /* END: Alert page */
           `);
           styleNode.appendChild(styleText);
           document.head.appendChild(styleNode);
