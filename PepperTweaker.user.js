@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.62
+// @version      0.9.63
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3233,6 +3233,11 @@
               width: 60em; /* TODO: for some reason alert manage tab doesn't keep width set in the '.tabbedInterface-tabs' class */
             }
             /* END: Alert page */
+            /* "Your new tab..." div at "For You" subpage */
+            .listLayout-main > div {
+              display: none;
+            }
+            /* END: "Your new tab..." div at "For You" subpage */
           `);
           styleNode.appendChild(styleText);
           document.head.appendChild(styleNode);
