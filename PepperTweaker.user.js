@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.66
+// @version      0.9.67
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -363,7 +363,8 @@
     /* Hide Top Deals Widget */
     if (pepperTweakerConfig.improvements.hideGroupsBar) {
       css += `
-        .subNav .groupPromo--bg {
+        .subNav .groupPromo--bg,
+        div[data-t="groupDiscoveryWidget"] { /* groups top bar at the search subpage */
           display: none !important;
         }
       `;
