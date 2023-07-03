@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.64
+// @version      0.9.65
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3055,8 +3055,8 @@
             .cept-meta-ribbon .icon--hourglass, .cept-meta-ribbon .icon--hourglass ~ span[class^="hide--"],  /* deal ends */
             .cept-meta-ribbon .icon--location, .cept-meta-ribbon .icon--location ~ span[class^="hide--"],    /* local deal */
             .cept-meta-ribbon .icon--world, .cept-meta-ribbon .icon--world ~ span[class^="hide--"],          /* delievery */
-            .cept-vote-box .cept-show-expired-threads,  /* deal ended text */
-            .cept-vote-box span[class^="hide--"] {  /* Discussion ended text */
+            .vote-box .cept-show-expired-threads,  /* deal ended text */
+            .vote-box span[class^="hide--"] {  /* Discussion ended text */
               display: none;
             }
             .cept-meta-ribbon .icon--refresh {
