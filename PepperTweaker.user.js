@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.67
+// @version      0.9.68
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2626,8 +2626,8 @@
           searchButtonsWrapper.style.left = `${threadArticleBoundingClientRect.right - searchButtonsWrapperWidth}px`;
           searchButtonsWrapper.style.opacity = '0.5';
         };
-        setSearchInterfacePosition();
         document.body.appendChild(searchButtonsWrapper);  // must add before computing position to get computed width: https://stackoverflow.com/questions/2921428/dom-element-width-before-appended-to-dom
+        window.addEventListener('load', setSearchInterfacePosition);
         window.addEventListener('resize', setSearchInterfacePosition);
         // const voteBox = document.querySelector('.cept-vote-box');
         // voteBox.parentNode.style.justifyContent = 'space-between';
