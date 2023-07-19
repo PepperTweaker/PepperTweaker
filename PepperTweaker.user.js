@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.68
+// @version      0.9.69
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -444,7 +444,7 @@
           background: linear-gradient(90deg,hsla(0,0%,100%,0),${darkBackgroundColor} 50%,${darkBackgroundColor});
           /* filter: brightness(100%) !important; */
         }
-        .fadeEdge--r:after, .overflow--fade:after {
+        .fadeEdge--r:after, .overflow--fade:after, .subNavMenu--lFade {
           background: -webkit-linear-gradient(left,hsla(0,0%,100%,0),${darkBackgroundColor} 80%);
           background: linear-gradient(90deg,hsla(0,0%,100%,0) 0,${darkBackgroundColor} 80%);
           filter: brightness(100%) !important;
