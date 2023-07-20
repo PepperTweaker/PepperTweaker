@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.70
+// @version      0.9.71
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -1876,8 +1876,11 @@
       const searchSubheadline = document.querySelector('h1.cept-nav-subheadline');
       if (searchSubheadline) {
         const searchQuery = `site:${location.host.replace('www.', '')} ${searchSubheadline.textContent.replace(/Szukaj |"/gi, '')}`;
-        const subNavMenu = document.querySelector('.subNavMenu--menu');
-        subNavMenu.parentNode.insertBefore(createSearchButton(searchEngine.google, searchQuery, { label: 'Szukaj przez Google' }), subNavMenu);
+        const searchButton = createSearchButton(searchEngine.google, searchQuery, { label: 'Szukaj przez Google' });
+        searchButton.querySelector('a')?.classList.add('button--type-secondary');
+        searchButton.style.cssFloat = 'right';
+        searchButton.classList.remove(...searchButton.classList); // remove all classes from wrapper, because they messing up the alignment
+        searchSubheadline.parentNode.insertBefore(searchButton, searchSubheadline);
       }
     }
     /*** END: Search Page ***/
