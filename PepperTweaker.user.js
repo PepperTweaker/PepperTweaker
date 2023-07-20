@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.69
+// @version      0.9.70
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3248,132 +3248,136 @@
         /* END: List to Grid */
 
         /* Auto Update */
-        const updateGridWidgetsPosition = (isGridLayout, container, dealsSelector) => {
-          if (isGridLayout) {
-            const allCurrentDeals = container.querySelectorAll(dealsSelector);
-            if (allCurrentDeals.length < 13) {  // only 3 widgets => index: 4 + 2 * 4 => 12 (but starting from 0)
-              return false;
-            }
-            const widgets = container.querySelectorAll('.gridLayout-item.hide--toW4[data-grid-pin="n!"]');
-            for (let i = 0, widgetsLength = widgets.length; i < widgetsLength; i++) {
-              container.insertBefore(widgets[i], allCurrentDeals[4 + i * 4].parentNode);
-            }
-            return true;
-          }
-        };
+        if (location.pathname.indexOf("/search") < 0) {
 
-        const insertNewDeals = observer => {
-          for (let newDeal of observer.newChildren) {
-            // if deal is already present => remove it
-            const dealToReplace = Array.from(observer.children).find(child => child.id === newDeal.id);
-            if (dealToReplace) {
-              dealToReplace.replaceWith(newDeal);
-              continue;
-            }
-            let firstCurrentDeal = observer.container.querySelector(observer.childrenSelector);  // first deal can change in the tickCallback!
+          const updateGridWidgetsPosition = (isGridLayout, container, dealsSelector) => {
             if (isGridLayout) {
-              newDeal = newDeal.parentNode;
-              if (firstCurrentDeal) {
-                firstCurrentDeal = firstCurrentDeal.parentNode;
+              const allCurrentDeals = container.querySelectorAll(dealsSelector);
+              if (allCurrentDeals.length < 13) {  // only 3 widgets => index: 4 + 2 * 4 => 12 (but starting from 0)
+                return false;
+              }
+              const widgets = container.querySelectorAll('.gridLayout-item.hide--toW4[data-grid-pin="n!"]');
+              for (let i = 0, widgetsLength = widgets.length; i < widgetsLength; i++) {
+                container.insertBefore(widgets[i], allCurrentDeals[4 + i * 4].parentNode);
+              }
+              return true;
+            }
+          };
+
+          const insertNewDeals = observer => {
+            for (let newDeal of observer.newChildren) {
+              // if deal is already present => remove it
+              const dealToReplace = Array.from(observer.children).find(child => child.id === newDeal.id);
+              if (dealToReplace) {
+                dealToReplace.replaceWith(newDeal);
+                continue;
+              }
+              let firstCurrentDeal = observer.container.querySelector(observer.childrenSelector);  // first deal can change in the tickCallback!
+              if (isGridLayout) {
+                newDeal = newDeal.parentNode;
+                if (firstCurrentDeal) {
+                  firstCurrentDeal = firstCurrentDeal.parentNode;
+                }
+              }
+              newDeal = repairSvgWithUseChildren(newDeal);
+              observer.container.insertBefore(newDeal, firstCurrentDeal);
+              processElement(newDeal, deepSearch);
+            }
+            updateGridWidgetsPosition(isGridLayout, observer.container, observer.childrenSelector);
+            const refreshBar = document.querySelector('div[class=""][data-handler="vue"]');
+            removeAllChildren(refreshBar);
+            // observer.container.replaceWith(repairSvgWithUseChildren(observer.remoteContainer));
+          };
+
+          const replaceElementDatasetWith = (targetDataset, sourceDataset) => {
+            for (const key of Object.keys(targetDataset)) {
+              delete targetDataset[key];
+            }
+            for (const key of Object.keys(sourceDataset)) {
+              targetDataset[key] = sourceDataset[key];
+            }
+            return targetDataset;
+          };
+
+          const newDealsObserver = new RemoteChildrenUpdateObserver({
+            containerSelector: dealsSectionSelector,
+            childrenSelector: 'article[id]',
+            remoteUrl: location.href,  // TODO: ?page=2 etc.  //.replace(location.search, '')
+            tickCallback: observer => {
+              // if (observer.remoteChildren.length < 20) {  // no remote children => there will be no matching deals
+              //     return;
+              // }
+              let updateWidgets = false;
+              // updating deals details:
+              for (const deal of observer.children) {
+                const matchingRemoteDeal = Array.from(observer.remoteChildren).find(remoteDeal => remoteDeal.id === deal.id);
+                if (matchingRemoteDeal) {
+                  deal.classList = matchingRemoteDeal.classList;  // update class list
+                  replaceElementDatasetWith(deal.dataset, matchingRemoteDeal.dataset);  // update data attributes
+                  removeAllChildren(deal);
+                  Array.from(matchingRemoteDeal.children).forEach(child => deal.appendChild(repairSvgWithUseChildren(child)));
+                  processElement(deal, deepSearch);
+                } else {  // deal not found in remoteChildren => remove it
+                  if (isGridLayout) {
+                    deal.parentNode.remove();
+                  } else {
+                    deal.remove();
+                  }
+                  updateWidgets = true;
+                }
+              }
+              if (updateWidgets) {
+                updateGridWidgetsPosition(isGridLayout, observer.container, observer.childrenSelector);
+              }
+            },
+            updateCallback: observer => blinkingTitle.run('NOWE oferty', () => {
+              if (pepperTweakerConfig.autoUpdate.askBeforeLoad) {
+                openConfirmDialog(
+                  'Nowe oferty',
+                  'Czy załadować nowe oferty?\n(anulowanie przerwie obserwację)',
+                  () => {
+                    blinkingTitle.stop();
+                    insertNewDeals(observer);
+                  },
+                  () => {
+                    blinkingTitle.stop();
+                    observer.disconnect();
+                    autoUpdateCheckbox.querySelector('input').checked = false;
+                  }
+                );
+              } else {
+                insertNewDeals(observer);
+              }
+            }),
+            // errorCallback: (observer, error) => {
+            //     if (observer.responseStatus !== 200) {
+            //         if (confirm(`Wystąpił błąd podczas pobierania strony (status: ${observer.responseStatus}).\nCzy przerwać obserwowanie?`)) {
+            //             observer.disconnect();
+            //             autoUpdateCheckbox.querySelector('input').checked = false;
+            //         }
+            //     }
+            // },
+          });
+
+          const autoUpdateCheckbox = createLabeledCheckbox({
+            label: 'Obserwuj', callback: event => {
+              if (event.target.checked) {
+                newDealsObserver.observe();
+              } else {
+                newDealsObserver.disconnect();
               }
             }
-            newDeal = repairSvgWithUseChildren(newDeal);
-            observer.container.insertBefore(newDeal, firstCurrentDeal);
-            processElement(newDeal, deepSearch);
+          });
+          autoUpdateCheckbox.classList.add('space--r-3', 'tGrid-cell', 'vAlign--all-m');
+          autoUpdateCheckbox.title = 'Aktualizuj stronę z ofertami';
+          if (pepperTweakerConfig.autoUpdate.dealsDefaultEnabled) {
+            autoUpdateCheckbox.querySelector('input').checked = true;
+            newDealsObserver.observe();
           }
-          updateGridWidgetsPosition(isGridLayout, observer.container, observer.childrenSelector);
-          const refreshBar = document.querySelector('div[class=""][data-handler="vue"]');
-          removeAllChildren(refreshBar);
-          // observer.container.replaceWith(repairSvgWithUseChildren(observer.remoteContainer));
-        };
+          const subNavMenu = document.querySelector('.subNavMenu--menu');
+          subNavMenu.parentNode.insertBefore(autoUpdateCheckbox, subNavMenu);
 
-        const replaceElementDatasetWith = (targetDataset, sourceDataset) => {
-          for (const key of Object.keys(targetDataset)) {
-            delete targetDataset[key];
-          }
-          for (const key of Object.keys(sourceDataset)) {
-            targetDataset[key] = sourceDataset[key];
-          }
-          return targetDataset;
-        };
-
-        const newDealsObserver = new RemoteChildrenUpdateObserver({
-          containerSelector: dealsSectionSelector,
-          childrenSelector: 'article[id]',
-          remoteUrl: location.href,  // TODO: ?page=2 etc.  //.replace(location.search, '')
-          tickCallback: observer => {
-            // if (observer.remoteChildren.length < 20) {  // no remote children => there will be no matching deals
-            //     return;
-            // }
-            let updateWidgets = false;
-            // updating deals details:
-            for (const deal of observer.children) {
-              const matchingRemoteDeal = Array.from(observer.remoteChildren).find(remoteDeal => remoteDeal.id === deal.id);
-              if (matchingRemoteDeal) {
-                deal.classList = matchingRemoteDeal.classList;  // update class list
-                replaceElementDatasetWith(deal.dataset, matchingRemoteDeal.dataset);  // update data attributes
-                removeAllChildren(deal);
-                Array.from(matchingRemoteDeal.children).forEach(child => deal.appendChild(repairSvgWithUseChildren(child)));
-                processElement(deal, deepSearch);
-              } else {  // deal not found in remoteChildren => remove it
-                if (isGridLayout) {
-                  deal.parentNode.remove();
-                } else {
-                  deal.remove();
-                }
-                updateWidgets = true;
-              }
-            }
-            if (updateWidgets) {
-              updateGridWidgetsPosition(isGridLayout, observer.container, observer.childrenSelector);
-            }
-          },
-          updateCallback: observer => blinkingTitle.run('NOWE oferty', () => {
-            if (pepperTweakerConfig.autoUpdate.askBeforeLoad) {
-              openConfirmDialog(
-                'Nowe oferty',
-                'Czy załadować nowe oferty?\n(anulowanie przerwie obserwację)',
-                () => {
-                  blinkingTitle.stop();
-                  insertNewDeals(observer);
-                },
-                () => {
-                  blinkingTitle.stop();
-                  observer.disconnect();
-                  autoUpdateCheckbox.querySelector('input').checked = false;
-                }
-              );
-            } else {
-              insertNewDeals(observer);
-            }
-          }),
-          // errorCallback: (observer, error) => {
-          //     if (observer.responseStatus !== 200) {
-          //         if (confirm(`Wystąpił błąd podczas pobierania strony (status: ${observer.responseStatus}).\nCzy przerwać obserwowanie?`)) {
-          //             observer.disconnect();
-          //             autoUpdateCheckbox.querySelector('input').checked = false;
-          //         }
-          //     }
-          // },
-        });
-
-        const autoUpdateCheckbox = createLabeledCheckbox({
-          label: 'Obserwuj', callback: event => {
-            if (event.target.checked) {
-              newDealsObserver.observe();
-            } else {
-              newDealsObserver.disconnect();
-            }
-          }
-        });
-        autoUpdateCheckbox.classList.add('space--r-3', 'tGrid-cell', 'vAlign--all-m');
-        autoUpdateCheckbox.title = 'Aktualizuj stronę z ofertami';
-        if (pepperTweakerConfig.autoUpdate.dealsDefaultEnabled) {
-          autoUpdateCheckbox.querySelector('input').checked = true;
-          newDealsObserver.observe();
         }
-        const subNavMenu = document.querySelector('.subNavMenu--menu');
-        subNavMenu.parentNode.insertBefore(autoUpdateCheckbox, subNavMenu);
       }
 
     }
