@@ -2969,11 +2969,6 @@
               for (let scriptElement of scriptElements) {
                 const content = scriptElement.textContent;
 
-                // If the content doesn't include "window.__INITIAL_STATE__", move to the next script element
-                if (!content.includes('window.__INITIAL_STATE__')) {
-                  continue;
-                }
-
                 // Attempt to match the content against the regex
                 const match = content.match(/window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/);
 
