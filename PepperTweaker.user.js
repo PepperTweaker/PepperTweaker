@@ -2966,7 +2966,7 @@
               const scriptElements = htmlDoc.getElementsByTagName('script');
 
               // Iterate through the script elements
-              for (let scriptElement of scriptElements) {
+              for (const scriptElement of scriptElements) {
                 const content = scriptElement.textContent;
 
                 // Attempt to match the content against the regex
