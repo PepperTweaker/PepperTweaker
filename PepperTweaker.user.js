@@ -2960,6 +2960,43 @@
             }
           }
 
+          /**
+           * Extracts the groups list from the provided HTML document.
+           * @param {Document} htmlDoc - The HTML document to extract the groups list from.
+           * @returns {Array<string>} - The list of group names found in the HTML document.
+           */
+          const getGroupsListFromDocument = (htmlDoc) => {
+            try {
+              // Get all script elements in the document
+              const scriptElements = htmlDoc.getElementsByTagName('script');
+
+              // Iterate through the script elements
+              for (const scriptElement of scriptElements) {
+                const content = scriptElement.textContent;
+
+                // Attempt to match the content against the regex
+                const match = content.match(/window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\});/);
+
+                // If there's no match or the match doesn't contain the JSON object, move to the next script element
+                if (!match || !match[1]) {
+                  continue;
+                }
+
+                // Parse the JSON object from the matched string
+                const initialState = JSON.parse(match[1]);
+
+                // Extract the groups list from the initialState object and return it
+                return initialState.threadDetail?.groupsPath?.map(({ threadGroupName }) => threadGroupName) || [];
+              }
+            } catch (error) {
+              // Log an error message if something goes wrong during processing
+              console.error('An error occurred while processing the page:', error);
+              return [];
+            }
+            // Return an empty array if no matching elements were found
+            return [];
+          }
+
           const link = element.querySelector('a.cept-tt');
           if (deepSearch && link && link.href && link.href.length > 0) {
             fetch(link.href)
@@ -2971,11 +3008,7 @@
               })
               .then(text => {
                 let htmlDoc = (new DOMParser()).parseFromString(text, 'text/html');
-                const groupLinks = htmlDoc.documentElement.querySelectorAll('.overflow--ellipsis a[href*="/grupa/"]');
-                const groups = [];
-                for (const groupLink of groupLinks) {
-                  groups.push(groupLink.textContent);
-                }
+                const groups = getGroupsListFromDocument(htmlDoc);
 
                 const locationIcon = htmlDoc.documentElement.querySelector('*[id^="thread"] .cept-thread-content svg.icon--location');
                 const local = locationIcon !== null && locationIcon.parentNode.parentNode.textContent.search(/Ogólnopolska/i) < 0;
