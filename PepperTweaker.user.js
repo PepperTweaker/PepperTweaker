@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.73
+// @version      0.9.74
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3276,7 +3276,7 @@
             }
             /* END: Alert page */
             /* "Your new tab..." div at "For You" subpage */
-            .listLayout-main > div {
+            .listLayout-main > div:not([class]) {
               display: none;
             }
             /* END: "Your new tab..." div at "For You" subpage */
