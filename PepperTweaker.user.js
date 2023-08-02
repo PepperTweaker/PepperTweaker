@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.72
+// @version      0.9.73
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2846,9 +2846,12 @@
         // Remove some ribbons
         const metaRibbons = dealNode.querySelectorAll('.threadGrid-headerMeta .metaRibbon');
         metaRibbons.forEach(ribbon => {
-          if (ribbon.querySelector('svg.icon--clock') === null) {
+          if (ribbon.querySelector('svg.icon--clock, svg.icon--refresh, svg.icon--flame') === null) {
             ribbon.remove();
           }
+          ribbon.classList.remove('text--b'); // remove text bolding
+          const ribbonSpan = ribbon.querySelector('span');
+          ribbonSpan.textContent = ribbonSpan.textContent.replace(/Zaktualizowano\s+/, '').replace(/\s+temu/, '');
         });
         // Number of comments in discussion
         const headerMetaIconComment = dealNode.querySelector('.threadGrid-headerMeta .icon--comment');
