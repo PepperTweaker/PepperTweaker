@@ -695,8 +695,10 @@
       document.addEventListener('DOMContentLoaded', appendStyle);
     } else {
       const appendStyle = () => {
-        if (document.head !== null || document.documentElement !== null) {
-          (document.head || document.documentElement).insertAdjacentHTML('afterend', `<style id="pepper-tweaker-style">${css}</style>`);  // cannot be 'beforeend' => <link> elements with CSS can be loaded after the style and override it!
+        if (document.head !== null) {
+          document.head.insertAdjacentHTML('afterend', `<style id="pepper-tweaker-style">${css}</style>`);
+        } else if (document.documentElement !== null) {
+          document.documentElement.insertAdjacentHTML('beforeend', `<style id="pepper-tweaker-style">${css}</style>`);
         } else {
           setTimeout(appendStyle, 10);
         }
