@@ -372,7 +372,7 @@
 
     /* Dark Theme Style */
     if (pepperTweakerConfig.darkThemeEnabled) {
-    
+
       // const invertColor = color => '#' + (Number(`0x1${ color.replace('#', '') }`) ^ 0xFFFFFF).toString(16).substr(1);
       const darkBorderColor = '#121212';
       const lightBorderColor = '#5c5c5c';
@@ -988,7 +988,7 @@
           spanElement.appendChild(spanText);
           wrapperDiv.appendChild(spanElement);
         }
-        
+
         wrapperDiv.appendChild(divElement);
         return wrapperDiv;
       };
@@ -2208,7 +2208,7 @@
     /*** Profile Page ***/
     if (pepperTweakerConfig.improvements.addCommentPreviewOnProfilePage
       && pepperTweakerConfig.pluginEnabled && location.pathname.match(/\/profile\//)) {
-      
+
       /* Remove 'Escape' Key Binding at Message Page */
       if (location.pathname.match(/\/messages\//)) {
         document.addEventListener('keyup', (event) => {
@@ -2294,13 +2294,13 @@
             if ((filter.active === false) || !filter.keyword && !filter.user) {
               continue;
             }
-  
+
             let commentAuthor = comment.querySelector('.comment-header a.user');
             commentAuthor = commentAuthor && commentAuthor.textContent;
-  
+
             if ((!filter.user || commentAuthor && commentAuthor.match(newRegExp(filter.user, 'i')))
               && (!filter.keyword || comment.innerHTML.match(newRegExp(filter.keyword, 'i')))) {  // innerHTML here for emoticon match too (e.g. <i class="emoji emoji--type-poo" title="(poo)"></i>)
-  
+
               if (filter.style.display === 'none') {
                 comment.insertBefore(createHiddenCommentBar(hideCommentMessage, showCommentOnClick), comment.firstChild);
               }
