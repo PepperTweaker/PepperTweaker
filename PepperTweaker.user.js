@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.78
+// @version      0.9.79
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3276,11 +3276,16 @@
               width: 60em; /* TODO: for some reason alert manage tab doesn't keep width set in the '.tabbedInterface-tabs' class */
             }
             /* END: Alert page */
-            /* "Your new tab..." div at "For You" subpage */
+            /* "Your new tab..." div on "For You" subpage */
             .listLayout-main > div:not([class]) {
               display: none;
             }
-            /* END: "Your new tab..." div at "For You" subpage */
+            /* END */
+            /* Weird empty space as the first tile on the alert subpage */
+            #threadMainListPortal {
+              display: none;
+            }
+            /* END */
           `);
           styleNode.appendChild(styleText);
           document.head.appendChild(styleNode);
