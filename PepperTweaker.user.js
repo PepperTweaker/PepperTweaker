@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.79
+// @version      0.9.80
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2879,7 +2879,7 @@
             history.replaceState(null, '', newRelativePathQuery);
 
             const pagination = document.getElementById('pagination');
-            const paginationPageText = pagination.querySelector('.pagination-page .hide--toW2');
+            const paginationPageText = pagination?.querySelector('.pagination-page .hide--toW2');
             if (paginationPageText) {
               paginationPageText.textContent = paginationPageText.textContent.replace(/\d+/, currentPage);
             }
