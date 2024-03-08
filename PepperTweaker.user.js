@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.80
+// @version      0.9.81
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2868,9 +2868,11 @@
       const getVerticalScrollPercentage = (node) => (node.scrollTop || node.parentNode.scrollTop) / (node.parentNode.scrollHeight - node.parentNode.clientHeight ) * 100;
       const rescale = (v, rMin, rMax, tMin, tMax) => ((v - rMin) / (rMax - rMin)) * (tMax - tMin) + tMin;
       const updatePagination = () => {
-        if (dealCount % 20 === 0) {
+        const pageSize = window?.__INITIAL_STATE__?.pagination?.pageSize ?? 30;
+
+        if (dealCount % pageSize === 0) {
           const position = getVerticalScrollPercentage(document.body);
-          const currentPage = startPage - 1 + Math.round(rescale((dealCount / 20) * (position / 100), 0, 10, 1, 10));
+          const currentPage = startPage - 1 + Math.round(rescale((dealCount / pageSize) * (position / 100), 0, 10, 1, 10));
 
           const searchParams = new URLSearchParams(location.search);
           if (searchParams.get('page') != currentPage) {
@@ -2878,15 +2880,15 @@
             const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
             history.replaceState(null, '', newRelativePathQuery);
 
-            const pagination = document.getElementById('pagination');
-            const paginationPageText = pagination?.querySelector('.pagination-page .hide--toW2');
-            if (paginationPageText) {
-              paginationPageText.textContent = paginationPageText.textContent.replace(/\d+/, currentPage);
-            }
-            const nextButton = pagination.querySelector('.cept-next-page button');
-            if (nextButton) {
-              nextButton.dataset.pagination = nextButton.dataset.pagination.replace(/\d+/, currentPage + 1);
-            }
+            // const pagination = document.getElementById('pagination');
+            // const paginationPageText = pagination?.querySelector('.pagination-page .hide--toW2');
+            // if (paginationPageText) {
+            //   paginationPageText.textContent = paginationPageText.textContent.replace(/\d+/, currentPage);
+            // }
+            // const nextButton = pagination?.querySelector('.cept-next-page button');
+            // if (nextButton) {
+            //   nextButton.dataset.pagination = nextButton.dataset.pagination.replace(/\d+/, currentPage + 1);
+            // }
           }
         }
       };
