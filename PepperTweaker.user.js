@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.82
+// @version      0.9.83
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2946,26 +2946,13 @@
 
           const user = element.querySelector('span.thread-username')?.textContent?.trim();
 
-          let priceOrDiscount = element.querySelector('.cept-tp');
-          let price, discount;
-          if (priceOrDiscount) {
-            let priceOrDiscountText = priceOrDiscount.textContent;
+          const price = threadVueObject?.price;
+          let discount = undefined;
 
-            if (priceOrDiscountText === 'ZA DARMO') {
-              price = 0;
-            } else if (priceOrDiscountText.includes('%')) {
-              discount = parseInt(priceOrDiscountText.replace(/[-%]/, ''));
-            } else {
-              price = parseFloat(priceOrDiscountText.replace('.', '').replace(',', '.'));
-            }
-
-            if (!discount) {
-              let nextBestPrice = element.querySelector('.cept-next-best-price');
-              nextBestPrice = nextBestPrice && parseFloat(nextBestPrice.textContent.replace('.', '').replace(',', '.'));
-
-              if (nextBestPrice) {
-                discount = (nextBestPrice - price) / nextBestPrice * 100;
-              }
+          if (price !== null && price > 0) {
+            const nextBestPrice = threadVueObject?.nextBestPrice;
+            if (nextBestPrice !== null && nextBestPrice > price) {
+              discount = (nextBestPrice - price) / nextBestPrice * 100;
             }
           }
 
