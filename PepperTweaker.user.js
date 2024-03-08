@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.83
+// @version      0.9.84
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2956,6 +2956,8 @@
             }
           }
 
+          const local = threadVueObject?.isLocal;
+
           /**
            * Extracts the groups list from the provided HTML document.
            * @param {Document} htmlDoc - The HTML document to extract the groups list from.
@@ -3006,8 +3008,10 @@
                 let htmlDoc = (new DOMParser()).parseFromString(text, 'text/html');
                 const groups = getGroupsListFromDocument(htmlDoc);
 
-                const locationIcon = htmlDoc.documentElement.querySelector('*[id^="thread"] .cept-thread-content svg.icon--location');
-                const local = locationIcon !== null && locationIcon.parentNode.parentNode.textContent.search(/Ogólnopolska/i) < 0;
+                // After Pepper developers changes there is no more such info preloaded in HTML
+                // => window.__INITIAL_STATE__ must be used instead, but isLocol is a property of threadVueObject too
+                // const merchantIcon = htmlDoc.documentElement.querySelector('*[id^="thread"] .threadItem-content svg.icon--merchant');
+                // const local = merchantIcon !== null && merchantIcon.parentNode.parentNode.textContent.search(/Ogólnopolska/i) < 0;
 
                 htmlDoc = null; // inform GC to clear parsed doc???
 
@@ -3028,7 +3032,9 @@
       // cannot combine as one selector => div.gridLayout appears before section.gridLayout on the main page
       const isGridLayout = dealsSectionSelector.indexOf('gridLayout') >= 0;
 
-      const deepSearch = pepperTweakerConfig.dealsFilters.findIndex(filter => (filter.active !== false) && (filter.groups || (filter.local === true))) >= 0;
+      // local is no more needed to be parsed from HTML doc => using Vue object instead
+      // const deepSearch = pepperTweakerConfig.dealsFilters.findIndex(filter => (filter.active !== false) && (filter.groups || (filter.local === true))) >= 0;
+      const deepSearch = pepperTweakerConfig.dealsFilters.findIndex(filter => (filter.active !== false) && filter.groups) >= 0;
 
       if (dealsSection) {
 
