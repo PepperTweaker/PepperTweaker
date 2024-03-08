@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.81
+// @version      0.9.82
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2932,17 +2932,19 @@
           // No deals filtering at search and profile pages (profile => alerts/saved etc.)
           if (location.pathname.match(/search|profile/)) return;
 
-          let title = element.querySelector('.cept-tt');
-          title = title && title.textContent;
+          // Apparently some info has been moved/copied to the "ThreadMainListItemNormalizer" Vue object
+          // Becuase the object has to be parsed to find merchant info, it will be faster to get some other info from this object too instead of parsing DOM (e.g. for deal title)
+          // Some properties are still missing though (e.g. description, user)
+          const threadVueObject = JSON.parse(element?.querySelector('div[data-vue2]')?.dataset?.vue2)?.props?.thread;
 
-          let description = element.querySelector('.cept-description-container');
-          description = description && description.textContent;
+          const title = threadVueObject?.title ?? element.querySelector('.cept-tt')?.textContent?.trim();;
 
-          let merchant = element.querySelector('.cept-merchant-name');
-          merchant = merchant && merchant.textContent;
+          const description = element.querySelector('.userHtml-content div')?.textContent?.trim();
 
-          let user = element.querySelector('.thread-username');
-          user = user && user.textContent;
+          // no more merchant info in the innerHTML property of the thread element => using Vue object instead
+          const merchant = threadVueObject?.merchant?.merchantName;
+
+          const user = element.querySelector('span.thread-username')?.textContent?.trim();
 
           let priceOrDiscount = element.querySelector('.cept-tp');
           let price, discount;
@@ -2951,7 +2953,7 @@
 
             if (priceOrDiscountText === 'ZA DARMO') {
               price = 0;
-            } else if(priceOrDiscountText.includes('%')) {
+            } else if (priceOrDiscountText.includes('%')) {
               discount = parseInt(priceOrDiscountText.replace(/[-%]/, ''));
             } else {
               price = parseFloat(priceOrDiscountText.replace('.', '').replace(',', '.'));
