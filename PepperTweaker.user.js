@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.89
+// @version      0.9.90
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -415,8 +415,8 @@
           border-radius: 5px;
         }
         .input, .inputBox, .secretCode-codeBox, .toolbar, .voucher-code {
-          background-color: ${darkBackgroundColor};
-          border-color: ${lightBorderColor};
+          background-color: ${darkBackgroundColor} !important;
+          border-color: ${lightBorderColor} !important;
         }
         /* Arrows */
         .input-caretLeft {
