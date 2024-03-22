@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.94
+// @version      0.9.95
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -500,6 +500,7 @@
         .bg--color-greyPanel {
           background-color: ${veryDarkBackgroundColor};
         }
+        .progressBar::before,
         .bg--color-greyTint, .thread-divider, .btn--mode-filter {
           background-color: ${textColor};
         }
