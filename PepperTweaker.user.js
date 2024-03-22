@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.85
+// @version      0.9.86
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3208,10 +3208,12 @@
               right: 0;
               top: 0;
             }
+            /* max-height trims the height of the widget
             #toc-target-deals .listLayout-side > div, .card--type-vertical {
               min-height: 500px;
               max-height: 500px;
             }
+            */
             /* this hides some "get deal" buttons
             .footerMeta .iGrid-item.width--all-12.width--fromW3-auto.space--l-0.space--fromW3-l-2.space--t-2.space--fromW3-t-0.hide--empty {
               display: none;
