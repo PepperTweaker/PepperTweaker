@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.84
+// @version      0.9.85
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2616,7 +2616,7 @@
         const setSearchInterfacePosition = () => {
           // const searchButtonsWrapperWidth = parseInt(window.getComputedStyle(searchButtonsWrapper).width);
           const searchButtonsWrapperWidth = parseInt(searchButtonsWrapper.style.width);
-          const threadArticle = document.querySelector('*[id^="thread"]');
+          const threadArticle = document.querySelector('.thread');
           const threadArticleBoundingClientRect = threadArticle.getBoundingClientRect();
           if (threadArticleBoundingClientRect.left > searchButtonsWrapperWidth) {
             searchButtonsWrapper.style.left = `${threadArticleBoundingClientRect.left - searchButtonsWrapperWidth}px`;
