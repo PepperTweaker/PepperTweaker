@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.95
+// @version      0.9.96
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3074,14 +3074,19 @@
           dealsSection.style.display = 'grid';
           dealsSection.style.gridGap = `${gridGapWidth}px`;
           dealsSection.style.gridAutoRows = 'min-content';
+
           const updateGridView = () => {
             const windowSize = getWindowSize();
             const gridMaxWidth = windowSize.width - sideContainerWidth - 2 * sideContainerPadding - 2 * gridPadding;
             const gridColumnCount = Math.min(pepperTweakerConfig.improvements.gridColumnCount || Infinity, Math.floor(gridMaxWidth / (columnWidth + gridGapWidth)));
-            const gridMarginLeft = (document.querySelector('.tabbedInterface') != null) ? 0 : Math.floor((gridMaxWidth - gridColumnCount * (columnWidth + gridGapWidth)) / 2);
             dealsSection.style.gridTemplateColumns = `repeat(${gridColumnCount}, ${columnWidth}px)`;
-            dealsSection.style.setProperty('margin-left', `${gridMarginLeft}px`, 'important');
+
+            if (location.pathname.indexOf("/profile") < 0) {
+              const gridMarginLeft = (document.querySelector('.tabbedInterface') != null) ? 0 : Math.floor((gridMaxWidth - gridColumnCount * (columnWidth + gridGapWidth)) / 2);
+              dealsSection.style.setProperty('margin-left', `${gridMarginLeft}px`, 'important');
+            }
           }
+
           updateGridView();
           window.addEventListener('resize', updateGridView);
 
