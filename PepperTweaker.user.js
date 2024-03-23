@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.102
+// @version      0.9.103
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -546,8 +546,9 @@
         .overflow--fade:after {
           background-color: linear-gradient(90deg,hsla(0,0%,100%,0) 0,#242424 80%) !important;
         }
+        .nav-logo,
         img, .badge, .btn--mode-primary-inverted, .btn--mode-primary-inverted--no-state, .btn--mode-primary-inverted--no-state:active, .btn--mode-primary-inverted--no-state:focus, .btn--mode-primary-inverted--no-state:hover, .btn--mode-primary-inverted:active, .btn--mode-primary-inverted:focus, button:active .btn--mode-primary-inverted, button:active .btn--mode-primary-inverted--no-state, button:focus .btn--mode-primary-inverted, button:focus .btn--mode-primary-inverted--no-state, button:hover .btn--mode-primary-inverted--no-state {
-          filter: invert(5%) brightness(90%);
+          filter: invert(2%) brightness(90%);
         }
         .thread--expired > * {
           filter: opacity(50%) brightness(95%);
