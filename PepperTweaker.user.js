@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.99
+// @version      0.9.100
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -490,6 +490,7 @@
         .tabbedInterface-tab--transparent {
           background-color: ${lightBackgroundColor};
         }
+        .userHtml hr,
         .internalLinking-tabContent, .border--color-greyBackground, .page-divider, .popover-item, .boxSec-divB, .boxSec--fromW3, .cept-comment-link, .border--color-borderGrey, .border--color-greyTint, .staticPageHtml table, .staticPageHtml td, .staticPageHtml th {
           border-color: ${lightBorderColor};
         }
