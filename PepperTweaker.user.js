@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.97
+// @version      0.9.98
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -438,6 +438,9 @@
         }
         .popover--layout-e > .popover-arrow:after {
           border-right-color: ${darkBackgroundColor};
+        }
+        .popover--layout-s > .popover-arrow::after, .inputBox::after {
+          border-bottom-color: ${orangeColor};
         }
         /* END: Arrows */
         /* Faders */
