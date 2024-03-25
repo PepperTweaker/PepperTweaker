@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.105
+// @version      0.9.106
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3097,6 +3097,8 @@
             if (location.pathname.indexOf("/profile") < 0) {
               const gridMarginLeft = (document.querySelector('.tabbedInterface') != null) ? 0 : Math.floor((gridMaxWidth - gridColumnCount * (columnWidth + gridGapWidth)) / 2);
               dealsSection.style.setProperty('margin-left', `${gridMarginLeft}px`, 'important');
+              // id="listingOptionsPortal" => the search sort option with the number of deals found
+              document.getElementById('listingOptionsPortal')?.style.setProperty('margin-left', `${gridMarginLeft}px`, 'important');
             }
           }
 
@@ -3301,7 +3303,8 @@
             }
             /* END: Alert page */
             /* "Your new tab..." div on "For You" subpage */
-            .listLayout-main > div:not([class]) {
+            /* id="listingOptionsPortal" => the search sort option with the number of deals found */
+            .listLayout-main > div:not([class]):not([id="listingOptionsPortal"]) {
               display: none;
             }
             /* END */
