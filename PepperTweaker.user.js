@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.106
+// @version      0.9.107
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2951,7 +2951,8 @@
           // Apparently some info has been moved/copied to the "ThreadMainListItemNormalizer" Vue object
           // Becuase the object has to be parsed to find merchant info, it will be faster to get some other info from this object too instead of parsing DOM (e.g. for deal title)
           // Some properties are still missing though (e.g. description, user)
-          const threadVueObject = JSON.parse(element?.querySelector('div[data-vue2]')?.dataset?.vue2)?.props?.thread;
+          const threadVueString = element?.querySelector('div[data-vue2]')?.dataset?.vue2;
+          const threadVueObject = threadVueString ? JSON.parse(threadVueString)?.props?.thread : undefined;
 
           const title = threadVueObject?.title ?? element.querySelector('.cept-tt')?.textContent?.trim();;
 
