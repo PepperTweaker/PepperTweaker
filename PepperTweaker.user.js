@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.114
+// @version      0.9.115
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -1254,8 +1254,39 @@
         }
       };
 
+      const createSupportButtons = () => {
+        const wrapperDiv = document.createElement('DIV');
+        wrapperDiv.classList.add('space--v-2');
+
+        const anchorElement = document.createElement('A');
+        anchorElement.href = 'https://buycoffee.to/peppertweaker';
+        anchorElement.target = '_blank';
+
+        const imageElement = document.createElement('IMG');
+        imageElement.src = 'https://raw.githubusercontent.com/PepperTweaker/PepperTweaker/master/images/buycoffeeto-banner.gif';
+        imageElement.style.width = '200px';
+
+        anchorElement.appendChild(imageElement);
+        wrapperDiv.appendChild(anchorElement);
+
+        return wrapperDiv;
+      };
+
       /* Settings Page Configuration */
       settingsPageConfig = {
+        support: {
+          header: 'Wsparcie projektu',
+          rows: {
+            buttons: {
+              label: 'Wesprzyj rozwój stawiając Misiowi kawkę! :D',
+              entries: {
+                buyCoffeeTo: {
+                  create: createSupportButtons,
+                },
+              },
+            },
+          },
+        },
         global: {
           header: 'Ustawienia ogólne',
           rows: {
