@@ -4,6 +4,11 @@ Czyli Pepper na resorach :)
 
 Jest to darmowe i otwartoźródłowe rozszerzenie do serwisu Pepper, które wzbogaca platformę o dodatkowe funkcjonalności niedostępne w wersji oficjalnej. Na chwilę obecną obsługiwany jest tylko polski serwis Pepper.pl, ale niebawem zostanie dodane wsparcie pozostałych domen Peppera.
 
+## Wsparcie
+
+Teraz możesz wesprzeć rozwój tego projektu stawiając mi kawę! :D
+
+<a href="https://buycoffee.to/peppertweaker" target="_blank"><img src="images/buycoffeeto-banner.gif" style="width: 200px" alt="Postaw mi kawę na buycoffee.to"></a>
 
 ## Spis treści
 
