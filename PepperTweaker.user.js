@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.113
+// @version      0.9.114
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -1038,7 +1038,7 @@
         }
         const dividerDiv = document.createElement('DIV');
         dividerDiv.classList.add('page-divider');
-        dividerDiv.style.width = '582px';  // TODO: set to 100% some how...
+        dividerDiv.style.width = '682px';  // TODO: set to 100% some how...
         wrapperDiv.appendChild(dividerDiv);
         return wrapperDiv;
       };
