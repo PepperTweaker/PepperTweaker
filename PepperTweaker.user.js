@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.111
+// @version      0.9.112
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -387,6 +387,7 @@
       // const orangeColor = '#d1d5db';
 
       css += `
+        .formList-label,
         .navMenu-label,
         .card-title,
         #threadBreadcrumbsPortal .text--color-white,
