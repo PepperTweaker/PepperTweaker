@@ -56,6 +56,14 @@ I gotowe! Od teraz możesz cieszyć się nową funkcjonalnością na Pepperze!
 
 ## Funkcje PepperTweakera
 
+### Ważna uwaga!
+
+**Część funkcji może już nie działać lub działać w inny sposób.** Ekipa tworząca Peppera wprowadza dużo zmian i niestety nie ze wszystkim nadążamy (w tym z odświeżaniem tego opisu).
+
+Priorytetem jest jednak utrzymanie **widoku siatki, filtrowania ofert oraz ciemnego motywu** - na to można zawsze liczyć. Najświeższe informacje odnośnie aktualizacji znajdują się w linkowanej już wyżej dyskusji na Pepperze: [PepperTweaker, czyli Pepper na resorach :)](https://www.pepper.pl/dyskusji/peppertweaker-beta-testy-188008).
+
+### Zakładka z ustawieniami
+
 Do zarządzania Tweakerem służy GUI dobudowane do Peppera w sekcji ustawień.
 Link jest dynamiczny i zależy od nazwy użytkownika, ale ogólna postać jest następująca:\
 https://www.pepper.pl/profile/[NAZWA_UŻYTKOWNIKA]/settings#peppertweaker
