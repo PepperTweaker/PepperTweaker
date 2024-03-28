@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.116
+// @version      0.9.117
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -745,23 +745,33 @@
     if (pepperTweakerConfig.pluginEnabled) {
 
       /*** Change Theme Button ***/
-      // const messagesButton = document.querySelector('.cept-navDropDown--messages');
-      // if (messagesButton) {
-      const searchForm = document.querySelector('form.search');
-      if (searchForm) {
-        const themeButtonDiv = document.createElement('DIV');
-        themeButtonDiv.classList.add('navDropDown', 'hAlign--all-l', 'vAlign--all-m', 'space--r-3', 'hide--toW2');  // space--r-3 => right space
-        const themeButtonLink = document.createElement('BUTTON');
-        themeButtonLink.classList.add('navDropDown-trigger', 'overflow--visible', 'button', 'button--shape-circle', 'button--type-primary', 'button--mode-white', 'button--square');
-        const themeButtonImg = document.createElement('IMG');
-        themeButtonImg.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAAC6V+0/AAAArlBMVEVHcEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADDOkjZAAAAOXRSTlMA3fOZiRSwMxFVoU/YkfKdOwP8Q0hu63cnC4Fw9vtaclSktufqy7H+9dvljTK1JhfKEsWlD3a37i9GF/eYAAAAnklEQVQY04XQ1xLCIBBA0QU0YmKiacbee++6//9jignMMj54n5gzQ1lgyNE0G0EeMVzOC0TaWqMvTfuaxhKYHIJbIY4vIe4WNhFbHn8+4Hqy8ZZUdXGoMM2y84W8wSkukuhXdG4EkasWB4oIi++O1JoBwlgdvrMxr4y4YWyFAWNTio3PRFgH8P5iIuUEx1IOKP5e1O4T4/rXOj1jQfcNdIApApX/xhoAAAAASUVORK5CYII=';
-        themeButtonImg.style.filter = 'invert(60%)';
-        themeButtonLink.appendChild(themeButtonImg);
-        themeButtonDiv.appendChild(themeButtonLink);
-        themeButtonDiv.onclick = () => setConfig({ darkThemeEnabled: !pepperTweakerConfig.darkThemeEnabled }, true);
-        // messagesButton.parentNode.insertBefore(themeButtonDiv, messagesButton);
-        searchForm.parentNode.insertBefore(themeButtonDiv, searchForm);
+      const addChangeThemeButton = (searchForm) => {
+        if (searchForm !== null && searchForm instanceof HTMLElement) { // sanity
+          const themeButtonDiv = document.createElement('DIV');
+          themeButtonDiv.classList.add('navDropDown', 'hAlign--all-l', 'vAlign--all-m', 'space--r-3', 'hide--toW2');  // space--r-3 => right space
+          const themeButtonLink = document.createElement('BUTTON');
+          themeButtonLink.classList.add('navDropDown-trigger', 'overflow--visible', 'button', 'button--shape-circle', 'button--type-primary', 'button--mode-white', 'button--square');
+          const themeButtonImg = document.createElement('IMG');
+          themeButtonImg.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAAC6V+0/AAAArlBMVEVHcEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADDOkjZAAAAOXRSTlMA3fOZiRSwMxFVoU/YkfKdOwP8Q0hu63cnC4Fw9vtaclSktufqy7H+9dvljTK1JhfKEsWlD3a37i9GF/eYAAAAnklEQVQY04XQ1xLCIBBA0QU0YmKiacbee++6//9jignMMj54n5gzQ1lgyNE0G0EeMVzOC0TaWqMvTfuaxhKYHIJbIY4vIe4WNhFbHn8+4Hqy8ZZUdXGoMM2y84W8wSkukuhXdG4EkasWB4oIi++O1JoBwlgdvrMxr4y4YWyFAWNTio3PRFgH8P5iIuUEx1IOKP5e1O4T4/rXOj1jQfcNdIApApX/xhoAAAAASUVORK5CYII=';
+          themeButtonImg.style.filter = 'invert(60%)';
+          themeButtonLink.appendChild(themeButtonImg);
+          themeButtonDiv.appendChild(themeButtonLink);
+          themeButtonDiv.onclick = () => setConfig({ darkThemeEnabled: !pepperTweakerConfig.darkThemeEnabled }, true);
+          searchForm.parentNode.insertBefore(themeButtonDiv, searchForm);
+        }
       }
+
+      const headerPortalObserver = new MutationObserver((allMutations, observer) => {
+        allMutations.every((mutation) => {
+          const searchForm = mutation.target.querySelector('form.search');
+          if (searchForm !== null) {
+            addChangeThemeButton(searchForm);
+            observer.disconnect();
+            return false;
+          }
+        });
+      });
+      headerPortalObserver.observe(document.querySelector('#header-portal'), { childList: true, subtree: true });
       /*** END: Change Theme Button ***/
 
       /*** Menu Links Addition ***/
