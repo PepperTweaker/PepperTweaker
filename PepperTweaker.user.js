@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.118
+// @version      0.9.119
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3121,7 +3121,7 @@
           const sideWidgets = document.querySelectorAll('.listLayout-side .listLayout-box');
           const sideWidgetsWidth = Array.from(sideWidgets).map((widget) => parseFloat(window.getComputedStyle(widget).width));
           let sideContainerWidth;
-          if (location.pathname.indexOf("/search") >= 0)
+          if (location.pathname.match(/\/search|\/grupa/))
             sideContainerWidth = 304;
           else
             sideContainerWidth = sideWidgetsWidth.reduce((acc, cur) => acc || (isNumeric(cur) && cur > 0), false) ? 234 : 0;
