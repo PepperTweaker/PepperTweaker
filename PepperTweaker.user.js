@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.122
+// @version      0.9.123
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -558,6 +558,18 @@
         .btn--mode-primary, .btn--mode-highlight, .bg--color-brandPrimary {  /* Orange Buttons/Backgrounds */
           filter: brightness(90%);
         }
+        
+        /* Animated badge */
+        .animation--colorTransfusion {
+          background-color: ${orangeColor} !important;
+          filter: brightness(90%);
+        }
+        .animation--colorTransfusion .text--color-brandPrimary {
+          color: #fff !important;
+          font-weight: bold !important;
+        }
+        /***/
+
         .btn--mode-dark-transparent, .btn--mode-dark-transparent:active, .btn--mode-dark-transparent:focus, button:active .btn--mode-dark-transparent, button:focus .btn--mode-dark-transparent {
           background-color: inherit;
         }
