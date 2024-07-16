@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.121
+// @version      0.9.122
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -624,6 +624,7 @@
           border: 1px solid ${lightBorderColor};
         }
         /* END */
+
         /* Buttons: coupons, comments, alerts */
         .btn--mode-boxSec,
         .btn--mode-primary-inverted,
@@ -631,6 +632,10 @@
           /* color: ${secondaryTextColor}; */
           background-color: ${darkBackgroundColor} !important;
           border: 1px solid ${lightBorderColor} !important;
+        }
+        .button--type-tag.button--mode-dark {
+          background-color: ${lightBackgroundColor} !important;
+          color: ${textColor} !important;
         }
         .footerMeta-actionSlot .btn--mode-boxSec { /* comment buttons in the grid list */
           color: ${secondaryTextColor};
