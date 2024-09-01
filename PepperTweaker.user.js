@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.123
+// @version      0.9.124
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -351,16 +351,16 @@
     }
 
     /* Voting buttons: Replaced up/down arrow with +/- */
-    .button--type-vote .icon--arrow-rounded-down, .button--type-vote .icon--arrow-rounded-up {
+    .vote-button .icon--arrow-rounded-down, .vote-button .icon--arrow-rounded-up {
       display: none;
     }
 
-    .button--type-vote.button--mode-up span:after {
+    .vote-button.vote-button--mode-up span:after {
       content: '+';
       font-weight: bold;
       font-size: 1.7em;
     }
-    .button--type-vote.button--mode-down span:after {
+    .vote-button.vote-button--mode-down span:after {
       content: '\u2013';
       font-weight: bold;
       font-size: 1.7em;
@@ -368,18 +368,18 @@
     }
 
     /* Changing the color only when voting enabled (not voted already) */
-    .button--type-vote.button--mode-up:not(:disabled) span:after {
+    .vote-button.vote-button--mode-up:not(:disabled) span:after {
       color: ${voteRedColor};
     }
-    .button--type-vote.button--mode-down:not(:disabled) span:after {
+    .vote-button.vote-button--mode-down:not(:disabled) span:after {
       color: ${voteBlueColor};
     }
     /***/
 
-    .button--type-vote.button--mode-up.button--mode-selected {
+    .vote-button.vote-button--mode-up.vote-button--mode-selected {
       background-color: ${voteRedColor} !important;
     }
-    .button--type-vote.button--mode-down.button--mode-selected {
+    .vote-button.vote-button--mode-down.vote-button--mode-selected {
       background-color: ${voteBlueColor} !important;
     }
     /* END: Voting buttons */
@@ -693,14 +693,14 @@
         }
 
         /* Voting buttons */
-        .button--type-vote {
+        .vote-button {
           background-color: ${darkBackgroundColor} !important;
         }
-        .button--type-vote:not(.button--mode-selected):disabled {
+        .vote-button:not(.vote-button--mode-selected):disabled {
           background-color: ${darkBackgroundColor} !important;
           color: ${textColor};
         }
-        .button--type-vote.button--mode-selected span:after {
+        .vote-button.vote-button--mode-selected span:after {
           color: ${darkBackgroundColor} !important;
         }
         /***/
