@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.129
+// @version      0.9.130
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -424,6 +424,7 @@
       // const orangeColor = '#d1d5db';
 
       css += `
+        .vote-temp--inert,
         .formList-label,
         .navMenu-label,
         .card-title,
@@ -438,8 +439,7 @@
         .redactor button.button--disabled svg,
         .redactor button.button--disabled span,
         .button--type-primary.button--mode-brand.button--disabled,
-        .button--type-secondary:not(.cept-on),
-        .vote-temp--inert {
+        .button--type-secondary:not(.cept-on) {
           color: ${secondaryTextColor} !important;
         }
         .navDropDown-trigger.button--type-primary.button--mode-white,
