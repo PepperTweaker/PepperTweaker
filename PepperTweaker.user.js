@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.124
+// @version      0.9.125
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3074,7 +3074,7 @@
           // no more merchant info in the innerHTML property of the thread element => using Vue object instead
           const merchant = threadVueObject?.merchant?.merchantName;
 
-          const user = element.querySelector('span.thread-username')?.textContent?.trim();
+          const user = threadVueObject?.user?.username ?? element.querySelector('span.thread-user')?.textContent?.trim();
 
           const price = threadVueObject?.price;
           let discount = undefined;
