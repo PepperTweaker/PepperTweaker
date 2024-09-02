@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.125
+// @version      0.9.126
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2424,8 +2424,8 @@
               continue;
             }
 
-            let commentAuthor = comment.querySelector('.comment-header a.user');
-            commentAuthor = commentAuthor && commentAuthor.textContent;
+            let commentAuthor = comment.querySelector('.comment-header .user');
+            commentAuthor = commentAuthor && commentAuthor.textContent?.trim();
 
             if ((!filter.user || commentAuthor && commentAuthor.match(newRegExp(filter.user, 'i')))
               && (!filter.keyword || comment.innerHTML.match(newRegExp(filter.keyword, 'i')))) {  // innerHTML here for emoticon match too (e.g. <i class="emoji emoji--type-poo" title="(poo)"></i>)
