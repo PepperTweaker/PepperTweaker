@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.130
+// @version      0.9.131
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -349,6 +349,12 @@
     .button--fromW3-size-l {
       height: 40px !important;
     }
+
+    /* Pepper ads */
+    #mrec1FuseZonePortal, #vrec1FuseZonePortal {
+      display: none;
+    }
+    /* END: Pepper ads */
 
     /* Voting buttons: Replaced up/down arrow with +/- */
     .vote-button .icon--arrow-rounded-down, .vote-button .icon--arrow-rounded-up {
