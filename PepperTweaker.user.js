@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.131
+// @version      0.9.132
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3434,6 +3434,11 @@
             /* Weird empty space as the first tile on the alert subpage */
             #threadMainListPortal {
               display: none;
+            }
+            /* END */
+            /* Hidding some promo deals with a different class "threadListCard" */
+            article.thread:has(> .threadListCard) {
+              display: none !important;
             }
             /* END */
           `);
