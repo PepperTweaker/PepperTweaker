@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.140
+// @version      0.9.141
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -526,7 +526,7 @@
           background: linear-gradient(270deg, rgba(36, 36, 36, .98) 10%, hsla(0, 0%, 100%, 0));
         }
         /* END: Faders */
-        .btn--border, .bg--off, .boxSec--fromW3:not(.thread-infos), .boxSec, .voucher-codeCopyButton, .search input, .img, .userHtml-placeholder, .userHtml img, .popover--subNavMenu .popover-content {
+        .btn--border, .bg--off, .boxSec--fromW3:not(.thread-infos), .boxSec, .voucher-codeCopyButton, .search input, .userHtml-placeholder, .userHtml img, .popover--subNavMenu .popover-content {
           border: 1px solid ${darkBorderColor} !important;  /* need full border definition for .bg--off */
         }
         .userProfile-header-inner .bg--color-greyPanel {
