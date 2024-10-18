@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.146
+// @version      0.9.147
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -460,7 +460,7 @@
         .redactor button.button--disabled svg,
         .redactor button.button--disabled span,
         .button--type-primary.button--mode-brand.button--disabled,
-        .button--type-secondary:not(.cept-on) {
+        .button--type-secondary:not(.cept-on), .button--mode-secondary, .button--type-tertiary {
           color: ${secondaryTextColor} !important;
         }
         .navDropDown-trigger.button--type-primary.button--mode-white,
