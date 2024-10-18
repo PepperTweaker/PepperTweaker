@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.134
+// @version      0.9.135
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -430,7 +430,13 @@
       // const orangeColor = '#d1d5db';
 
       css += `
-        .color--text-NeutralSecondary, .color--text-TranslucentPrimary,
+        :root {
+          --textTranslucentPrimary: ${textColor};
+          --textNeutralSecondary: ${textColor};
+          --textTranslucentSecondary: ${secondaryTextColor};
+          --graphicTranslucentTertiary: ${secondaryTextColor};
+          --graphicTranslucentSecondary: ${secondaryTextColor};
+        }
         .vote-temp--inert,
         .formList-label,
         .navMenu-label,
@@ -442,7 +448,6 @@
         .page2-center .mute--text2, .page2-subTitle2.mute--text2, .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .page2-secTitle, .userProfile-title, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
           color: ${textColor};
         }
-        .color--text-TranslucentSecondary, .color--graphic-TranslucentSecondary,
         .redactor button,
         .redactor button.button--disabled svg,
         .redactor button.button--disabled span,
