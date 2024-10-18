@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.139
+// @version      0.9.140
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -466,7 +466,7 @@
           background-color: ${darkBackgroundColor};
           color: ${textColor};
         }
-        .thread--type-card, .thread--type-list, .conversationList-msg--read:not(.conversationList-msg--active), .card, .threadCardLayout--card article, .threadCardLayout--card article span .threadCardLayout--card article span, .vote-box, .cept-comments-link, .subNavMenu-btn {
+        .thread--type-card, .thread--type-list, .conversationList-msg--read:not(.conversationList-msg--active), .card, .threadCardLayout--card article, .threadCardLayout--card article span .threadCardLayout--card article span, .cept-comments-link, .subNavMenu-btn {
           background-color: ${darkBackgroundColor} !important;
           border-color: ${darkBorderColor};
         }
@@ -476,7 +476,7 @@
           border-top: none; /* there is some problem with the top border => whole article goes up */
           border-radius: 5px;
         }
-        .input, .inputBox, .secretCode-codeBox, .toolbar, .voucher-code {
+        .vote-box, .input, .inputBox, .secretCode-codeBox, .toolbar, .voucher-code {
           background-color: ${darkBackgroundColor} !important;
           border-color: ${lightBorderColor} !important;
         }
