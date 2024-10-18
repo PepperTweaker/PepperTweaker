@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.147
+// @version      0.9.148
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -436,6 +436,7 @@
           --textNeutralSecondary: ${textColor};
           --textTranslucentPrimary: ${textColor};
           --textTranslucentSecondary: ${secondaryTextColor};
+          --textTranslucentSecondaryHover: ${textColor};
           --textTranslucentTertiary: ${textColor};
           --graphicTranslucentTertiary: ${secondaryTextColor};
           --graphicTranslucentTertiaryHover: ${textColor};
