@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.142
+// @version      0.9.143
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3450,6 +3450,11 @@
               .threadGrid-headerMeta .metaRibbon:not(:has(svg.icon--clock, svg.icon--refresh, svg.icon--flame)) {
                 display: none !important;
               }
+            /* END */
+            /* Hiding dilivery cost with an icon */
+            .threadGrid-title span.color--text-TranslucentSecondary:has(svg.icon--truck) {
+              display: none;
+            }
             /* END */
           `);
           styleNode.appendChild(styleText);
