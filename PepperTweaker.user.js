@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.143
+// @version      0.9.144
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3447,9 +3447,9 @@
             }
             /* END */
             /* Hidding some deal meta ribbons */
-              .threadGrid-headerMeta .metaRibbon:not(:has(svg.icon--clock, svg.icon--refresh, svg.icon--flame)) {
-                display: none !important;
-              }
+            .threadGrid-headerMeta .metaRibbon:not(:has(svg.icon--clock, svg.icon--refresh, svg.icon--flame)) {
+              display: none !important;
+            }
             /* END */
             /* Hiding dilivery cost with an icon */
             .threadGrid-title span.color--text-TranslucentSecondary:has(svg.icon--truck) {
