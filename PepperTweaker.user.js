@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.144
+// @version      0.9.145
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3454,6 +3454,11 @@
             /* Hiding dilivery cost with an icon */
             .threadGrid-title span.color--text-TranslucentSecondary:has(svg.icon--truck) {
               display: none;
+            }
+            /* END */
+            /* Hiding the "ended" text when deal is expired */
+            .thread--expired span:has(> svg.icon--hourglass) span {
+              display: none !important;
             }
             /* END */
           `);
