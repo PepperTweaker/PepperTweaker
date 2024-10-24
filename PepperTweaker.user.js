@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.151
+// @version      0.9.152
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -863,7 +863,7 @@
           }
         });
       });
-      headerPortalObserver.observe(document.querySelector('#header-portal'), { childList: true, subtree: true });
+      headerPortalObserver.observe(document.querySelector('#header-portal, #ve-header-desktop'), { childList: true, subtree: true });
       /*** END: Change Theme Button ***/
 
       /*** Menu Links Addition ***/
