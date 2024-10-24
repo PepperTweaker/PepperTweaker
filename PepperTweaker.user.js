@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.154
+// @version      0.9.155
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -444,6 +444,10 @@
 
           /* background color variables used by Pepper */
           --bgBaseSecondary: ${darkBackgroundColor};
+          --bgNeutralPrimary: ${lightBackgroundColor};
+
+          /* border color variables used by Pepper */
+          --borderNeutralPrimary: ${lightBorderColor};
         }
         .subNavMenu-link,
         .vote-temp--inert,
