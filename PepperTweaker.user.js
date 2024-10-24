@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.159
+// @version      0.9.160
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -425,7 +425,7 @@
       const lightBackgroundColor = '#35373b';
       const textColor = '#bfbfbf';
       const secondaryTextColor = '#8f949b';
-      const orangeColor = '#ff7900';
+      const orangeColor = '#f7641b';
       // const greyButtonColor = '#8f949b';
       // const orangeColor = '#d1d5db';
 
@@ -717,6 +717,7 @@
           background-color: ${veryDarkBackgroundColor} !important;
         }
         .redactor button.button--mode-brand:hover,
+        .button--selected,
         .btn--mode-white--dark:hover,
         .btn--mode-white--dark:active,
         .btn--mode-white--dark:focus {
