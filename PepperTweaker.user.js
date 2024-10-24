@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.158
+// @version      0.9.159
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -487,10 +487,14 @@
           background-color: ${darkBackgroundColor} !important;
           border-color: ${lightBorderColor} !important;
         }
-        /* Range sliders */
-        .rangeSlider::-moz-range-thumb,     /* Firefox */
-        .rangeSlider::-webkit-slider-thumb, /* Chrome, Safari, Opera - not implemented? */
-        .rangeSlider::-ms-thumb {           /* IE - not tested */
+        /* Range sliders - have to be defined separately */
+        .rangeSlider::-moz-range-thumb {  /* Firefox */
+          background-color: ${darkBackgroundColor} !important;
+        }
+        .rangeSlider::-webkit-slider-thumb {  /* Chrome, Safari, Opera */
+          background-color: ${darkBackgroundColor} !important;
+        }
+        .rangeSlider::-ms-thumb {  /* IE - not tested */
           background-color: ${darkBackgroundColor} !important;
         }
         /* END: Range sliders */
