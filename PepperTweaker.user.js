@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.152
+// @version      0.9.153
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2939,7 +2939,7 @@
     /*** END: Deal Details Page ***/
 
     /*** Deals List ***/
-    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/search|gor%C4%85ce|nowe|grupa|om%C3%B3wione|promocje|kupony[^\/]|dyskusji|profile/) || 1 == 1)) {
+    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/search|gor%C4%85ce|najgoretsze|dlaciebie|nowe|grupa|om%C3%B3wione|promocje|kupony[^\/]|dyskusji|profile/))) {
 
       /* Deals Filtering */
       const checkFilters = (filters, deal) => {
