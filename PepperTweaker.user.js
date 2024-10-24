@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.153
+// @version      0.9.154
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3181,21 +3181,23 @@
 
       if (dealsSection) {
 
-        /* Process already visible elements */
-        for (let childNode of dealsSection.childNodes) {
-          processElement(childNode, deepSearch, isGridLayout);
-        }
+        if (!location.pathname.includes("dyskusji")) {
+          /* Process already visible elements */
+          for (let childNode of dealsSection.childNodes) {
+            processElement(childNode, deepSearch, isGridLayout);
+          }
 
-        /* Set the observer to process elements on addition */
-        const dealsSectionObserver = new MutationObserver(function (allMutations, observer) {
-          allMutations.every(function (mutation) {
-            for (const addedNode of mutation.addedNodes) {
-              processElement(addedNode, deepSearch, isGridLayout);
-            }
-            return false;
+          /* Set the observer to process elements on addition */
+          const dealsSectionObserver = new MutationObserver(function (allMutations, observer) {
+            allMutations.every(function (mutation) {
+              for (const addedNode of mutation.addedNodes) {
+                processElement(addedNode, deepSearch, isGridLayout);
+              }
+              return false;
+            });
           });
-        });
-        dealsSectionObserver.observe(dealsSection, { childList: true });
+          dealsSectionObserver.observe(dealsSection, { childList: true });
+        }
         /* END: Deals Filtering */
 
         /* List to Grid */
