@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.161
+// @version      0.9.162
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -686,6 +686,9 @@
         .button--type-tag.button--mode-dark {
           background-color: ${lightBackgroundColor} !important;
           color: ${textColor} !important;
+        }
+        .radio-icon {
+          background-color: var(--bgNeutralPrimary);
         }
         .footerMeta-actionSlot .btn--mode-boxSec { /* comment buttons in the grid list */
           color: ${secondaryTextColor};
