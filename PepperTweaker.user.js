@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.162
+// @version      0.9.163
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
 // @run-at       document-start
 // @grant        none
+// @downloadURL  https://update.greasyfork.org/scripts/390341/PepperTweaker.user.js
+// @updateURL    https://update.greasyfork.org/scripts/390341/PepperTweaker.meta.js
 // ==/UserScript==
 
 (function () {
