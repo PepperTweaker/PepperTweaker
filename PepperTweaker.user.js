@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.163
+// @version      0.9.164
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -489,6 +489,27 @@
           background-color: ${darkBackgroundColor} !important;
           border-color: ${lightBorderColor} !important;
         }
+        /* MC Notifications, e.g. reindeers */
+        .mc-notification .text--color-white {
+          color: ${textColor} !important;
+        }
+        .button--type-primary.button--mode-white {
+          --text-default: ${textColor};
+        }
+        .mc-notification-inner {
+          border-color: ${textColor} !important;
+        }
+        .mc-background--primary,
+        .mc-background--shade,
+        .mc-background--shadow,
+        .mc-background--grey,
+        .mc-background--lvl1,
+        .mc-background--lvl2,
+        .mc-background--lvl3 {
+          background: none;
+          background-color: ${veryDarkBackgroundColor} !important;
+        }
+        /* END: MC Notifications */
         /* Range sliders - have to be defined separately */
         .rangeSlider::-moz-range-thumb {  /* Firefox */
           background-color: ${darkBackgroundColor} !important;
