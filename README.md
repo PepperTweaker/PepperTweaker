@@ -82,7 +82,7 @@ Funkcje i zakładka ustawień zmienia się co jakiś czas, więc w aktualnej wer
 
 Opcja domyślnie włączona, która powoduje podmianę widoku listy na stary dobry widok siatki ;) Jeśli wolisz listę, możesz wyłączyć tę opcję na stronie ustawień.
 
-Aktualny wygląd siatki:
+Aktualny wygląd siatki (kolorowe ramki i przezroczystość ofert pochodzą z filtrów okazji):
 
 ![Grid View](images/peppertweaker-grid-view.png)
 
