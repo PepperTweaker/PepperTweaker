@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.164
+// @version      0.9.165
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3021,24 +3021,24 @@
 
       /* List to grid voucher button update */
       const updateGridDeal = (dealNode) => {
-        // Voucher button update
-        const buttonToMove = dealNode.querySelector('.threadGrid-body div div.width--fromW2-6:last-child');
-        const threadGridFooterMeta = dealNode.querySelector('.footerMeta .iGrid-item');
-        if (buttonToMove && threadGridFooterMeta) {
-          const viewDealButton = threadGridFooterMeta.querySelector('.iGrid-item .btn');
-          if (viewDealButton) {
-            viewDealButton.remove();
-          }
-          threadGridFooterMeta.appendChild(buttonToMove);
-          buttonToMove.style.width = '100%';
-          buttonToMove.style.paddingRight = '0 !important';
-          buttonToMove.parentNode.style.display = 'block';
-        }
-        // Deal refresh ribbon text
-        const refreshRibbon = dealNode.querySelector('.cept-meta-ribbon .icon--refresh ~ span.hide--toW3');
-        if (refreshRibbon) {
-          refreshRibbon.textContent = refreshRibbon.textContent.replace(/Zaktualizowano|temu/ig, '');
-        }
+        // // Voucher button update
+        // const buttonToMove = dealNode.querySelector('.threadGrid-body div div.width--fromW2-6:last-child');
+        // const threadGridFooterMeta = dealNode.querySelector('.footerMeta .iGrid-item');
+        // if (buttonToMove && threadGridFooterMeta) {
+        //   const viewDealButton = threadGridFooterMeta.querySelector('.iGrid-item .btn');
+        //   if (viewDealButton) {
+        //     viewDealButton.remove();
+        //   }
+        //   threadGridFooterMeta.appendChild(buttonToMove);
+        //   buttonToMove.style.width = '100%';
+        //   buttonToMove.style.paddingRight = '0 !important';
+        //   buttonToMove.parentNode.style.display = 'block';
+        // }
+        // // Deal refresh ribbon text
+        // const refreshRibbon = dealNode.querySelector('.cept-meta-ribbon .icon--refresh ~ span.hide--toW3');
+        // if (refreshRibbon) {
+        //   refreshRibbon.textContent = refreshRibbon.textContent.replace(/Zaktualizowano|temu/ig, '');
+        // }
         // Number of comments in discussion
         const headerMetaIconComment = dealNode.querySelector('.threadGrid-headerMeta .icon--comment');
         if (headerMetaIconComment) {
@@ -3281,7 +3281,7 @@
             .listLayout-box.bg--color-brandPrimaryPale {
               grid-column: 1 / -1;
             }
-            .threadGrid-headerMeta {
+            .threadGrid-headerMeta, .threadListCard-header {
               grid-column: 1;
               grid-row: 1;
               -ms-grid-row-span: 1;
@@ -3304,10 +3304,16 @@
             .cept-meta-ribbon .icon--refresh {
               margin-right: .35em !important;
             }
-            .cept-vote-box button[data-track*="vote"] {  /* smaller vote box */
+            /* Deal added / deal ends etc. */
+            .chip--type-info, .chip--type-default, .chip--type-warning, .chip--type-expired {
+              display: none;
+            }
+            /* Smaller vote box */
+            .cept-vote-box button[data-track*="vote"] {
               padding-left: .28em !important;
               padding-right: .28em !important;
             }
+            /* OLD CLASS => Save to delete?
             .threadGrid-image {
               grid-row-start: 2;
               grid-row-end: 4;
@@ -3316,22 +3322,42 @@
               width: 196px !important;
               padding: 0.35em 0 0.65em 0 !important;
             }
+            */
+            .threadListCard-image {
+              grid-row-start: 2;
+              grid-row-end: 4;
+              -ms-grid-row-span: 3;
+              grid-column: 1;
+              width: 196px !important;
+              padding: 0.35em 0 0.65em 0 !important;
+              margin: 8px auto 0;
+            }
+            .threadListCard-image .thread-image {
+              max-width: 100%;
+              max-height: 100%;
+            }
             .thread-listImgCell, .thread-listImgCell--medium {
               width: 100%;
             }
+            /* OLD CLASS => Required for discution subpage */
             .threadGrid-title {
               grid-column: 1;
               grid-row-start: 5;
               grid-row-end: 6;
               width: 196px !important;
             }
-            .threadGrid-title .thread-title {
+            .threadGrid-title .thread-title, .threadListCard-body .thread-title {
               padding-top: 0.2em;
-              height: 3.3em;
+              height: 3.1em !important;
+              display: inline-block !important;
             }
             .threadGrid-title .overflow--fade {
               height: 1.9em;
             }
+            .threadListCard-body .flex--wrap { /* disable wrapping of the price + delivery (etc.) line */
+              flex-wrap: nowrap;
+            }
+            /* OLD CLASS => Required for discution subpage */
             .threadGrid-body {
               grid-column: 1;
               -ms-grid-column-span: 1;
@@ -3344,6 +3370,34 @@
               -webkit-line-clamp: 3;
               -webkit-box-orient: vertical;
             }
+            .threadListCard-body {
+              grid-column: 1;
+              -ms-grid-column-span: 1;
+              grid-row: 7;
+              padding-top: .28571em !important;
+              height: 9em;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              display: -webkit-box;
+              -webkit-line-clamp: 3;
+              -webkit-box-orient: vertical;
+              font-size: 1rem !important;
+              line-height: 1.5rem !important;
+              --line-height: 1.5rem !important;
+            }
+            @media (min-width: 48em) {
+              .threadListCard-body {
+                margin: 0.4em 0 0.1em;
+              }
+            }
+            .threadListCard-body div.flex {
+              height: 2em;
+            }
+            /* TODO: Move user info to the footer */
+            .threadListCard-body div.flex div.flex--inline + span,
+            .threadListCard-body .thread-price + span {
+              display: none !important;
+            }
             .threadGrid-title .userHtml-content {  /* Discussion description */
               height: 6.2em;
               margin-bottom: 0.5em;
@@ -3353,7 +3407,7 @@
               -webkit-line-clamp: 4;
               -webkit-box-orient: vertical;
             }
-            .userHtml-content .size--fromW3-m {
+            .userHtml-content .size--fromW3-m, .userHtml-content .hide--toW3 {
               line-height: 1.05rem;
               --line-height: 1.05rem;
             }
@@ -3367,7 +3421,8 @@
               padding-top: 0 !important;
             }
             .threadGrid-body .thread-updates-top,
-            .threadGrid-body .voucher {
+            .threadGrid-body .voucher,
+            .threadListCard-footer .voucher {
               display: none;
             }
             .threadGrid-body .width--fromW2-6 {
@@ -3379,14 +3434,14 @@
             .threadGrid-body .flex--dir-row-reverse {
               display: none;
             }
-            .threadGrid-footerMeta {
+            .threadGrid-footerMeta, .threadListCard-footer {
               grid-column: 1;
               -ms-grid-column-span: 1;
               grid-row: 8;
               width: 196px !important;
               padding-top: 0.5em !important;
             }
-            .threadGrid-footerMeta .footerMeta.fGrid {
+            .threadGrid-footerMeta .footerMeta.fGrid, .threadListCard-footer {
               flex-flow: row wrap;
             }
             .threadGrid-footerMeta .iGrid-item {
@@ -3457,9 +3512,9 @@
             .thread-title--list::after {
               top: 20px;
             }
-            .size--all-l {
+            .size--all-l, .size--all-xl {
               font-size: 1rem !important;
-              line-height: 1.5rem !important;
+              /* line-height: 1.5rem !important; */
             }
             .listLayout-main > div:empty {
               display: none;
@@ -3490,9 +3545,10 @@
             }
             /* END */
             /* Hidding some promo deals with a different class "threadListCard" */
+            /* Now all deals have the ".threadListCard" class
             article.thread:has(> .threadListCard) {
               display: none !important;
-            }
+            } */
             /* END */
             /* Hidding some deal meta ribbons */
             .threadGrid-headerMeta .metaRibbon:not(:has(svg.icon--clock, svg.icon--refresh, svg.icon--flame)) {
@@ -3500,7 +3556,8 @@
             }
             /* END */
             /* Hiding dilivery cost with an icon */
-            .threadGrid-title span.color--text-TranslucentSecondary:has(svg.icon--truck) {
+            .threadGrid-title span.color--text-TranslucentSecondary:has(svg.icon--truck),
+            .threadListCard-body span.color--text-TranslucentSecondary:has(svg.icon--truck) {
               display: none;
             }
             /* END */
