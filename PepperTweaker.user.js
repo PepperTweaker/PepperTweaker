@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.165
+// @version      0.9.166
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -332,6 +332,13 @@
   const voteBlueColor = '#1f7ecb';
 
   css += `
+    /* The override of the color variables used by Pepper */
+    :root {
+      /* hot deal temperature + hot badge icon */
+      --temperature90: ${voteRedColor};
+    }
+    /* END */
+
     body {
       font-family: Arial;
     }
