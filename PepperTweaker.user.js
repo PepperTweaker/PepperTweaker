@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.168
+// @version      0.9.169
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -360,6 +360,10 @@
       font-size: 0.925rem;
       line-height: 1.25rem;
       --line-height: 1.25rem;
+    }
+    .threadListCard-body .textBadge { /* the discount badge of a deal in the main page */
+      line-height: 1.3rem;
+      --line-height: 1.3rem;
     }
     /* END: Font Size */
 
