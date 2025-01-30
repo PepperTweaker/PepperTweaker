@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.167
+// @version      0.9.168
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -478,11 +478,14 @@
         .page2-center .mute--text2, .page2-subTitle2.mute--text2, .conversation-content.mute--text2, .linkGrey, .thread-userOptionLink, .cept-nav-subheadline, .user:not(.thread-user), .tabbedInterface-tab, .subNavMenu, .subNavMenu-btn, .tag, .page-label, .page-subTitle, .page2-secTitle, .userProfile-title, .userProfile-title--sub, .bg--color-inverted .text--color-white, .comments-pagination--header .pagination-next, .comments-pagination--header .pagination-page, .comments-pagination--header .pagination-previous, .conversationList-msgPreview, .thread-title, .mute--text, .text--color-charcoal, .text--color-charcoalTint, .cept-tt, .cept-description-container, /*.cept-tp,*/ .thread-username, .voucher input, .hide--bigCards1, .hide--toBigCards1 {
           color: ${textColor};
         }
+        .nav {
+          background-color: ${lightBackgroundColor};
+        }
         .redactor button,
         .redactor button.button--disabled svg,
         .redactor button.button--disabled span,
         .button--type-primary.button--mode-brand.button--disabled,
-        .button--type-secondary:not(.cept-on), .button--mode-secondary, .button--type-tertiary {
+        .button--type-secondary:not(.cept-on), .button--mode-secondary {
           color: ${secondaryTextColor} !important;
         }
         .navDropDown-trigger.button--type-primary.button--mode-white,
@@ -714,6 +717,9 @@
         /* END */
 
         /* Buttons: coupons, comments, alerts */
+        .button--type-tertiary {
+          background-color: ${darkBackgroundColor} !important;
+        }
         .btn--mode-boxSec,
         .btn--mode-primary-inverted,
         .btn--mode-primary-inverted--no-state {
