@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.166
+// @version      0.9.167
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -350,8 +350,16 @@
     .size--fromW3-xxl, .thread-title--item, .userHtml--subtitles h3 {
       font-size: 1.25rem !important;
     }
-    .threadItemCard-price {
+    #threadDetailPortal .threadItemCard-price { /* the main price in deal details */
       font-size: 1.5rem !important;
+    }
+    .card .threadItemCard-price { /* the price of a deal in related threads */
+      font-size: 1rem !important;
+    }
+    .card .textBadge { /* the discount badge of a deal in related threads */
+      font-size: 0.925rem;
+      line-height: 1.25rem;
+      --line-height: 1.25rem;
     }
     /* END: Font Size */
 
