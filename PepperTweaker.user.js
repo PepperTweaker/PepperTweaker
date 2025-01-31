@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.173
+// @version      0.9.174
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -336,6 +336,8 @@
     :root {
       /* hot deal temperature + hot badge icon */
       --temperature90: ${voteRedColor};
+      /* cold deal temperature */
+      --temperature10: ${voteBlueColor};
     }
     /* END */
 
