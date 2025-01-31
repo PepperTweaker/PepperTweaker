@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.174
+// @version      0.9.175
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3466,9 +3466,6 @@
               display: none;
             }
             /* Voucher buttons */
-            .threadListCard-footer .voucher { /* Strech the voucher code & button to entire tile */
-              min-width: 196px !important;
-            }
             .threadListCard-footer .voucher .buttonWithCode-button { /* Allow smaller width of a button */
               min-width: 1rem;
             }
@@ -3499,8 +3496,10 @@
               grid-column: 1;
               -ms-grid-column-span: 1;
               grid-row: 8;
-              width: 196px !important;
               padding-top: 0.5em !important;
+            }
+            .threadGrid-footerMeta { /* needed for discutions */
+              width: 196px !important;
             }
             .threadGrid-footerMeta .footerMeta.fGrid, .threadListCard-footer {
               flex-flow: row wrap;
