@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.175
+// @version      0.9.176
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3483,6 +3483,12 @@
               content: "Skopiowano";
             }
             /* END: Voucher buttons */
+            /* Comments & share button */
+            .threadListCard-footer .button[data-t="shareBtn"] {
+              order: -1;
+              margin-left: auto;
+            }
+            /* END: Comments & share button */
             .threadGrid-body .width--fromW2-6 {
               width: 100%;
               padding: 0 !important;
