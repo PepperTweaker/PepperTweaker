@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.171
+// @version      0.9.172
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3429,6 +3429,9 @@
             .threadListCard-body div.flex div.flex--inline + span,
             .threadListCard-body .thread-price + span {
               display: none !important;
+            }
+            .threadListCard-body .userHtml-content { /* remove ellipse text overflow in the middle of a deal description */
+              display: inline-block;
             }
             .threadGrid-title .userHtml-content {  /* Discussion description */
               height: 6.2em;
