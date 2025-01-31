@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.172
+// @version      0.9.173
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3407,7 +3407,7 @@
               -ms-grid-column-span: 1;
               grid-row: 7;
               padding-top: .28571em !important;
-              height: 9em;
+              height: 9.1em;
               text-overflow: ellipsis;
               overflow: hidden;
               display: -webkit-box;
@@ -3432,6 +3432,10 @@
             }
             .threadListCard-body .userHtml-content { /* remove ellipse text overflow in the middle of a deal description */
               display: inline-block;
+            }
+            .userHtml-content .size--fromW3-m, .userHtml-content .hide--toW3 { /* add more space between deal description lines */
+              line-height: 1.1rem !important;
+              --line-height: 1.1rem !important;
             }
             .threadGrid-title .userHtml-content {  /* Discussion description */
               height: 6.2em;
