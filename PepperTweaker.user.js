@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.170
+// @version      0.9.171
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3310,7 +3310,6 @@
               grid-column: 1;
               grid-row: 1;
               -ms-grid-row-span: 1;
-              width: 196px !important;
             }
             .cept-meta-ribbon .icon--clock.text--color-green, .cept-meta-ribbon .icon--clock.text--color-green ~ span[class^="hide--"],  /* deal starts */
             .cept-meta-ribbon .icon--hourglass, .cept-meta-ribbon .icon--hourglass ~ span[class^="hide--"],  /* deal ends */
@@ -3329,10 +3328,18 @@
             .cept-meta-ribbon .icon--refresh {
               margin-right: .35em !important;
             }
-            /* Deal added / deal ends etc. */
-            .chip--type-info, .chip--type-default, .chip--type-warning, .chip--type-expired {
-              display: none;
+            /* Deal added / start / ends etc. */
+            .threadListCard-header { /* move the "chip" element to a new line */
+              display: block;
             }
+            .chip--type-info, .chip--type-default, .chip--type-warning, .chip--type-expired { /* disable wrapping & hide overflow */
+              display: inline-block;
+              max-width: 100%;
+              text-wrap: nowrap;
+              overflow: hidden;
+              margin-top: 0.5em;
+            }
+            /* END: Deal added / start / ends etc. */
             /* Smaller vote box */
             .cept-vote-box button[data-track*="vote"] {
               padding-left: .28em !important;
