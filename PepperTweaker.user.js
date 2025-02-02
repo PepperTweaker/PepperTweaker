@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.178
+// @version      0.9.179
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -412,6 +412,11 @@
       background-color: ${voteBlueColor} !important;
     }
     /* END: Voting buttons */
+
+    /* Thread description: All deals, sorted by... etc. */
+    #threadListingDescriptionPortal {
+      display: none !important;
+    }
   `;
 
   if (pepperTweakerConfig.pluginEnabled) {
