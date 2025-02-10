@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.180
+// @version      0.9.181
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -374,6 +374,8 @@
     }
 
     /* Pepper ads */
+    #leftStickySidebarLinkedAdSlotPortal,
+    #sidebarTopAdSlotPortal, #sidebarBottomAdSlotPortal,
     #mrec1FuseZonePortal, #vrec1FuseZonePortal {
       display: none;
     }
