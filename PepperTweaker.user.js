@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.182
+// @version      0.9.183
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -380,6 +380,12 @@
       display: none;
     }
     /* END: Pepper ads */
+
+    /* Pepper Widgets */
+    #keywordSuggestionsWidgetPortal {
+      display: none;
+    }
+    /* END: Pepper Widgets */
 
     /* Voting buttons: Replaced up/down arrow with +/- */
     .vote-button .icon--arrow-rounded-down, .vote-button .icon--arrow-rounded-up {
@@ -3328,7 +3334,7 @@
             .vote-box span[class^="hide--"],  /* discussion ended text */
             .threadGrid-headerMeta > div > div:not(.vote-box) button,  /* three dots button, covering deal starting date */
             #exploreMoreRelatedWidget, #exploreMoreTopWidgetPortal,  /* explore more widget */
-            #incontentFuseZonePortal, #incontent1FuseZonePortal, #incontent2FuseZonePortal, #incontent3FuseZonePortal, #incontent4FuseZonePortal, #inListing1AdSlotPortal, #inListing2AdSlotPortal, #inListing3AdSlotPortal, #keywordSuggestionsWidgetPortal,  /* empty tiles on a search page */
+            #incontentFuseZonePortal, #incontent1FuseZonePortal, #incontent2FuseZonePortal, #incontent3FuseZonePortal, #incontent4FuseZonePortal, #inListing1AdSlotPortal, #inListing2AdSlotPortal, #inListing3AdSlotPortal, /* empty tiles on a search page */
             #groupHottestWidgetPortal,  /* hottests deals widget on the category subpage */
             #rlpBannerPortal,  /* link to a voucher subpage on a merchant search page */
             .js-threadList > div:not([class]):not([id]) { /* empty tiles on category subpages */
