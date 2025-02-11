@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.184
+// @version      0.9.185
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -382,6 +382,7 @@
     /* END: Pepper ads */
 
     /* Pepper Widgets */
+    #voteSecondarySectionPortal, /* Secondary vote section */
     #threadDetailPortal *[data-t="keywordSuggestionsWidget"], /* the keyword widget for an expired deal */
     #keywordSuggestionsWidgetPortal { /* the keyword widget below deal details */
       display: none;
