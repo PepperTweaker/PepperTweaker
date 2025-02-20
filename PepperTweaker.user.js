@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.185
+// @version      0.9.186
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3061,31 +3061,64 @@
         }
       };
 
-      /* List to grid voucher button update */
+      /* List to grid update */
       const updateGridDeal = (dealNode) => {
-        // // Voucher button update
-        // const buttonToMove = dealNode.querySelector('.threadGrid-body div div.width--fromW2-6:last-child');
-        // const threadGridFooterMeta = dealNode.querySelector('.footerMeta .iGrid-item');
-        // if (buttonToMove && threadGridFooterMeta) {
-        //   const viewDealButton = threadGridFooterMeta.querySelector('.iGrid-item .btn');
-        //   if (viewDealButton) {
-        //     viewDealButton.remove();
-        //   }
-        //   threadGridFooterMeta.appendChild(buttonToMove);
-        //   buttonToMove.style.width = '100%';
-        //   buttonToMove.style.paddingRight = '0 !important';
-        //   buttonToMove.parentNode.style.display = 'block';
-        // }
-        // // Deal refresh ribbon text
-        // const refreshRibbon = dealNode.querySelector('.cept-meta-ribbon .icon--refresh ~ span.hide--toW3');
-        // if (refreshRibbon) {
-        //   refreshRibbon.textContent = refreshRibbon.textContent.replace(/Zaktualizowano|temu/ig, '');
-        // }
-        // Number of comments in discussion
-        const headerMetaIconComment = dealNode.querySelector('.threadGrid-headerMeta .icon--comment');
-        if (headerMetaIconComment) {
-          headerMetaIconComment.parentNode.lastChild.textContent = headerMetaIconComment.parentNode.lastChild.textContent.replace(/ Komentarz(y|e)?/, '');
+        const vueText = dealNode.querySelector('.js-vue2')?.dataset?.vue2;
+        const vueObject = JSON.parse(vueText);
+        const threadObject = vueObject.props.thread;
+
+        const dealFooter = dealNode.querySelector('.threadListCard-footer');
+        if (dealFooter !== null) {
+          const userSpan = createUserSpanInfo(threadObject.user, threadObject.commentCount);
+          dealFooter.prepend(userSpan);
+        } else {
+          console.error('Deal footer not found (.threadListCard-footer)');
         }
+      }
+
+      const createUserSpanInfo = (userObject, commentCount = 0) => {
+        const containerSpan = document.createElement('SPAN');
+        containerSpan.classList.add('color--text-TranslucentSecondary', 'overflow--wrap-off', 'gap--h-1', 'flex', 'boxAlign-ai--all-c');
+        // Add some overlay to longer labels
+        containerSpan.style['-webkit-mask-image'] = 'linear-gradient(90deg, #000 85%, transparent)';
+
+        // Computing the width of the container based on comments count
+        let containerWidth = '108px';
+        if (commentCount >= 10 && commentCount <= 99) {
+          containerWidth = '100px'
+        } else if (commentCount >= 100 && commentCount <= 999) {
+          containerWidth = '93px'
+        } else if (commentCount >= 1000 && commentCount <= 9999) {
+          containerWidth = '85px'
+        } else if (commentCount >= 10000 && commentCount <= 99999) {
+          containerWidth = '77px'
+        }
+
+        containerSpan.style.width = containerWidth;
+
+        const avatarImg = document.createElement('IMG');
+        avatarImg.classList.add('size--all-s', 'size--fromW3-m', 'avatar--type-xs', 'img', 'img--type-entity', 'img--square-s');
+
+        // Set an user avatar if present, otherwise set the default Pepper avatar
+        if (userObject.avatar && userObject.avatar.path && userObject.avatar.name) {
+          avatarImg.src = `https://static.pepper.pl/${userObject.avatar.path}/${userObject.avatar.name}/fi/60x60/qt/45/${userObject.avatar.name}.jpg`;
+        } else {
+          avatarImg.src = '/assets/img/profile-placeholder_09382.png';
+        }
+
+        avatarImg.srcset = avatarImg.src;
+
+        const labelSpan = document.createElement('SPAN');
+        labelSpan.classList.add('overflow--ellipsis', 'size--all-xs', 'size--fromW3-s');
+        labelSpan.style.textOverflow = 'unset';
+
+        const labelText = document.createTextNode(userObject.username);
+
+        labelSpan.appendChild(labelText);
+
+        containerSpan.append(avatarImg, labelSpan);
+
+        return containerSpan;
       }
       /* END */
 
@@ -3498,10 +3531,15 @@
               content: "Skopiowano";
             }
             /* END: Voucher buttons */
-            /* Comments & share button */
+            /* Comments, share & bookmark button + user info section */
             .threadListCard-footer .button[data-t="shareBtn"] {
-              order: -1;
-              margin-left: auto;
+              display: none;
+            }
+            .threadListCard-footer .button[data-t="addBookmark"] {
+              order: -1; /* set as the second in a row */
+            }
+            .threadListCard-footer span:has(> img[src*="/users/"], > img[src*="profile-placeholder"]) {
+              order: -2; /* set as the first in a row */
             }
             /* END: Comments & share button */
             .threadGrid-body .width--fromW2-6 {
