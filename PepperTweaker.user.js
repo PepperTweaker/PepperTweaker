@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.187
+// @version      0.9.188
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -659,15 +659,6 @@
           filter: brightness(90%);
         }
         
-        /* Setting vote box & buttons borders */
-        button.vote-button--primary {
-          border-width: 0 !important;
-        }
-        .vote-box {
-          border: 1px solid ${lightBorderColor};
-        }
-        /***/
-
         /* Animated badge */
         .animation--colorTransfusion {
           background-color: ${orangeColor} !important;
@@ -819,9 +810,15 @@
         .vote-button.vote-button--mode-selected span:after {
           color: ${darkBackgroundColor} !important;
         }
-        /***/
 
-        /* END */
+        /* Set borders of vote box & vote buttons */
+        button.vote-button--primary {
+          border-width: 0 !important;
+        }
+        .vote-box {
+          border: 1px solid ${lightBorderColor};
+        }
+        /* END: Voting buttons */
 
         /* Badges */
         .textBadge,
