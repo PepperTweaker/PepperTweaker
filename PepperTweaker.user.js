@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.195
+// @version      0.9.196
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -622,7 +622,8 @@
           border: 1px solid ${lightBorderColor} !important;
         }
         .commentList-comment--highlighted, .comments-item-inner--edit,
-        .bg--color-white, .carousel-list--air, .tabbedInterface-tab:hover, .tabbedInterface-tab--selected, .bg--main, .tabbedInterface-tab--horizontal, .tabbedInterface-tab--selected, .comment--selected, .comments-item--in-moderation, .comments-item-inner--active, .comments-item-inner--edit, /*.thread.cept-sale-event-thread.thread--deal,*/ .vote-btn, .notification-item:not(.notification-item--read), .search input, .text--overlay, .popover--brandAccent .popover-content, .popover--brandPrimary .popover-content, .popover--default .popover-content, .popover--menu .popover-content, .popover--red .popover-content {
+        .notification-item--read,
+        .bg--color-white, .carousel-list--air, .tabbedInterface-tab:hover, .tabbedInterface-tab--selected, .bg--main, .tabbedInterface-tab--horizontal, .tabbedInterface-tab--selected, .comment--selected, .comments-item--in-moderation, .comments-item-inner--active, .comments-item-inner--edit, /*.thread.cept-sale-event-thread.thread--deal,*/ .vote-btn, .search input, .text--overlay, .popover--brandAccent .popover-content, .popover--brandPrimary .popover-content, .popover--default .popover-content, .popover--menu .popover-content, .popover--red .popover-content {
           background-color: ${darkBackgroundColor} !important;
         }
         .notification-item:hover, .notification-item--read:hover {
@@ -632,7 +633,8 @@
           color: ${darkBackgroundColor};
         }
         .stickyBar-top,
-        .bg--off, .js-pagi-bottom, .js-sticky-pagi--on, .bg--color-grey, .notification-item--read, #main, .subNavMenu--menu .subNavMenu-list {
+        .notification-item:not(.notification-item--read),
+        .bg--off, .js-pagi-bottom, .js-sticky-pagi--on, .bg--color-grey, #main, .subNavMenu--menu .subNavMenu-list {
           background-color: ${lightBackgroundColor} !important;
           color: ${textColor};
         }
