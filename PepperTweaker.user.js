@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.189
+// @version      0.9.190
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3496,7 +3496,7 @@
               -ms-grid-row-span: 3;
               grid-column: 1;
               width: 196px !important;
-              padding: 0.15em 0 0.3em 0 !important;
+              padding: 0.25em 0 0.2em 0 !important;
               margin: 8px auto 0;
             }
             .threadListCard-image .thread-image {
@@ -3542,7 +3542,7 @@
               -ms-grid-column-span: 1;
               grid-row: 7;
               padding-top: .28571em !important;
-              height: 9.1em;
+              height: 8.8em;
               text-overflow: ellipsis;
               overflow: hidden;
               display: -webkit-box;
@@ -3554,11 +3554,11 @@
             }
             @media (min-width: 48em) {
               .threadListCard-body {
-                margin: 0.4em 0 0.1em;
+                margin: 0.2em 0 0.1em;
               }
             }
             .threadListCard-body div.flex {
-              height: 2em;
+              height: 1.7em;
             }
             /* TODO: Move user info to the footer */
             .threadListCard-body div.flex div.flex--inline + span,
@@ -3640,7 +3640,7 @@
               grid-column: 1;
               -ms-grid-column-span: 1;
               grid-row: 8;
-              padding-top: 0.5em !important;
+              padding-top: 0.25em !important;
             }
             .threadGrid-footerMeta { /* needed for discutions */
               width: 196px !important;
