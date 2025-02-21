@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.192
+// @version      0.9.193
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3621,7 +3621,8 @@
             .threadListCard-footer .button[data-t="shareBtn"] {
               display: none;
             }
-            .threadListCard-footer .button[data-t="addBookmark"] {
+            .threadListCard-footer .button[data-t="addBookmark"],
+            .threadListCard-footer .button[data-t="removeBookmark"] {
               order: -1; /* set as the second in a row */
             }
             .threadListCard-footer span:has(> img[src*="/users/"], > img[src*="profile-placeholder"]) {
