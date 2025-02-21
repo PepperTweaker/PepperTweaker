@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.193
+// @version      0.9.194
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -327,6 +327,8 @@
   /*** Setting CSS ***/
   let css = '';
 
+  const orangeColor = '#f7641b';
+
   /* Theme independent style */
   const voteRedColor = '#e00034';
   const voteBlueColor = '#1f7ecb';
@@ -427,6 +429,11 @@
     #threadListingDescriptionPortal {
       display: none !important;
     }
+
+    /* Bookmark button */
+    .button[data-t="removeBookmark"] { /* force the orange color for saved deals */
+      color: ${orangeColor} !important;
+    }
   `;
 
   if (pepperTweakerConfig.pluginEnabled) {
@@ -465,7 +472,6 @@
       const lightBackgroundColor = '#35373b';
       const textColor = '#bfbfbf';
       const secondaryTextColor = '#8f949b';
-      const orangeColor = '#f7641b';
       // const greyButtonColor = '#8f949b';
       // const orangeColor = '#d1d5db';
 
