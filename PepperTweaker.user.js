@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.194
+// @version      0.9.195
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -430,8 +430,9 @@
       display: none !important;
     }
 
-    /* Bookmark button */
-    .button[data-t="removeBookmark"] { /* force the orange color for saved deals */
+    /* Force the orange color */
+    .text--color-green, /* green text like in "For free" */
+    .button[data-t="removeBookmark"] { /* bookmark button for saved deals */
       color: ${orangeColor} !important;
     }
   `;
