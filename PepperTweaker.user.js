@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.188
+// @version      0.9.189
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -883,7 +883,7 @@
 
   /* Check What Browser */
   const isFirefoxBrowser = typeof InstallTrigger !== 'undefined';
-  const isOperaBrowser = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+  // const isOperaBrowser = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
 
   // Apply CSS
   if (css.length > 0) {
@@ -3069,17 +3069,100 @@
 
       /* List to grid update */
       const updateGridDeal = (dealNode) => {
-        const vueText = dealNode.querySelector('.js-vue2')?.dataset?.vue2;
-        const vueObject = JSON.parse(vueText);
-        const threadObject = vueObject.props.thread;
+        const vueString = dealNode?.querySelector('div[data-vue2]')?.dataset?.vue2;
 
-        const dealFooter = dealNode.querySelector('.threadListCard-footer');
-        if (dealFooter !== null) {
-          const userSpan = createUserSpanInfo(threadObject.user, threadObject.commentCount);
-          dealFooter.prepend(userSpan);
+        if (vueString) {
+          const vueObject = JSON.parse(vueString);
+          const threadObject = vueObject?.props?.thread;
+
+          if (threadObject) {
+            const dealHeader = dealNode.querySelector('.threadListCard-header');
+            if (dealHeader !== null) {
+              const nowDate = new Date();
+
+              // startDate & endDate are in object format i.e.: { timestamp: 1740006060 }
+              // publishedAt is defined just as an integer (timestamp)
+              const dealStartDate = isInteger(threadObject.startDate?.timestamp) ? new Date(threadObject.startDate.timestamp * 1000) : null;
+              const dealEndDate = isInteger(threadObject.endDate?.timestamp) ? new Date(threadObject.endDate.timestamp * 1000) : null;
+              const dealPublishedAtDate = isInteger(threadObject.publishedAt) ? new Date(threadObject.publishedAt * 1000) : null;
+
+              let date = null;
+              let color = null;
+
+              if (dealStartDate !== null && dealStartDate > nowDate) {
+                date = dealStartDate;
+                color = 'var(--textStatusInfo)';
+              } else if (dealEndDate !== null && dealEndDate < nowDate) {
+                date = dealEndDate;
+                color = 'var(--textStatusNegative)';
+              } else {
+                date = dealPublishedAtDate;
+                color = null;
+              }
+
+              if (date !== null) {
+                const dealDateInfo = createDealDateInfo(date, color);
+                dealHeader.append(dealDateInfo);
+              }
+            } else {
+              console.error('Deal header not found (.threadListCard-header)');
+            }
+
+            const dealFooter = dealNode.querySelector('.threadListCard-footer');
+            if (dealFooter !== null) {
+              const userSpan = createUserSpanInfo(threadObject.user, threadObject.commentCount);
+              dealFooter.prepend(userSpan);
+            } else {
+              console.error('Deal footer not found (.threadListCard-footer)');
+            }
+          } else {
+            console.error('Extracting VUE object failed');
+          }
         } else {
-          console.error('Deal footer not found (.threadListCard-footer)');
+          console.error('VUE element not found in DOM');
         }
+      }
+
+      const createDealDateInfo = (date, color = null) => {
+        const containerSpan = document.createElement('SPAN');
+        containerSpan.classList.add('color--text-TranslucentSecondary');
+        containerSpan.style.cssFloat = 'right';
+        containerSpan.style.lineHeight = '2.1em';
+        if (color) containerSpan.style.color = color;
+
+        const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svgElement.classList.add('icon', 'icon--clock');
+        svgElement.style.verticalAlign = 'middle';
+        svgElement.style.setProperty('margin-right', '0.25em', 'important');
+        svgElement.setAttribute('width', '18');
+        svgElement.setAttribute('height', '18');
+
+        const useElement = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        useElement.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/assets/img/ico_22b5d.svg#clock');
+        svgElement.appendChild(useElement);
+
+        const labelSpan = document.createElement('SPAN');
+        labelSpan.style.fontSize = '0.95em';
+
+        const labelText = document.createTextNode(createDealDateInfoString(date));
+        labelSpan.appendChild(labelText);
+
+        containerSpan.append(svgElement, labelSpan);
+
+        return containerSpan;
+      };
+
+      const isSameDay = (date1, date2) => date1?.setHours(0, 0, 0, 0) === date2?.setHours(0, 0, 0, 0);
+
+      const createDealDateInfoString = (date) => {
+        const hours = zeroPad(date.getHours());
+        const minutes = zeroPad(date.getMinutes());
+        const month = zeroPad(date.getMonth() + 1); // months starting from 0
+        const day = zeroPad(date.getDate());
+
+        const nowDate = new Date();
+
+        return isSameDay(date, nowDate) ? `${hours}:${minutes}` : `${day}/${month}`;
       }
 
       const createUserSpanInfo = (userObject, commentCount = 0) => {
@@ -3126,7 +3209,7 @@
 
         return containerSpan;
       }
-      /* END */
+      /* END: List to grid update */
 
       let dealCount = 0;
       const startPage = Number((new URLSearchParams(location.search)).get('page') || 1);
@@ -3386,14 +3469,10 @@
             }
             /* Deal added / start / ends etc. */
             .threadListCard-header { /* move the "chip" element to a new line */
-              display: block;
+              padding-top: 0.8em;
             }
-            .chip--type-info, .chip--type-default, .chip--type-warning, .chip--type-expired { /* disable wrapping & hide overflow */
-              display: inline-block;
-              max-width: 100%;
-              text-wrap: nowrap;
-              overflow: hidden;
-              margin-top: 0.5em;
+            .chip--type-info, .chip--type-default, .chip--type-warning, .chip--type-expired { /* hide original time info */
+              display: none;
             }
             /* END: Deal added / start / ends etc. */
             /* Smaller vote box */
@@ -3839,11 +3918,7 @@
     // call on next available tick
     setTimeout(startPepperTweaker, 1);
   } else {
-    if (isOperaBrowser) {
-      window.addEventListener('load', startPepperTweaker);
-    } else {
-      document.addEventListener('DOMContentLoaded', startPepperTweaker);
-    }
+    document.addEventListener('DOMContentLoaded', startPepperTweaker);
   }
 
   /***** END: RUN AFTER DOCUMENT HAS BEEN LOADED *****/
