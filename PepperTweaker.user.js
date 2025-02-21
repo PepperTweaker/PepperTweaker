@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.191
+// @version      0.9.192
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -431,7 +431,7 @@
 
   if (pepperTweakerConfig.pluginEnabled) {
 
-    /* Hide Groups Bar */
+    /* Hide top deals widget */
     if (pepperTweakerConfig.improvements.hideTopDealsWidget) {
       css += `
         .listLayout .vue-portal-target, .listLayout-side .vue-portal-target,
@@ -441,12 +441,14 @@
       `;
     }
 
-    /* Hide Top Deals Widget */
+    /* Hide top bar with group & category buttons */
     if (pepperTweakerConfig.improvements.hideGroupsBar) {
       css += `
-        .subNav .groupPromo--bg,
-        div[data-t="groupsPromotionWidget"] { /* groups top bar at the search subpage */
+        header .subNav--light {
           display: none !important;
+        }
+        #subNavMenu {
+          top: 57px !important;
         }
       `;
     }
@@ -1554,7 +1556,7 @@
                 hideGroupsBar: {
                   create: createLabeledCheckbox,
                   params: {
-                    label: 'Ukryj pasek grup',
+                    label: 'Ukryj pasek grup z przyciskami "Kategorie", "Kupony", "Okazje" etc.',
                     id: 'hide-groups-bar',
                     checked: pepperTweakerConfig.improvements.hideGroupsBar,
                     callback: event => setConfig({ improvements: { hideGroupsBar: event.target.checked } }, false),
