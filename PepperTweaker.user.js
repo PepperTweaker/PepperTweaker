@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.196
+// @version      0.9.197
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3638,6 +3638,15 @@
               order: -2; /* set as the first in a row */
             }
             /* END: Comments & share button */
+
+            /* Hide original user info, local deal info, merchant info etc. */
+            .threadListCard-body span:has(> img[src*="/users/"], > img[src*="profile-placeholder"]),
+            .threadListCard-body span:has(> a[data-t="merchantLink"]),
+            .threadListCard-body span.overflow--ellipsis:has(> span:not([class])), /* merchant info without a link */
+            .threadListCard-body div:has(> svg.icon--location) { /* local deal info */
+              display: none;
+            }
+
             .threadGrid-body .width--fromW2-6 {
               width: 100%;
               padding: 0 !important;
