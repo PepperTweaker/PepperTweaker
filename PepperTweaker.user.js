@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.198
+// @version      0.9.199
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -480,15 +480,15 @@
       css += `
         :root {
           /* text color variables used by Pepper */
-          --textNeutralPrimary: ${textColor};
-          --textNeutralSecondary: ${textColor};
-          --textTranslucentPrimary: ${textColor};
-          --textTranslucentSecondary: ${secondaryTextColor};
-          --textTranslucentSecondaryHover: ${textColor};
-          --textTranslucentTertiary: ${textColor};
-          --graphicTranslucentTertiary: ${secondaryTextColor};
-          --graphicTranslucentTertiaryHover: ${textColor};
-          --graphicTranslucentSecondary: ${secondaryTextColor};
+          --textNeutralPrimary: ${textColor} !important;
+          --textNeutralSecondary: ${textColor} !important;
+          --textTranslucentPrimary: ${textColor} !important;
+          --textTranslucentSecondary: ${secondaryTextColor} !important;
+          --textTranslucentSecondaryHover: ${textColor} !important;
+          --textTranslucentTertiary: ${textColor} !important;
+          --graphicTranslucentTertiary: ${secondaryTextColor} !important;
+          --graphicTranslucentTertiaryHover: ${textColor} !important;
+          --graphicTranslucentSecondary: ${secondaryTextColor} !important;
 
           /* background color variables used by Pepper */
           --bgBaseSecondary: ${darkBackgroundColor};
