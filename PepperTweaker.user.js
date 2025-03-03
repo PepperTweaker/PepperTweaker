@@ -3561,12 +3561,17 @@
               height: 8.8em;
               text-overflow: ellipsis;
               overflow: hidden;
-              display: -webkit-box;
-              -webkit-line-clamp: 3;
-              -webkit-box-orient: vertical;
               font-size: 1rem !important;
               line-height: 1.5rem !important;
               --line-height: 1.5rem !important;
+            }
+            /* For non-Safari browsers */
+            @supports not (-webkit-hyphens:none) {
+              .threadListCard-body {
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+              }
             }
             @media (min-width: 48em) {
               .threadListCard-body {
