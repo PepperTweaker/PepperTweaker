@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.199
+// @version      0.9.200
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3135,45 +3135,49 @@
       }
 
       const createDealDateInfo = (date, color = null) => {
-        const containerSpan = document.createElement('SPAN');
-        containerSpan.classList.add('color--text-TranslucentSecondary');
-        containerSpan.style.cssFloat = 'right';
-        containerSpan.style.lineHeight = '2.1em';
-        if (color) containerSpan.style.color = color;
+        const mainContainer = document.createElement('DIV');
+        mainContainer.classList.add('color--text-TranslucentSecondary');
+        mainContainer.style.cssFloat = 'right';
+        if (color) mainContainer.style.color = color;
 
-        const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svgElement.classList.add('icon', 'icon--clock');
-        svgElement.style.verticalAlign = 'middle';
-        svgElement.style.setProperty('margin-right', '0.25em', 'important');
-        svgElement.setAttribute('width', '18');
-        svgElement.setAttribute('height', '18');
+        const labelContainer = document.createElement('DIV');
+        labelContainer.style.display = 'grid';
+        labelContainer.style.cssFloat = 'right';
 
-        const useElement = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-        useElement.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/assets/img/ico_22b5d.svg#clock');
-        svgElement.appendChild(useElement);
+        const timeDateInfo = createDealDateInfoString(date);
 
-        const labelSpan = document.createElement('SPAN');
-        labelSpan.style.fontSize = '0.95em';
+        const timeLabelSpan = document.createElement('SPAN');
+        timeLabelSpan.style.fontSize = '0.85em';
+        timeLabelSpan.style.lineHeight = '1.2em';
 
-        const labelText = document.createTextNode(createDealDateInfoString(date));
-        labelSpan.appendChild(labelText);
+        const timeLabelText = document.createTextNode(timeDateInfo.time);
+        timeLabelSpan.appendChild(timeLabelText);
 
-        containerSpan.append(svgElement, labelSpan);
+        const dateLabelSpan = document.createElement('SPAN');
+        dateLabelSpan.style.fontSize = '0.85em';
+        dateLabelSpan.style.lineHeight = '1.2em';
 
-        return containerSpan;
+        const dateLabelText = document.createTextNode(timeDateInfo.date);
+        dateLabelSpan.appendChild(dateLabelText);
+
+        labelContainer.append(timeLabelSpan, dateLabelSpan);
+        mainContainer.append(labelContainer);
+
+        return mainContainer;
       };
-
-      const isSameDay = (date1, date2) => date1?.setHours(0, 0, 0, 0) === date2?.setHours(0, 0, 0, 0);
 
       const createDealDateInfoString = (date) => {
         const hours = zeroPad(date.getHours());
         const minutes = zeroPad(date.getMinutes());
+        const seconds = zeroPad(date.getSeconds());
         const month = zeroPad(date.getMonth() + 1); // months starting from 0
         const day = zeroPad(date.getDate());
+        const year = zeroPad(date.getFullYear().toString().substr(-2));
 
-        const nowDate = new Date();
-
-        return isSameDay(date, nowDate) ? `${hours}:${minutes}` : `${day}/${month}`;
+        return {
+          time: `${hours}:${minutes}:${seconds}`,
+          date: `${day}/${month}/${year}`,
+        };
       }
 
       const createUserSpanInfo = (userObject, commentCount = 0) => {
