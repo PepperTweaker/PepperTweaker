@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.202
+// @version      0.9.203
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -798,7 +798,6 @@
           background-color: ${veryDarkBackgroundColor} !important;
         }
         .redactor button.button--mode-brand:hover,
-        .button--selected,
         .btn--mode-white--dark:hover,
         .btn--mode-white--dark:active,
         .btn--mode-white--dark:focus {
