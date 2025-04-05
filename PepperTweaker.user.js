@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.203
+// @version      0.9.204
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -832,8 +832,8 @@
         /* END: Voting buttons */
 
         /* Badges */
-        .textBadge,
-        .textBadge--greyBackground {
+        .textBadge:not(.thread--expired .textBadge), /* match all elements with the "textBadge" class that don't have a parent with the "thread--expired" class */
+        .textBadge--greyBackground:not(.thread--expired .textBadge--greyBackground) { /* similar as above */
           background-color: ${orangeColor} !important;
           color: ${darkestBackgroundColor} !important;
           font-weight: bold !important;
