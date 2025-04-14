@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.206
+// @version      0.9.207
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -428,8 +428,8 @@
     }
     /* END: Voting buttons */
 
-    /* Thread description: All deals, sorted by... etc. */
-    #threadListingDescriptionPortal {
+    /* Thread description: All deals, Hottest deals... etc. */
+    #threadListingDescriptionPortal > div > p:first-child {
       display: none !important;
     }
 
