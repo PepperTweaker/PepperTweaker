@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.205
+// @version      0.9.206
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3630,10 +3630,12 @@
               margin: 0 auto;
               padding-left: 1.25em !important;
             }
-            .threadListCard-footer .voucher .color--text-StatusPositive span { /* Hide the defualt long text when clicking the vouvher button */
+            .threadListCard-footer .voucher .color--text-StatusPositive span, /* Hide the defualt long text when clicking the vouvher button */
+            .threadListCard-footer .voucher .color--text-TranslucentSecondary span {
               display: none;
             }
-            .threadListCard-footer .voucher .color--text-StatusPositive:after { /* Replace the default text with short message */
+            .threadListCard-footer .voucher .color--text-StatusPositive:after, /* Replace the default text with short message */
+            .threadListCard-footer .voucher .color--text-TranslucentSecondary:after {
               content: "Skopiowano";
             }
             /* END: Voucher buttons */
