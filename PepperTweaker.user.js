@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.208
+// @version      0.9.209
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3581,6 +3581,10 @@
             }
             .threadListCard-body div.flex {
               height: 1.7em;
+            }
+            /* Hide the updete box in discussion tiles */
+            .thread--discussion .thread-updates-top {
+              display: none;
             }
             /* TODO: Move user info to the footer */
             .threadListCard-body div.flex div.flex--inline + span,
