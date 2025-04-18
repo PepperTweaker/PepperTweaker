@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.209
+// @version      0.9.210
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -385,6 +385,7 @@
     /* END: Pepper ads */
 
     /* Pepper Widgets */
+    #votePromptPortal, /* empty box in the alerts page */
     #personalizationMessagePortal, /* personalization link in the popular tab */
     #personalizedVotingWidgetPortal, /* empty tile in the grid view */
     .js-threadList > div:has(a[href*="/kupony/"]), /* a coupon subpage link in merchant search results */
@@ -3042,7 +3043,7 @@
     /*** END: Deal Details Page ***/
 
     /*** Deals List ***/
-    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/search|gor%C4%85ce|najgoretsze|dlaciebie|nowe|grupa|om%C3%B3wione|promocje|kupony[^\/]|dyskusji|profile/))) {
+    if (pepperTweakerConfig.pluginEnabled && ((location.pathname.length < 2) || location.pathname.match(/search|gor%C4%85ce|najgoretsze|dlaciebie|nowe|grupa|om%C3%B3wione|promocje|kupony[^\/]|dyskusji|profile|alerts/))) {
 
       /* Deals Filtering */
       const checkFilters = (filters, deal) => {
@@ -3446,7 +3447,7 @@
             const gridColumnCount = Math.min(pepperTweakerConfig.improvements.gridColumnCount || Infinity, Math.floor(gridMaxWidth / (columnWidth + gridGapWidth)));
             dealsSection.style.gridTemplateColumns = `repeat(${gridColumnCount}, ${columnWidth}px)`;
 
-            if (location.pathname.indexOf("/profile") < 0) {
+            if (location.pathname.indexOf('/alerts') < 0) {
               const gridMarginLeft = (document.querySelector('.tabbedInterface') != null) ? 0 : Math.floor((gridMaxWidth - gridColumnCount * (columnWidth + gridGapWidth)) / 2);
               dealsSection.style.setProperty('margin-left', `${gridMarginLeft}px`, 'important');
               // id="listingOptionsPortal" => the search sort option with the number of deals found
@@ -3766,8 +3767,7 @@
               max-width: 100%;
             }
             .tabbedInterface-tabs {
-              max-width: 60em;
-              min-width: 20em;
+              width: 60em;
               margin-left: auto;
               margin-right: auto;
             }
