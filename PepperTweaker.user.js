@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.210
+// @version      0.9.211
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3815,7 +3815,7 @@
         /* END: List to Grid */
 
         /* Auto Update */
-        if (location.pathname.indexOf("/search") < 0) {
+        if (!location.pathname.match(/\/search|\/alerts|\/profile/)) {
 
           const updateGridWidgetsPosition = (isGridLayout, container, dealsSelector) => {
             if (isGridLayout) {
@@ -3935,15 +3935,19 @@
               }
             }
           });
+
           autoUpdateCheckbox.classList.add('space--r-3', 'tGrid-cell', 'vAlign--all-m');
           autoUpdateCheckbox.title = 'Aktualizuj stronę z ofertami';
+
           if (pepperTweakerConfig.autoUpdate.dealsDefaultEnabled) {
             autoUpdateCheckbox.querySelector('input').checked = true;
             newDealsObserver.observe();
           }
-          const subNavMenu = document.querySelector('.subNavMenu--menu');
-          subNavMenu.parentNode.insertBefore(autoUpdateCheckbox, subNavMenu);
 
+          const subNavMenu = document.querySelector('.subNavMenu--menu');
+          if (subNavMenu) {
+            subNavMenu.parentNode.insertBefore(autoUpdateCheckbox, subNavMenu);
+          }
         }
       }
 
