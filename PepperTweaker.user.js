@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.211
+// @version      0.9.212
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3395,7 +3395,7 @@
       }
 
       let dealsSectionSelector;
-      const dealsSection = document.querySelector(dealsSectionSelector = '.js-threadList') || document.querySelector(dealsSectionSelector = '#toc-target-deals .js-threadList') || document.querySelector(dealsSectionSelector = '#toc-target-deals') || document.querySelector(dealsSectionSelector = '.listLayout') || document.querySelector(dealsSectionSelector = '.listLayout-scrollBox');
+      const dealsSection = document.querySelector(dealsSectionSelector = '.js-threadList') || document.querySelector(dealsSectionSelector = '#toc-target-deals .js-threadList') || document.querySelector(dealsSectionSelector = '#toc-target-deals') || document.querySelector(dealsSectionSelector = '.listLayout') || document.querySelector(dealsSectionSelector = '.listLayout-scrollBox') || document.querySelector(dealsSectionSelector = '#tab-feed');
       // cannot combine as one selector => div.gridLayout appears before section.gridLayout on the main page
       const isGridLayout = dealsSectionSelector.indexOf('gridLayout') >= 0;
 
