@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.212
+// @version      0.9.213
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -448,7 +448,7 @@
     if (pepperTweakerConfig.improvements.hideTopDealsWidget) {
       css += `
         .listLayout .vue-portal-target, .listLayout-side .vue-portal-target,
-        .js-vue2[data-vue2*="HottestWidget"] {
+        .js-vue3[data-vue3*="HottestWidget"] {
           display: none !important;
         }
       `;
@@ -3083,7 +3083,7 @@
 
       /* List to grid update */
       const updateGridDeal = (dealNode) => {
-        const vueString = dealNode?.querySelector('div[data-vue2]')?.dataset?.vue2;
+        const vueString = dealNode?.querySelector('div[data-vue3]')?.dataset?.vue3;
 
         if (vueString) {
           const vueObject = JSON.parse(vueString);
@@ -3301,7 +3301,7 @@
           // Apparently some info has been moved/copied to the "ThreadMainListItemNormalizer" Vue object
           // Becuase the object has to be parsed to find merchant info, it will be faster to get some other info from this object too instead of parsing DOM (e.g. for deal title)
           // Some properties are still missing though (e.g. description, user)
-          const threadVueString = element?.querySelector('div[data-vue2]')?.dataset?.vue2;
+          const threadVueString = element?.querySelector('div[data-vue3]')?.dataset?.vue3;
           const threadVueObject = threadVueString ? JSON.parse(threadVueString)?.props?.thread : undefined;
 
           const title = threadVueObject?.title ?? element.querySelector('.cept-tt')?.textContent?.trim();;
