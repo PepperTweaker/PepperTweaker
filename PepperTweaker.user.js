@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.9.214
+// @version      0.9.215
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3627,8 +3627,12 @@
               display: none;
             }
             /* Voucher buttons */
+            .threadListCard-footer .threadListCard-footer-action { /* Limit the width of a footer */
+              width: 100%;
+            }
             .threadListCard-footer .voucher .buttonWithCode-button { /* Allow smaller width of a button */
-              min-width: 1rem;
+              width: 2.5rem;
+              min-width: 2.5rem;
             }
             .threadListCard-footer .voucher .buttonWithCode-button span { /* Hide button text (left only an icon) */
               font-size: 0;
@@ -3636,6 +3640,7 @@
             .threadListCard-footer .voucher .buttonWithCode-code { /* Center the text of a voucher code */
               margin: 0 auto;
               padding-left: 1.25em !important;
+              text-align: center;
             }
             .threadListCard-footer .voucher .color--text-StatusPositive span, /* Hide the defualt long text when clicking the vouvher button */
             .threadListCard-footer .voucher .color--text-TranslucentSecondary span {
