@@ -19,6 +19,7 @@ Teraz możesz wesprzeć rozwój tego projektu stawiając mi kawę! :D
   * [Ciemny motyw](#ciemny-motyw)
   * [Filtrowanie okazji](#filtrowanie-okazji)
   * [Filtrowanie komentarzy](#filtrowanie-komentarzy)
+  * [Oryginalne emotikony Peppera](#oryginalne-emotikony-peppera)
   * [Przyciski polubienia najlepszych komentarzy](#przyciski-polubienia-najlepszych-komentarzy)
   * [Powiększanie miniaturek obrazków](#powiększanie-miniaturek-obrazków)
   * [Opcja kalendarza](#opcja-kalendarza)
@@ -129,6 +130,20 @@ Domyślnie włączony jest tylko jeden filtr, który powoduje wyróżnianie ziel
 Obecna wersja ustawień dotyczących filtrów okazji jest następująca:
 
 ![Comment Filter Settings](images/peppertweaker-comment-filter-settings.png)
+
+
+### Oryginalne emotikony Peppera
+
+Jeśli jesteś starszym Pepperowiczem, to zapewne kojarzysz oryginalne emotikony stosowane od lat.
+Ciężko wyobrazić sobie Peppera bez nich, a jednak... ich już nie ma.
+
+Nowe emotikony są kompletnie nieczytelne, nie mówiąc już o zabiciu Pepperowego ducha drzemiącego w starych emotkach.
+
+Dlatego w PepperTweakerze masz możliwość przywrócenia starych emotikon, takich jak na poniższym obrazku.
+
+Jeśli chcesz używać nowych emotek, wystarczy zmiana odpowiedniej opcji w ustawieniach Tweakera (domyślnie włączone są stare emotikony z obrazka poniżej).
+
+![Original emoticons](images/peppertweaker-original-emoticons.png)
 
 
 ### Przyciski polubienia najlepszych komentarzy
