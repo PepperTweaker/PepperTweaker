@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.10.1
+// @version      0.10.2
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3840,7 +3840,11 @@
             .threadListCard-body div.flex {
               height: 1.7em;
             }
-            /* Hide the updete box in discussion tiles */
+            /* Hide the label box in offer alert tiles */
+            .threadListCard .threadListCard-label {
+              display: none;
+            }
+            /* Hide the update box in discussion tiles */
             .thread--discussion .thread-updates-top {
               display: none;
             }
