@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.10.3
+// @version      0.10.4
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3847,6 +3847,10 @@
             /* Hide the box shadow of unread offer alert tiles (doesn't work with the grid view) */
             .thread--shadow.thread--unread:has(.thread-unreadBadge) {
               box-shadow: none !important;
+            }
+            /* Hide the "read all" button on the alert page */
+            #alertsFeedMarkAllAsReadPortalTarget {
+              display: none;
             }
             /* Hide the update box in discussion tiles */
             .thread--discussion .thread-updates-top {
