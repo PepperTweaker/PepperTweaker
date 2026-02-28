@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.10.6
+// @version      0.10.7
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -395,7 +395,8 @@
     #personalizedVotingWidgetPortal, /* empty tile in the grid view */
     #topMerchantsWidgetPortal, /* another empty tile in the grid view? */
     .js-threadList > div:has(a[href*="/kupony/"]), /* a coupon subpage link in merchant search results */
-    #voteSecondarySectionPortal, /* Secondary vote section */
+    #voteSecondarySectionPortal, /* secondary vote section */
+    div[data-t="voteSecondary"]:has(.vote-secondary), /* another type of the secondary vote section */
     #threadDetailPortal *[data-t="keywordSuggestionsWidget"], /* the keyword widget for an expired deal */
     #keywordSuggestionsWidgetPortal, /* the keyword widget below deal details */
     #customBannerList-id-147 { /* empty tile in the grid view */
