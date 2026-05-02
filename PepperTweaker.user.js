@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.10.8
+// @version      0.10.9
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -379,7 +379,8 @@
     }
 
     /* Pepper ads */
-    .box--content:has(.slot), /* new type of ad slots on a details page */
+    .listLayout-box:has(.slot), /* a new type of ad slot on the main page */
+    .box--content:has(.slot), /* a new type of ad slots on a deal details page */
     .box--content:has(.ad--bg .ad), /* new type of ad slots without a class name */
     #belowDetailsAdSlotPortal, /* ad slot below deal info on deal details pages */
     #eventThemingPortal, /* top page event banner */
