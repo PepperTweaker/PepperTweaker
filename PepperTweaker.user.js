@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.10.12
+// @version      0.10.13
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -1587,7 +1587,9 @@
             }
           }
           if (styleBlock.params.borderStyle) {
-            borderStyle = document.getElementById(styleBlock.params.borderStyle.id).value;
+            const borderStyleSelectElement = document.getElementById(styleBlock.params.borderStyle.id);
+            borderStyle = borderStyleSelectElement.value;
+            borderStyleSelectElement.parentNode.querySelector('.select-txt span').textContent = borderStyle;
             if (event.target.id === styleBlock.params.borderStyle.id) {
               enableBorderCheckbox = true;
             }
