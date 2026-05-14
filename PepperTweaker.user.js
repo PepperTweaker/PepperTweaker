@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.10.11
+// @version      0.10.12
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -1403,7 +1403,7 @@
 
       // Works only in settings page because of cloneNode() !!!
       const createSelectInput = ({ options = [createNewFilterName], value, id, callback } = {}) => {
-        const select = document.querySelector('#defaultLandingPage .select').cloneNode(true);
+        const select = document.querySelector('#preferencesTab .select').cloneNode(true);
         const selectCtrl = select.querySelector('.select-ctrl');
         selectCtrl.name = 'filter_selection';
         if (id) {
@@ -1419,7 +1419,7 @@
         if (value && options.includes(value)) {
           selectCtrl.value = value;
         }
-        select.querySelector('.js-select-val').textContent = options[selectCtrl.selectedIndex];
+        select.querySelector('.select-txt span').textContent = options[selectCtrl.selectedIndex];
         return select;
       };
 
@@ -1604,7 +1604,7 @@
         const filterSelectionInput = document.getElementById(settingsPageConfig[filterType].rows.filterSelection.entries.filterSelectionInput.params.id);
         const filterOptionElement = filter && filter.name && filterSelectionInput.querySelector(`option[value="${filter.name}"]`) || null;
         filterSelectionInput.value = filterOptionElement && filterOptionElement.value || createNewFilterName;
-        filterSelectionInput.parentNode.querySelector('.js-select-val').textContent = filter && filter.name || createNewFilterName;
+        filterSelectionInput.parentNode.querySelector('.select-txt span').textContent = filter && filter.name || createNewFilterName;
 
         for (const settingRow of Object.values(settingsPageConfig[filterType].rows)) {
           for (const [key, value] of Object.entries(settingRow.entries)) {
@@ -1624,7 +1624,7 @@
                 document.getElementById(value.params.border.id).checked = (filter && filter.style && filter.style.border && filter.style.border !== 'none') ? true : false;
                 document.getElementById(value.params.borderColor.id).value = filter && filter.style && filter.style.border && getCSSBorderColor(filter.style.border) || defaultFilterStyleValues[filterType].borderColor;
                 document.getElementById(value.params.borderStyle.id).value = filter && filter.style && filter.style.border && getCSSBorderStyle(filter.style.border) || defaultFilterStyleValues[filterType].borderStyle;
-                document.getElementById(value.params.borderStyle.id).parentNode.querySelector('.js-select-val').textContent = document.getElementById(value.params.borderStyle.id).value;
+                document.getElementById(value.params.borderStyle.id).parentNode.querySelector('.select-txt span').textContent = document.getElementById(value.params.borderStyle.id).value;
                 document.getElementById(value.params.styleText.id).value = filter && filter.style && JSON.stringify(filter.style) || '';
             }
           }
@@ -2295,37 +2295,56 @@
       filtersTabLinkInner.textContent = 'PepperTweaker';
       preferencesTabLink.parentNode.appendChild(filtersTabLink);
       const preferencesTab = document.getElementById('tab-preferences');
-      const filtersTab = preferencesTab.cloneNode(true);
-      filtersTab.id = 'tab-peppertweaker';
-      const filtersTitle = filtersTab.querySelector('.userProfile-title');
-      filtersTitle.textContent = 'PepperTweaker';
 
-      const rowsContainer = filtersTab.querySelector('.formList');
-      removeAllChildren(rowsContainer);
+      // Dynamically loaded content of settings tab
+      const preferencesTabObserver = new MutationObserver((allMutations, observer) => {
+          if (preferencesTab.querySelector('.userProfile-title') !== null) {
+            const filtersTab = preferencesTab.cloneNode(true);
+            filtersTab.id = 'tab-peppertweaker';
 
-      for (const settingsBlock of Object.values(settingsPageConfig)) {
-        rowsContainer.appendChild(createSettingsBlockHeader(settingsBlock.header));
-        for (const rowBlock of Object.values(settingsBlock.rows)) {
-          const newRowNode = createSettingsRow(rowBlock.label);
-          const newRowNodeContent = newRowNode.querySelector('.formList-content');
-          for (const rowEntry of Object.values(rowBlock.entries)) {
-            const newRowEntryNode = rowEntry.create(rowEntry.params);
-            if (rowEntry.style) {
-              Object.assign(newRowEntryNode.style, rowEntry.style);
+            const filtersTitle = filtersTab.querySelector('.userProfile-title');
+            filtersTitle.textContent = 'PepperTweaker';
+
+            const rowsContainer = filtersTab.querySelector('.formList');
+            removeAllChildren(rowsContainer);
+
+            for (const settingsBlock of Object.values(settingsPageConfig)) {
+              rowsContainer.appendChild(createSettingsBlockHeader(settingsBlock.header));
+
+              for (const rowBlock of Object.values(settingsBlock.rows)) {
+                const newRowNode = createSettingsRow(rowBlock.label);
+                const newRowNodeContent = newRowNode.querySelector('.formList-content');
+
+                for (const rowEntry of Object.values(rowBlock.entries)) {
+                  const newRowEntryNode = rowEntry.create(rowEntry.params);
+
+                  if (rowEntry.style) {
+                    Object.assign(newRowEntryNode.style, rowEntry.style);
+                  }
+
+                  newRowNodeContent.appendChild(newRowEntryNode);
+                }
+
+                rowsContainer.appendChild(newRowNode);
+              }
             }
-            newRowNodeContent.appendChild(newRowEntryNode);
-          }
-          rowsContainer.appendChild(newRowNode);
-        }
-      }
 
-      preferencesTab.parentNode.insertBefore(filtersTab, preferencesTab.parentNode.querySelector('.userProfile-footer'));
-      updateFilterInputs(filterType.deals, null);
-      updateFilterInputs(filterType.comments, null);
-      if (location.hash.indexOf('peppertweaker') >= 0) {
-        filtersTab.classList.remove('hide');
-        filtersTabLink.classList.add('tabbedInterface-tab--selected');
-      }
+            preferencesTab.parentNode.insertBefore(filtersTab, preferencesTab.parentNode.querySelector('.userProfile-footer'));
+
+            updateFilterInputs(filterType.deals, null);
+            updateFilterInputs(filterType.comments, null);
+
+            if (location.hash.indexOf('peppertweaker') >= 0) {
+              filtersTab.classList.remove('hide');
+              filtersTabLink.classList.add('tabbedInterface-tab--selected');
+            }
+
+            observer.disconnect(); // content was loaded => stop MutationObserver
+          }
+      });
+
+      preferencesTabObserver.observe(preferencesTab, { childList: true, subtree: true });
+
       return;
     }
     /*** END: Settings Page Configuration ***/
