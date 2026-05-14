@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.10.10
+// @version      0.10.11
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3727,7 +3727,7 @@
               grid-column: 1 / -1;
             }
             .threadGrid-headerMeta, .threadListCard-header {
-              grid-column: 1;
+              grid-column: 1 !important;
               grid-row: 1;
               -ms-grid-row-span: 1;
             }
@@ -3956,7 +3956,7 @@
               display: none;
             }
             .threadGrid-footerMeta, .threadListCard-footer {
-              grid-column: 1;
+              grid-column: 1 !important;
               -ms-grid-column-span: 1;
               grid-row: 8;
               padding-top: 0.25em !important;
