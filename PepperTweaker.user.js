@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.10.14
+// @version      0.10.15
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -2286,66 +2286,264 @@
         },
       };
 
-      const preferencesTabLink = document.querySelector('a[href="#preferences"]');
-      const filtersTabLink = preferencesTabLink.cloneNode(true);
-      filtersTabLink.href = '#peppertweaker';
-      filtersTabLink.classList.remove('tabbedInterface-tab--selected');
-      filtersTabLink.querySelector('svg use').setAttribute('xlink:href', '/assets/img/ico_37b33.svg#filter');
-      const filtersTabLinkInner = filtersTabLink.querySelector('.js-tabbedInterface-tab--inner-preferences');
-      filtersTabLinkInner.classList.remove('js-tabbedInterface-tab--inner-preferences');
-      filtersTabLinkInner.classList.add('js-tabbedInterface-tab--inner-filters');
-      filtersTabLinkInner.textContent = 'PepperTweaker';
-      preferencesTabLink.parentNode.appendChild(filtersTabLink);
-      const preferencesTab = document.getElementById('tab-preferences');
+      /**
+       * Synchronizes the PepperTweaker tab's selected state and panel visibility
+       * with the current URL hash.
+       *
+       * PepperTweaker is a custom tab that is not managed by Vue's built-in tab
+       * configuration. Its selected state and panel visibility must therefore
+       * be synchronized manually.
+       *
+       * When PepperTweaker is active, selects it, sets its `aria-current`
+       * attribute, displays its panel, hides other settings panels, and clears
+       * the selected state and `aria-current` attribute from other tabs.
+       *
+       * When another tab is active, removes the selected state and `aria-current`
+       * attribute from PepperTweaker, leaving the visibility of other panels
+       * to Vue.
+       *
+       * Does nothing if the PepperTweaker tab link or panel cannot be found.
+       *
+       * @returns {void}
+       */
+      function syncPepperTweakerTab() {
+        const pepperLink = document.querySelector(
+          'a[href="#peppertweaker"]'
+        );
+        const pepperPanel = document.getElementById(
+          'tab-peppertweaker'
+        );
 
-      // Dynamically loaded content of settings tab
-      const preferencesTabObserver = new MutationObserver((allMutations, observer) => {
-          if (preferencesTab.querySelector('.userProfile-title') !== null) {
-            const filtersTab = preferencesTab.cloneNode(true);
-            filtersTab.id = 'tab-peppertweaker';
+        if (!pepperLink || !pepperPanel) return;
 
-            const filtersTitle = filtersTab.querySelector('.userProfile-title');
-            filtersTitle.textContent = 'PepperTweaker';
+        const isPepperActive = location.hash === '#peppertweaker';
 
-            const rowsContainer = filtersTab.querySelector('.formList');
-            removeAllChildren(rowsContainer);
+        pepperLink.classList.toggle(
+          'tabbedInterface-tab--selected',
+          isPepperActive
+        );
 
-            for (const settingsBlock of Object.values(settingsPageConfig)) {
-              rowsContainer.appendChild(createSettingsBlockHeader(settingsBlock.header));
+        if (isPepperActive) {
+          pepperLink.setAttribute('aria-current', 'page');
 
-              for (const rowBlock of Object.values(settingsBlock.rows)) {
-                const newRowNode = createSettingsRow(rowBlock.label);
-                const newRowNodeContent = newRowNode.querySelector('.formList-content');
+          // Show PepperTweaker and hide all other settings panels
+          pepperPanel.parentElement
+            .querySelectorAll(':scope > .tabbedInterface-content')
+            .forEach(panel => {
+              panel.classList.toggle('hide', panel !== pepperPanel);
+            });
 
-                for (const rowEntry of Object.values(rowBlock.entries)) {
-                  const newRowEntryNode = rowEntry.create(rowEntry.params);
-
-                  if (rowEntry.style) {
-                    Object.assign(newRowEntryNode.style, rowEntry.style);
-                  }
-
-                  newRowNodeContent.appendChild(newRowEntryNode);
-                }
-
-                rowsContainer.appendChild(newRowNode);
+          // Keep PepperTweaker as the only selected tab
+          pepperLink.parentElement
+            .querySelectorAll('.tabbedInterface-tab')
+            .forEach(link => {
+              if (link !== pepperLink) {
+                link.classList.remove('tabbedInterface-tab--selected');
+                link.removeAttribute('aria-current');
               }
+            });
+        } else {
+          // Let Vue handle the visibility of all other panels
+          pepperLink.removeAttribute('aria-current');
+        }
+      }
+
+      /**
+       * Synchronizes custom tab state with the current URL hash.
+       *
+       * When the Account tab is active, schedules `showAccountTab()` to restore
+       * its panel and selected state after Vue has processed the current event.
+       * Otherwise, synchronizes the PepperTweaker tab by calling
+       * `syncPepperTweakerTab()`.
+       *
+       * The Account tab requires special handling because Vue may retain it as
+       * the previously selected tab while PepperTweaker is active. In that case,
+       * clicking Account again may not trigger the Vue update needed to restore
+       * its panel.
+       *
+       * @returns {void}
+       */
+      function syncCustomTabHistory() {
+        if (location.hash === '#account') {
+          setTimeout(showAccountTab, 0);
+        } else {
+          syncPepperTweakerTab();
+        }
+      }
+
+      /**
+       * Manually restores the Account tab's selected state and panel visibility.
+       *
+       * Vue may retain Account as the previously selected tab while the custom
+       * PepperTweaker tab is active. Returning to Account may therefore fail to
+       * trigger the Vue update that normally displays its panel.
+       *
+       * This function works around that behavior by explicitly displaying the
+       * Account panel, hiding the other settings panels, selecting the Account
+       * tab, setting its `aria-current` attribute to `page`, and removing that
+       * attribute from the other tabs.
+       *
+       * Does nothing if the current URL hash is not `#account` or if any of the
+       * required tab links or panels cannot be found.
+       *
+       * @returns {void}
+       */
+      function showAccountTab() {
+        if (location.hash !== '#account') return;
+
+        const accountLink = document.querySelector('a[href="#account"]');
+        const accountPanel = document.getElementById('tab-account');
+        const pepperLink = document.querySelector('a[href="#peppertweaker"]');
+
+        if (!accountLink || !accountPanel || !pepperLink) return;
+
+        // Show Account and hide all other settings panels
+        accountPanel.parentElement
+          .querySelectorAll(':scope > .tabbedInterface-content')
+          .forEach(panel => {
+            panel.classList.toggle('hide', panel !== accountPanel);
+          });
+
+        // Synchronize the selected tab and its accessibility attribute
+        accountLink.parentElement
+          .querySelectorAll('.tabbedInterface-tab')
+          .forEach(link => {
+            const isAccount = link === accountLink;
+
+            link.classList.toggle('tabbedInterface-tab--selected', isAccount);
+
+            if (isAccount) {
+              link.setAttribute('aria-current', 'page');
+            } else {
+              link.removeAttribute('aria-current');
             }
+          });
+      }
 
-            preferencesTab.parentNode.insertBefore(filtersTab, preferencesTab.parentNode.querySelector('.userProfile-footer'));
+      /**
+       * Observes the settings content until the Preferences tab has finished
+       * rendering, then creates the custom PepperTweaker tab and panel.
+       *
+       * The Preferences link and panel are rendered dynamically by Vue, so they
+       * may not exist when this script first runs. The observer waits until the
+       * link, panel, and panel title are available before cloning and customizing
+       * them.
+       *
+       * The observer is limited to `#pageContent` to avoid unnecessary mutation
+       * notifications from unrelated parts of the document.
+       *
+       * Once PepperTweaker has been initialized, the observer disconnects.
+       * It also disconnects if the PepperTweaker link already exists, preventing
+       * duplicate tab creation.
+       */
+      const preferencesTabObserver = new MutationObserver((mutations, observer) => {
+        const preferencesTabLink = document.querySelector('a[href="#preferences"]');
+        const preferencesTab = document.getElementById('tab-preferences');
 
-            updateFilterInputs(filterType.deals, null);
-            updateFilterInputs(filterType.comments, null);
+        if (
+          !preferencesTabLink ||
+          !preferencesTab ||
+          !preferencesTab.querySelector('.userProfile-title')
+        ) {
+          return;
+        }
 
-            if (location.hash.indexOf('peppertweaker') >= 0) {
-              filtersTab.classList.remove('hide');
-              filtersTabLink.classList.add('tabbedInterface-tab--selected');
-            }
+        // Avoid creating duplicate tabs if the observer fires again
+        if (preferencesTabLink.parentNode.querySelector(
+          ':scope > a[href="#peppertweaker"]'
+        )) {
+          observer.disconnect();
+          return;
+        }
 
-            observer.disconnect(); // content was loaded => stop MutationObserver
+        const tweakerTabLink = preferencesTabLink.cloneNode(true);
+        tweakerTabLink.href = '#peppertweaker';
+        tweakerTabLink.classList.remove('tabbedInterface-tab--selected');
+        tweakerTabLink
+          .querySelector('svg use')
+          ?.setAttribute('xlink:href', '/assets/img/ico_37b33.svg#filter');
+
+        for (const child of tweakerTabLink.children) {
+          if (child.textContent.trim() === 'Preferencje') {
+            child.textContent = 'PepperTweaker';
           }
+        }
+
+        preferencesTabLink.parentNode.appendChild(tweakerTabLink);
+
+        tweakerTabLink.addEventListener('click', event => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (location.hash !== '#peppertweaker') {
+            location.hash = '#peppertweaker';
+          }
+
+          syncPepperTweakerTab();
+        });
+
+        // Vue needs an explicit correction when returning to Account
+        document.querySelector('a[href="#account"]')
+          ?.addEventListener('click', () => {
+            setTimeout(showAccountTab, 0);
+          });
+
+        const tweakerTab = preferencesTab.cloneNode(true);
+        tweakerTab.id = 'tab-peppertweaker';
+
+        const tweakerTabTitle = tweakerTab.querySelector('.userProfile-title');
+        tweakerTabTitle.textContent = 'PepperTweaker';
+
+        const rowsContainer = tweakerTab.querySelector('.formList');
+        removeAllChildren(rowsContainer);
+
+        for (const settingsBlock of Object.values(settingsPageConfig)) {
+          rowsContainer.appendChild(createSettingsBlockHeader(settingsBlock.header));
+
+          for (const rowBlock of Object.values(settingsBlock.rows)) {
+            const newRowNode = createSettingsRow(rowBlock.label);
+            const newRowNodeContent = newRowNode.querySelector('.formList-content');
+
+            for (const rowEntry of Object.values(rowBlock.entries)) {
+              const newRowEntryNode = rowEntry.create(rowEntry.params);
+
+              if (rowEntry.style) {
+                Object.assign(newRowEntryNode.style, rowEntry.style);
+              }
+
+              newRowNodeContent.appendChild(newRowEntryNode);
+            }
+
+            rowsContainer.appendChild(newRowNode);
+          }
+        }
+
+        preferencesTab.parentNode.insertBefore(
+          tweakerTab,
+          preferencesTab.parentNode.querySelector('.userProfile-footer')
+        );
+
+        window.addEventListener('hashchange', syncCustomTabHistory);
+
+        updateFilterInputs(filterType.deals, null);
+        updateFilterInputs(filterType.comments, null);
+
+        // Restore the correct panel if the page opened on a custom tab
+        syncPepperTweakerTab();
+
+        // Content was loaded => stop MutationObserver
+        observer.disconnect();
       });
 
-      preferencesTabObserver.observe(preferencesTab, { childList: true, subtree: true });
+      // Observe only the settings content, not the entire document
+      const pageContent = document.getElementById('pageContent');
+
+      if (pageContent) {
+        preferencesTabObserver.observe(pageContent, {
+          childList: true,
+          subtree: true
+        });
+      }
 
       return;
     }
