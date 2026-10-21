@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.10.19
+// @version      0.10.20
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -407,6 +407,18 @@
       display: none;
     }
     /* END: Pepper Widgets */
+
+    /* Groups view */
+    .tiles-wrapper:has(.grid-container), /* example item images in a group */
+    .groups-header .scrollBox-space--m-0:has(.scrollBox-container), /* subcategory carousel */
+    div[data-t="bottom"] > .box--contents:has([data-t="tableOfContents"]), #footer-description { /* group footer description and table of contents */
+      display: none;
+    }
+
+    .groups-header {
+      min-height: auto;
+    }
+    /* END: Groups view */
 
     /* Voting buttons: Replaced up/down arrow with +/- */
     .vote-button .icon--arrow-rounded-down, .vote-button .icon--arrow-rounded-up {
