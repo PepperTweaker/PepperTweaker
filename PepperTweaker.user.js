@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.10.16
+// @version      0.10.17
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3910,7 +3910,7 @@
 
         /* List to Grid */
         if (pepperTweakerConfig.improvements.listToGrid && !isGridLayout) {
-          const sideWidgets = document.querySelectorAll('.listLayout-side .listLayout-box');
+          const sideWidgets = document.querySelectorAll('.listLayout-side .listLayout-box, #profileSidebarPortal');
           const sideWidgetsWidth = Array.from(sideWidgets).map((widget) => parseFloat(window.getComputedStyle(widget).width));
           let sideContainerWidth;
           if (location.pathname.match(/\/search|\/grupa/))
