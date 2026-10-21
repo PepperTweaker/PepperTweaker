@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.10.18
+// @version      0.10.19
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -393,6 +393,7 @@
     /* END: Pepper ads */
 
     /* Pepper Widgets */
+    #freebiesRetentionWidgetPortal, /* an empty slot in groups view */
     #votePromptPortal, /* empty box in the alerts page */
     #personalizationMessagePortal, /* personalization link in the popular tab */
     #personalizedVotingWidgetPortal, /* empty tile in the grid view */
