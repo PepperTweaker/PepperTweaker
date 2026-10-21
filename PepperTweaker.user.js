@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PepperTweaker
 // @namespace    bearbyt3z
-// @version      0.10.17
+// @version      0.10.18
 // @description  Pepper na resorach...
 // @author       bearbyt3z
 // @match        https://www.pepper.pl/*
@@ -3925,18 +3925,67 @@
           dealsSection.style.gridGap = `${gridGapWidth}px`;
           dealsSection.style.gridAutoRows = 'min-content';
 
+          let observedGridContainer = null;
+          let gridResizeObserver = null;
+
           const updateGridView = () => {
             const windowSize = getWindowSize();
-            const gridMaxWidth = windowSize.width - sideContainerWidth - 2 * sideContainerPadding - 2 * gridPadding;
-            const gridColumnCount = Math.min(pepperTweakerConfig.improvements.gridColumnCount || Infinity, Math.floor(gridMaxWidth / (columnWidth + gridGapWidth)));
+
+            const gridContainer = dealsSection.closest('.userProfile-content')
+              || dealsSection.closest('.listLayout-main');
+
+            if (gridContainer !== observedGridContainer) {
+              if (observedGridContainer && gridResizeObserver)
+                gridResizeObserver.unobserve(observedGridContainer);
+
+              observedGridContainer = gridContainer;
+
+              if (observedGridContainer && gridResizeObserver)
+                gridResizeObserver.observe(observedGridContainer);
+            }
+
+            let gridMaxWidth;
+
+            if (gridContainer) {
+              const contentStyles = getComputedStyle(gridContainer);
+              const contentWidth = gridContainer.clientWidth
+                - (parseFloat(contentStyles.paddingLeft) || 0)
+                - (parseFloat(contentStyles.paddingRight) || 0);
+
+              gridMaxWidth = Math.max(0, contentWidth - 2 * gridPadding);
+            } else {
+              gridMaxWidth = windowSize.width - sideContainerWidth - 2 * sideContainerPadding - 2 * gridPadding;
+            }
+
+            const configuredCount = Number(pepperTweakerConfig.improvements.gridColumnCount);
+            const columnLimit = Number.isFinite(configuredCount) && configuredCount > 0
+              ? Math.floor(configuredCount)
+              : Infinity;
+            const maxColumnCount = Math.floor(gridMaxWidth / (columnWidth + gridGapWidth));
+            const gridColumnCount = Math.max(1, Math.min(columnLimit, maxColumnCount));
+
             dealsSection.style.gridTemplateColumns = `repeat(${gridColumnCount}, ${columnWidth}px)`;
 
-            if (location.pathname.indexOf('/alerts') < 0) {
-              const gridMarginLeft = (document.querySelector('.tabbedInterface') != null) ? 0 : Math.floor((gridMaxWidth - gridColumnCount * (columnWidth + gridGapWidth)) / 2);
-              dealsSection.style.setProperty('margin-left', `${gridMarginLeft}px`, 'important');
-              // id="listingOptionsPortal" => the search sort option with the number of deals found
-              document.getElementById('listingOptionsPortal')?.style.setProperty('margin-left', `${gridMarginLeft}px`, 'important');
+            let gridMarginLeft = 0;
+
+            if (document.querySelector('.tabbedInterface') == null) {
+              if (gridContainer) {
+                const renderedGridWidth = gridColumnCount * columnWidth + (gridColumnCount - 1) * gridGapWidth;
+                gridMarginLeft = Math.max(0, Math.floor(gridPadding + (gridMaxWidth - renderedGridWidth) / 2));
+              } else {
+                gridMarginLeft = Math.floor((gridMaxWidth - gridColumnCount * (columnWidth + gridGapWidth)) / 2);
+              }
             }
+
+            dealsSection.style.setProperty('margin-left', `${gridMarginLeft}px`, 'important');
+            // id="listingOptionsPortal" => the search sort option with the number of deals found
+            document.getElementById('listingOptionsPortal')?.style.setProperty('margin-left', `${gridMarginLeft}px`, 'important');
+          }
+
+          if (typeof ResizeObserver !== 'undefined') {
+            gridResizeObserver = new ResizeObserver(() => {
+              updateGridView();
+            });
           }
 
           updateGridView();
@@ -4234,7 +4283,9 @@
               margin-right: auto;
             }
             .listLayout-main {
-              width: max-content;
+              flex: 1 1 0;
+              width: auto;
+              min-width: 0;
             }
             .listLayout-side {
               width: ${sideContainerWidth}px;
